@@ -534,10 +534,154 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Fila 1 -->
+        <!-- Fila 1 (2026 - Enero) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
           <td><code>#AT1-1001</code></td>
+          <td>2026-01-10</td>
+          <td><strong>Carlos Sandoval Ríos</strong></td>
+          <td>35 años</td>
+          <td><span class="badge badge-soft-primary">Masculino</span></td>
+          <td>Dr. Carlos Mendoza</td>
+          <td><code>J00</code> Rinofaringitis Aguda</td>
+          <td>Consulta Externa</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 2 (2026 - Enero) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1002</code></td>
+          <td>2026-01-18</td>
+          <td><strong>Natalia Fuentes Bravo</strong></td>
+          <td>28 años</td>
+          <td><span class="badge badge-soft-info">Femenino</span></td>
+          <td>Dra. Elena Ramos</td>
+          <td><code>K29</code> Gastritis Aguda</td>
+          <td>Urgencia</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 3 (2026 - Enero) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1003</code></td>
+          <td>2026-01-25</td>
+          <td><strong>Jorge Valenzuela Soto</strong></td>
+          <td>64 años</td>
+          <td><span class="badge badge-soft-primary">Masculino</span></td>
+          <td>Dr. Andrés Ortiz</td>
+          <td><code>I10</code> Hipertensión Esencial</td>
+          <td>Control Crónico</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 4 (2026 - Febrero) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1004</code></td>
+          <td>2026-02-12</td>
+          <td><strong>Diego Pizarro Vargas</strong></td>
+          <td>54 años</td>
+          <td><span class="badge badge-soft-primary">Masculino</span></td>
+          <td>Dr. Andrés Ortiz</td>
+          <td><code>I10</code> Hipertensión Esencial</td>
+          <td>Control Crónico</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 5 (2026 - Marzo) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1005</code></td>
+          <td>2026-03-08</td>
+          <td><strong>Camila Silva Oyarzún</strong></td>
+          <td>41 años</td>
+          <td><span class="badge badge-soft-info">Femenino</span></td>
+          <td>Dra. Patricia Vidal</td>
+          <td><code>J45</code> Asma Bronquial</td>
+          <td>Control Crónico</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 6 (2026 - Abril) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1006</code></td>
+          <td>2026-04-14</td>
+          <td><strong>Rodrigo Araya Muñoz</strong></td>
+          <td>50 años</td>
+          <td><span class="badge badge-soft-primary">Masculino</span></td>
+          <td>Dr. Carlos Mendoza</td>
+          <td><code>E11</code> Diabetes Mellitus Tipo 2</td>
+          <td>Control Crónico</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 7 (2026 - Mayo) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1007</code></td>
+          <td>2026-05-20</td>
+          <td><strong>Francisca Pinto Lara</strong></td>
+          <td>22 años</td>
+          <td><span class="badge badge-soft-info">Femenino</span></td>
+          <td>Dra. Elena Ramos</td>
+          <td><code>N39</code> Infección del Tracto Urinario</td>
+          <td>Urgencia</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 8 (2026 - Junio) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1008</code></td>
+          <td>2026-06-11</td>
+          <td><strong>Manuel Castro Reyes</strong></td>
+          <td>37 años</td>
+          <td><span class="badge badge-soft-primary">Masculino</span></td>
+          <td>Dr. Andrés Ortiz</td>
+          <td><code>M54</code> Dorsalgia / Lumbalgia</td>
+          <td>Consulta Externa</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 9 (2026 - Julio) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1009</code></td>
+          <td>2026-07-15</td>
+          <td><strong>Sofía Navarro Palma</strong></td>
+          <td>29 años</td>
+          <td><span class="badge badge-soft-info">Femenino</span></td>
+          <td>Dra. Elena Ramos</td>
+          <td><code>K21</code> Reflujo Gastroesofágico</td>
+          <td>Consulta Externa</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 10 (2026 - Agosto) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1010</code></td>
           <td>2026-08-01</td>
           <td><strong>Adriana Vega Solís</strong></td>
           <td>34 años</td>
@@ -547,13 +691,13 @@
           <td>Consulta Externa</td>
           <td><span class="badge badge-soft-success">Validado</span></td>
           <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle" onclick="SingApp.toast({title: 'Detalle', message: 'Visualizando folio #AT1-1001', type: 'info'})"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 2 -->
+        <!-- Fila 11 (2026 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1002</code></td>
+          <td><code>#AT1-1011</code></td>
           <td>2026-08-02</td>
           <td><strong>Gabriel Santos Ruiz</strong></td>
           <td>45 años</td>
@@ -566,10 +710,10 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 3 -->
+        <!-- Fila 12 (2026 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1003</code></td>
+          <td><code>#AT1-1012</code></td>
           <td>2026-08-02</td>
           <td><strong>Beatriz Morales Peña</strong></td>
           <td>28 años</td>
@@ -582,10 +726,10 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 4 -->
+        <!-- Fila 13 (2026 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1004</code></td>
+          <td><code>#AT1-1013</code></td>
           <td>2026-08-03</td>
           <td><strong>Fernando Ruiz Lara</strong></td>
           <td>62 años</td>
@@ -598,29 +742,13 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 5 -->
+        <!-- Fila 14 (2026 - Septiembre) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1005</code></td>
-          <td>2026-08-04</td>
-          <td><strong>Lucía Valdés Castro</strong></td>
-          <td>19 años</td>
-          <td><span class="badge badge-soft-info">Femenino</span></td>
-          <td>Dra. Elena Ramos</td>
-          <td><code>K29</code> Gastritis Aguda</td>
-          <td>Consulta Externa</td>
-          <td><span class="badge badge-soft-success">Validado</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 6 -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1006</code></td>
-          <td>2026-08-04</td>
-          <td><strong>Martín Gómez Silva</strong></td>
-          <td>51 años</td>
+          <td><code>#AT1-1014</code></td>
+          <td>2026-09-04</td>
+          <td><strong>Tomás Loyola Espina</strong></td>
+          <td>48 años</td>
           <td><span class="badge badge-soft-primary">Masculino</span></td>
           <td>Dr. Carlos Mendoza</td>
           <td><code>I10</code> Hipertensión Esencial</td>
@@ -630,103 +758,71 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 7 -->
+        <!-- Fila 15 (2026 - Octubre) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1007</code></td>
-          <td>2026-08-05</td>
-          <td><strong>Camila Herrera Pino</strong></td>
-          <td>8 años</td>
+          <td><code>#AT1-1015</code></td>
+          <td>2026-10-19</td>
+          <td><strong>Valeria Godoy Sepúlveda</strong></td>
+          <td>33 años</td>
           <td><span class="badge badge-soft-info">Femenino</span></td>
-          <td>Dra. Patricia Vidal</td>
-          <td><code>J20</code> Bronquitis Aguda</td>
-          <td>Urgencia Pediátrica</td>
-          <td><span class="badge badge-soft-warning">Pendiente</span></td>
+          <td>Dra. Elena Ramos</td>
+          <td><code>K58</code> Síndrome Intestino Irritable</td>
+          <td>Consulta Externa</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
           <td style="text-align: center;">
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 8 -->
+        <!-- Fila 16 (2026 - Noviembre) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1008</code></td>
-          <td>2026-08-06</td>
-          <td><strong>Rodrigo Soto Bravo</strong></td>
-          <td>39 años</td>
+          <td><code>#AT1-1016</code></td>
+          <td>2026-11-22</td>
+          <td><strong>Esteban Parra Cárdenas</strong></td>
+          <td>60 años</td>
           <td><span class="badge badge-soft-primary">Masculino</span></td>
           <td>Dr. Andrés Ortiz</td>
-          <td><code>S93</code> Esguince de Tobillo</td>
+          <td><code>E11</code> Diabetes Mellitus Tipo 2</td>
+          <td>Control Crónico</td>
+          <td><span class="badge badge-soft-success">Validado</span></td>
+          <td style="text-align: center;">
+            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>
+        <!-- Fila 17 (2026 - Diciembre) -->
+        <tr>
+          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
+          <td><code>#AT1-1017</code></td>
+          <td>2026-12-05</td>
+          <td><strong>Constanza Rivas Toro</strong></td>
+          <td>26 años</td>
+          <td><span class="badge badge-soft-info">Femenino</span></td>
+          <td>Dra. Patricia Vidal</td>
+          <td><code>J06</code> Infección Respiratoria Aguda</td>
           <td>Urgencia</td>
           <td><span class="badge badge-soft-success">Validado</span></td>
           <td style="text-align: center;">
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 9 -->
+        <!-- Fila 18 (2025 - Enero) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1009</code></td>
-          <td>2026-08-07</td>
-          <td><strong>Valentina Lagos Rivas</strong></td>
-          <td>42 años</td>
+          <td><code>#AT1-0910</code></td>
+          <td>2025-01-14</td>
+          <td><strong>Daniela Cáceres Luna</strong></td>
+          <td>24 años</td>
           <td><span class="badge badge-soft-info">Femenino</span></td>
           <td>Dra. Elena Ramos</td>
-          <td><code>K58</code> Síndrome de Intestino Irritable</td>
-          <td>Consulta Externa</td>
+          <td><code>N39</code> Infección del Tracto Urinario</td>
+          <td>Urgencia</td>
           <td><span class="badge badge-soft-success">Validado</span></td>
           <td style="text-align: center;">
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 10 -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1010</code></td>
-          <td>2026-08-08</td>
-          <td><strong>Javier Méndez Rojas</strong></td>
-          <td>70 años</td>
-          <td><span class="badge badge-soft-primary">Masculino</span></td>
-          <td>Dr. Carlos Mendoza</td>
-          <td><code>E11</code> Diabetes Mellitus Tipo 2</td>
-          <td>Control Crónico</td>
-          <td><span class="badge badge-soft-danger">En Observación</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 11 (2026 - Julio) -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1011</code></td>
-          <td>2026-07-15</td>
-          <td><strong>Sofía Navarro Palma</strong></td>
-          <td>29 años</td>
-          <td><span class="badge badge-soft-info">Femenino</span></td>
-          <td>Dra. Elena Ramos</td>
-          <td><code>K21</code> Enfermedad por Reflujo Gastroesofágico</td>
-          <td>Consulta Externa</td>
-          <td><span class="badge badge-soft-success">Validado</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 12 (2026 - Febrero) -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-1012</code></td>
-          <td>2026-02-20</td>
-          <td><strong>Diego Pizarro Vargas</strong></td>
-          <td>54 años</td>
-          <td><span class="badge badge-soft-primary">Masculino</span></td>
-          <td>Dr. Andrés Ortiz</td>
-          <td><code>I10</code> Hipertensión Esencial</td>
-          <td>Control Crónico</td>
-          <td><span class="badge badge-soft-success">Validado</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 13 (2025 - Agosto) -->
+        <!-- Fila 19 (2025 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
           <td><code>#AT1-0985</code></td>
@@ -742,39 +838,7 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 14 (2025 - Febrero) -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-0940</code></td>
-          <td>2025-02-14</td>
-          <td><strong>Daniela Cáceres Luna</strong></td>
-          <td>24 años</td>
-          <td><span class="badge badge-soft-info">Femenino</span></td>
-          <td>Dra. Elena Ramos</td>
-          <td><code>N39</code> Infección del Tracto Urinario</td>
-          <td>Urgencia</td>
-          <td><span class="badge badge-soft-success">Validado</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 15 (2025 - Julio) -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-0965</code></td>
-          <td>2025-07-28</td>
-          <td><strong>Felipe Carrasco Morales</strong></td>
-          <td>67 años</td>
-          <td><span class="badge badge-soft-primary">Masculino</span></td>
-          <td>Dr. Carlos Mendoza</td>
-          <td><code>E11</code> Diabetes Mellitus Tipo 2</td>
-          <td>Control Crónico</td>
-          <td><span class="badge badge-soft-warning">Pendiente</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 16 (2024 - Agosto) -->
+        <!-- Fila 20 (2024 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
           <td><code>#AT1-0810</code></td>
@@ -790,23 +854,7 @@
             <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
           </td>
         </tr>
-        <!-- Fila 17 (2024 - Marzo) -->
-        <tr>
-          <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
-          <td><code>#AT1-0755</code></td>
-          <td>2024-03-05</td>
-          <td><strong>Marcela Fuentes Quintana</strong></td>
-          <td>31 años</td>
-          <td><span class="badge badge-soft-info">Femenino</span></td>
-          <td>Dra. Patricia Vidal</td>
-          <td><code>J45</code> Asma Bronquial</td>
-          <td>Control Crónico</td>
-          <td><span class="badge badge-soft-success">Validado</span></td>
-          <td style="text-align: center;">
-            <button class="btn btn-subtle btn-sm btn-icon" title="Ver detalle"><i class="bi bi-eye"></i></button>
-          </td>
-        </tr>
-        <!-- Fila 18 (2023 - Agosto) -->
+        <!-- Fila 21 (2023 - Agosto) -->
         <tr>
           <td style="text-align: center;"><input type="checkbox" class="excel-row-checkbox"></td>
           <td><code>#AT1-0620</code></td>
@@ -893,7 +941,7 @@
       }
 
       initRows() {
-        this.allRows = Array.from(this.tbody.querySelectorAll('tr')).map(tr => {
+        this.allRows = Array.from(this.tbody.querySelectorAll('tr:not(.excel-no-records-row)')).map(tr => {
           const cells = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
           return { element: tr, cells: cells };
         });
@@ -903,19 +951,19 @@
         const self = this;
 
         // Sync Top Select2 Year & Month Filters with Table Data
-        $('#selectYear, #selectMonth').on('change', function() {
-          self.selectedYears = $('#selectYear').val() || [];
-          self.selectedMonths = $('#selectMonth').val() || [];
+        const updatePeriodFilter = () => {
+          self.selectedYears = ($('#selectYear').val() || []).map(String);
+          self.selectedMonths = ($('#selectMonth').val() || []).map(String);
           self.applyFilters();
-        });
+        };
+
+        $('#selectYear, #selectMonth').on('change select2:select select2:unselect select2:clear', updatePeriodFilter);
 
         $('#btnApplyFilter').on('click', function() {
-          self.selectedYears = $('#selectYear').val() || [];
-          self.selectedMonths = $('#selectMonth').val() || [];
-          self.applyFilters();
+          updatePeriodFilter();
           SingApp.toast({
             title: 'Tabla AT1 Filtrada',
-            message: `Años: [${self.selectedYears.length ? self.selectedYears.join(', ') : 'Todos'}] | Meses: [${self.selectedMonths.length ? self.selectedMonths.join(', ') : 'Todos'}]`,
+            message: `Años: [${self.selectedYears.length ? self.selectedYears.join(', ') : 'Todos'}] | Meses: [${self.selectedMonths.length ? self.selectedMonths.map(m => MONTH_NAMES[m] || m).join(', ') : 'Todos'}]`,
             type: 'primary'
           });
         });
@@ -1477,14 +1525,14 @@
 
         this.allRows.forEach(row => {
           let visible = true;
-          const dateStr = row.cells[2] || '';
+          const dateStr = (row.cells[2] || '').trim();
 
           // 1. Check Top Period Filter (Años y Meses)
           if (dateStr) {
             const parts = dateStr.split('-');
             if (parts.length >= 2) {
-              const rowYear = parts[0];
-              const rowMonth = parts[1];
+              const rowYear = parts[0].trim();
+              const rowMonth = parts[1].trim();
               if (this.selectedYears && this.selectedYears.length > 0 && !this.selectedYears.includes(rowYear)) {
                 visible = false;
               }
@@ -1517,6 +1565,27 @@
           row.element.style.display = visible ? '' : 'none';
           if (visible) visibleCount++;
         });
+
+        // Empty state row handling
+        let noRecordsRow = this.tbody.querySelector('.excel-no-records-row');
+        if (visibleCount === 0) {
+          if (!noRecordsRow) {
+            noRecordsRow = document.createElement('tr');
+            noRecordsRow.className = 'excel-no-records-row';
+            noRecordsRow.innerHTML = `
+              <td colspan="11" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+                <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.6;"></i>
+                <strong>No se encontraron registros para el período o filtros seleccionados</strong>
+                <div style="font-size: 0.8rem; margin-top: 0.25rem;">Prueba seleccionando otro mes o año en la cabecera.</div>
+              </td>
+            `;
+            this.tbody.appendChild(noRecordsRow);
+          } else {
+            noRecordsRow.style.display = '';
+          }
+        } else if (noRecordsRow) {
+          noRecordsRow.style.display = 'none';
+        }
 
         this.updateFooter(visibleCount);
       }
