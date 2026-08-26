@@ -11,7 +11,7 @@
 @endphp
 
 <!-- Sidebar Navigation with Auto-Expand on Hover and Multi-Level Support -->
-<aside class="app-sidebar {{ (isset($_COOKIE['sing_sidebar_hover']) && $_COOKIE['sing_sidebar_hover'] === 'true') ? 'is-expanded-hold' : '' }}" id="appSidebar">
+<aside class="app-sidebar" id="appSidebar">
   <!-- Brand Header -->
   <div class="sidebar-brand">
     <a href="{{ route('dashboard') }}" class="sidebar-logo">
@@ -57,42 +57,43 @@
       </div>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Notificación SVS">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Notificación SVS', message: 'Módulo de notificación epidemiológica SVS', type: 'info'});">
+    <li class="sidebar-item {{ request()->routeIs('informes.notificacion_svs') ? 'active' : '' }}" data-tooltip="Notificación SVS">
+      <a href="{{ route('informes.notificacion_svs') }}" class="sidebar-link">
         <i class="bi bi-file-earmark-medical-fill nav-icon"></i>
         <span class="nav-label">Notificación SVS</span>
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Calendario Epi">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Calendario Epi', message: 'Calendario de semanas epidemiológicas activas', type: 'primary'});">
+    <li class="sidebar-item {{ request()->routeIs('calendario_epi') ? 'active' : '' }}" data-tooltip="Calendario Epi">
+      <a href="{{ route('calendario_epi') }}" class="sidebar-link">
         <i class="bi bi-calendar3 nav-icon"></i>
         <span class="nav-label">Calendario Epi</span>
       </a>
     </li>
 
-    <li class="sidebar-item {{ request()->routeIs('forms') ? 'active' : '' }}" data-tooltip="Ingreso de Datos">
-      <a href="{{ route('forms') }}" class="sidebar-link">
+    <li class="sidebar-item {{ (request()->routeIs('ingresos.*') || request()->routeIs('ingresos') || request()->routeIs('forms')) ? 'active' : '' }}" data-tooltip="Ingresos AT-1">
+      <a href="{{ route('ingresos.index') }}" class="sidebar-link">
         <i class="bi bi-pencil-square nav-icon"></i>
-        <span class="nav-label">Ingreso de Datos</span>
+        <span class="nav-label">Ingresos AT-1</span>
       </a>
     </li>
 
     <!-- GRUPO 2: REPORTES Y SALIDA -->
     <li class="sidebar-heading">Reportes y Salida</li>
 
-    <li class="sidebar-item {{ request()->routeIs('tables') ? 'active' : '' }}" data-tooltip="Registros AT1">
-      <a href="{{ route('tables') }}" class="sidebar-link">
+    <li class="sidebar-item {{ (request()->routeIs('registrosat1') || request()->routeIs('tables') || request()->routeIs('registros')) ? 'active' : '' }}" data-tooltip="Registros AT1">
+      <a href="{{ route('registrosat1') }}" class="sidebar-link">
         <i class="bi bi-table nav-icon"></i>
         <span class="nav-label">Registros AT1</span>
         <span class="badge badge-soft-success nav-badge">AT1</span>
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Informes AT1">
-      <a href="{{ route('charts') }}" class="sidebar-link">
-        <i class="bi bi-bar-chart-line-fill nav-icon"></i>
+    <li class="sidebar-item {{ request()->routeIs('informesat1') ? 'active' : '' }}" data-tooltip="Informes AT1">
+      <a href="{{ route('informesat1') }}" class="sidebar-link">
+        <i class="bi bi-file-earmark-bar-graph-fill nav-icon"></i>
         <span class="nav-label">Informes AT1</span>
+        <span class="badge badge-soft-primary nav-badge">Diag</span>
       </a>
     </li>
 
@@ -104,7 +105,7 @@
     </li>
 
     <!-- Submenú de Informes Médicos y Epidemiológicos -->
-    <li class="sidebar-item has-submenu {{ in_array('informes', $openSubmenus) ? 'open' : '' }}" data-submenu="informes" data-tooltip="Informes">
+    <li class="sidebar-item has-submenu {{ (request()->routeIs('informes.*') || in_array('informes', $openSubmenus)) ? 'open' : '' }}" data-submenu="informes" data-tooltip="Informes">
       <a href="javascript:void(0)" class="sidebar-link">
         <i class="bi bi-file-earmark-bar-graph-fill nav-icon"></i>
         <span class="nav-label">Informes</span>
@@ -112,18 +113,19 @@
       </a>
       <div class="sidebar-submenu-wrapper">
         <ul class="sidebar-submenu">
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Atenciones', message: 'Reporte consolidado de atenciones', type: 'info'});"><i class="bi bi-person-check"></i> Atenciones</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'TB9', message: 'Reporte de programa de tuberculosis TB9', type: 'warning'});"><i class="bi bi-clipboard2-pulse"></i> TB9</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Implantes', message: 'Registro de implantes y procedimientos', type: 'primary'});"><i class="bi bi-bandaid"></i> Implantes</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'AT2-r N', message: 'Reporte de registros AT2-r N', type: 'info'});"><i class="bi bi-card-checklist"></i> AT2-r N</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Morbilidad', message: 'Informe de morbilidad general', type: 'danger'});"><i class="bi bi-virus"></i> Morbilidad</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'ITS', message: 'Reporte epidemiológico de ITS', type: 'warning'});"><i class="bi bi-shield-plus"></i> ITS</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Alerta Semanal', message: 'Vigilancia de alertas semanales', type: 'danger'});"><i class="bi bi-exclamation-triangle"></i> Alerta Semanal</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'TRANS-2', message: 'Reporte de transferencias TRANS-2', type: 'info'});"><i class="bi bi-activity"></i> TRANS-2</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'SM1-07', message: 'Informe de salud materno infantil SM1-07', type: 'success'});"><i class="bi bi-heart-pulse"></i> SM1-07</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'SM2', message: 'Informe complementario SM2', type: 'success'});"><i class="bi bi-hospital"></i> SM2</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'SM3-07', message: 'Informe consolidado SM3-07', type: 'success'});"><i class="bi bi-file-medical"></i> SM3-07</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Hora Médico', message: 'Rendimiento y productividad por hora médica', type: 'primary'});"><i class="bi bi-clock-history"></i> Hora Médico</a></li>
+          <li class="{{ request()->routeIs('informes.atenciones') ? 'active' : '' }}"><a href="{{ route('informes.atenciones') }}" class="sidebar-link"><i class="bi bi-person-check"></i> Atenciones</a></li>
+          <li class="{{ request()->routeIs('informes.at2') ? 'active' : '' }}"><a href="{{ route('informes.at2') }}" class="sidebar-link"><i class="bi bi-file-earmark-medical"></i> AT2 Individual</a></li>
+          <li class="{{ request()->routeIs('informes.tb9') ? 'active' : '' }}"><a href="{{ route('informes.tb9') }}" class="sidebar-link"><i class="bi bi-clipboard2-pulse"></i> TB9</a></li>
+          <li class="{{ request()->routeIs('informes.implantes') ? 'active' : '' }}"><a href="{{ route('informes.implantes') }}" class="sidebar-link"><i class="bi bi-bandaid"></i> Implantes</a></li>
+          <li class="{{ request()->routeIs('informes.at2r-n') ? 'active' : '' }}"><a href="{{ route('informes.at2r-n') }}" class="sidebar-link"><i class="bi bi-card-checklist"></i> AT2-r N</a></li>
+          <li class="{{ request()->routeIs('informes.morbilidad') ? 'active' : '' }}"><a href="{{ route('informes.morbilidad') }}" class="sidebar-link"><i class="bi bi-virus"></i> Morbilidad</a></li>
+          <li class="{{ request()->routeIs('informes.its') ? 'active' : '' }}"><a href="{{ route('informes.its') }}" class="sidebar-link"><i class="bi bi-shield-plus"></i> ITS</a></li>
+          <li class="{{ request()->routeIs('informes.alerta-semanal') ? 'active' : '' }}"><a href="{{ route('informes.alerta-semanal') }}" class="sidebar-link"><i class="bi bi-exclamation-triangle"></i> Alerta Semanal</a></li>
+          <li class="{{ request()->routeIs('informes.trans2') ? 'active' : '' }}"><a href="{{ route('informes.trans2') }}" class="sidebar-link"><i class="bi bi-activity"></i> TRANS-2</a></li>
+          <li class="{{ request()->routeIs('informes.sm107') ? 'active' : '' }}"><a href="{{ route('informes.sm107') }}" class="sidebar-link"><i class="bi bi-heart-pulse"></i> SM1-07</a></li>
+          <li class="{{ request()->routeIs('informes.sm2') ? 'active' : '' }}"><a href="{{ route('informes.sm2') }}" class="sidebar-link"><i class="bi bi-hospital"></i> SM2</a></li>
+          <li class="{{ request()->routeIs('informes.sm307') ? 'active' : '' }}"><a href="{{ route('informes.sm307') }}" class="sidebar-link"><i class="bi bi-file-medical"></i> SM3-07</a></li>
+          <li class="{{ request()->routeIs('informes.hora-medico*') ? 'active' : '' }}"><a href="{{ route('informes.hora-medico') }}" class="sidebar-link"><i class="bi bi-clock-history"></i> Hora Médico</a></li>
         </ul>
       </div>
     </li>

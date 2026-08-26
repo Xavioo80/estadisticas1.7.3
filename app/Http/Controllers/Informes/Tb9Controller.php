@@ -25,16 +25,48 @@ class Tb9Controller extends Controller
             return redirect()->route('informes.tb9');
         }
 
-        $ano = $request->input('ano', date('Y'));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
         $mes = $request->input('mes', '');
-        if (empty($mes))
-            $mes = $this->resolverMesPorDefecto($ano);
+        if (empty($mes)) {
+            $mes = $this->resolverMesPorDefecto((string)$ano, true);
+        }
 
         $jornada = $request->input('jornada', 'TODAS') ?: 'TODAS';
         $selectedProfs = (array) $request->input('profesiones', []);
 
-        $anos = $this->service->getAnosDisponibles();
-        $meses = RegistroGlobal::distinct()->orderByRaw("FIELD(UPPER(mes), 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE')")->pluck('mes');
+        $anos = RegistroGlobal::distinct()
+            ->whereNotNull('ano')
+            ->where('ano', '>', 1900)
+            ->orderBy('ano', 'desc')
+            ->pluck('ano');
+
+        if ($anos->isEmpty()) {
+            $anos = collect([date('Y')]);
+        }
+
+        $mesMap = [
+            'ENERO' => 1, 'FEBRERO' => 2, 'MARZO' => 3, 'ABRIL' => 4,
+            'MAYO' => 5, 'JUNIO' => 6, 'JULIO' => 7, 'AGOSTO' => 8,
+            'SEPTIEMBRE' => 9, 'OCTUBRE' => 10, 'NOVIEMBRE' => 11, 'DICIEMBRE' => 12
+        ];
+
+        $mesesRaw = RegistroGlobal::where('ano', $ano)
+            ->whereNotNull('mes')
+            ->where('mes', '!=', '')
+            ->distinct()
+            ->pluck('mes')
+            ->toArray();
+
+        if (empty($mesesRaw)) {
+            $mesesRaw = RegistroGlobal::whereNotNull('mes')->where('mes', '!=', '')->distinct()->pluck('mes')->toArray();
+        }
+
+        $meses = collect($mesesRaw)->map(fn($m) => strtoupper(trim($m)))
+            ->unique()
+            ->sort(fn($a, $b) => ($mesMap[$a] ?? 0) <=> ($mesMap[$b] ?? 0))
+            ->values();
+
         $jornadas = RegistroGlobal::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->orderBy('jornada')->pluck('jornada');
         $profesiones = RegistroGlobal::distinct()->whereNotNull('prof')->where('prof', '!=', '')->orderBy('prof')->pluck('prof');
 
@@ -73,8 +105,12 @@ class Tb9Controller extends Controller
 
     public function export(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
         $mes = $request->input('mes', '');
+        if (empty($mes)) {
+            $mes = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = $request->input('jornada', 'TODAS');
         $selectedProfs = (array) $request->input('profesiones', []);
 

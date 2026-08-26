@@ -14,6 +14,11 @@
   </div>
 
   <div class="navbar-right">
+    <!-- Quick Add New Record Button (Green with Plus Icon) -->
+    <a href="{{ route('ingresos.create') }}" class="btn-navbar-add-green" title="Nuevo Registro (AT-1)">
+      <i class="bi bi-plus-lg"></i>
+    </a>
+
     <!-- Quick Theme Switcher Button -->
     <button type="button" class="theme-toggle-btn" data-toggle="theme" title="Alternar Modo Claro / Oscuro (Alt+Shift+D)">
       <i class="bi bi-sun-fill icon-sun"></i>

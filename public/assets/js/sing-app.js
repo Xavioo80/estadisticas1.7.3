@@ -7,6 +7,59 @@
   'use strict';
 
   // ==========================================================================
+  // SAFE STORAGE WRAPPER (Prevents Tracking Prevention & Sandbox Exceptions)
+  // ==========================================================================
+  const memStore = {};
+
+  const SafeStorage = {
+    getLocal(key) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage.getItem(key);
+        }
+      } catch (e) {}
+      return memStore['loc_' + key] || null;
+    },
+    setLocal(key, val) {
+      memStore['loc_' + key] = val;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, val);
+        }
+      } catch (e) {}
+    },
+    getSession(key) {
+      try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          return window.sessionStorage.getItem(key);
+        }
+      } catch (e) {}
+      return memStore['sess_' + key] || null;
+    },
+    setSession(key, val) {
+      memStore['sess_' + key] = val;
+      try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          window.sessionStorage.setItem(key, val);
+        }
+      } catch (e) {}
+    },
+    removeSession(key) {
+      delete memStore['sess_' + key];
+      try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          window.sessionStorage.removeItem(key);
+        }
+      } catch (e) {}
+    },
+    setCookie(name, val, maxAge) {
+      try {
+        document.cookie = name + '=' + (val || '') + '; path=/; max-age=' + (maxAge || 86400) + '; SameSite=Lax';
+      } catch (e) {}
+    }
+  };
+
+  // ==========================================================================
   // SIDEBAR CONTROLS & ANIMATIONS
   // ==========================================================================
   function initSidebar() {
@@ -24,9 +77,15 @@
           // Desktop: Toggle pinned full-width mode vs mini hover-to-expand mode
           document.body.classList.toggle('sidebar-collapsed');
           const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-          try {
-            localStorage.setItem('sing_sidebar_collapsed', isCollapsed ? 'true' : 'false');
-          } catch (err) {}
+          if (!isCollapsed) {
+            document.body.classList.remove('sidebar-hover-active');
+            if (appSidebar) appSidebar.classList.remove('is-expanded-hold');
+          }
+          SafeStorage.setLocal('sing_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+          // Dispatch single resize after CSS transition finishes for charts
+          setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+          }, 240);
         }
       });
     });
@@ -38,7 +97,7 @@
 
     // Restore desktop collapsed state (defaults to collapsed/mini on desktop for hover-to-expand)
     if (window.innerWidth > 992) {
-      const savedState = localStorage.getItem('sing_sidebar_collapsed');
+      const savedState = SafeStorage.getLocal('sing_sidebar_collapsed');
       if (savedState === 'false') {
         document.body.classList.remove('sidebar-collapsed');
       } else {
@@ -46,7 +105,7 @@
       }
     }
 
-    // 1. Submenu Accordion & State Persistence across page loads (Zero shift/jump)
+    // 1. Submenu Accordion & State Persistence across page loads
     const hasSubmenuItems = document.querySelectorAll('.sidebar-item.has-submenu');
     
     function saveSubmenuStates() {
@@ -57,28 +116,28 @@
           openSubmenuIds.push(subId);
         }
       });
-      try {
-        sessionStorage.setItem('sing_open_submenus', JSON.stringify(openSubmenuIds));
-        document.cookie = "sing_open_submenus=" + encodeURIComponent(JSON.stringify(openSubmenuIds)) + "; path=/; max-age=86400; SameSite=Lax";
-      } catch (e) {}
+      SafeStorage.setSession('sing_open_submenus', JSON.stringify(openSubmenuIds));
+      SafeStorage.setCookie('sing_open_submenus', encodeURIComponent(JSON.stringify(openSubmenuIds)), 86400);
     }
 
     // Restore open submenu states from sessionStorage
-    const savedSubmenus = sessionStorage.getItem('sing_open_submenus');
+    const savedSubmenus = SafeStorage.getSession('sing_open_submenus');
     if (savedSubmenus !== null) {
       try {
         const openSubmenuIds = JSON.parse(savedSubmenus);
-        hasSubmenuItems.forEach((item, idx) => {
-          const subId = item.getAttribute('data-submenu') || idx.toString();
-          if (openSubmenuIds.includes(subId)) {
-            item.classList.add('open');
-          } else {
-            // Keep open if contains the currently active page
-            if (!item.querySelector('.sidebar-submenu li.active')) {
-              item.classList.remove('open');
+        if (Array.isArray(openSubmenuIds)) {
+          hasSubmenuItems.forEach((item, idx) => {
+            const subId = item.getAttribute('data-submenu') || idx.toString();
+            if (openSubmenuIds.includes(subId)) {
+              item.classList.add('open');
+            } else {
+              // Keep open if contains the currently active page
+              if (!item.querySelector('.sidebar-submenu li.active')) {
+                item.classList.remove('open');
+              }
             }
-          }
-        });
+          });
+        }
       } catch (e) {}
     } else {
       saveSubmenuStates();
@@ -100,29 +159,33 @@
       });
     });
 
-    // 2. Sidebar Menu Scroll Position Preservation (100% Static Scroll Lock)
+    // 2. Sidebar Menu Scroll Position Preservation with Debounce
     const sidebarMenu = document.querySelector('.sidebar-menu');
     if (sidebarMenu) {
       const restoreScrollPos = () => {
-        const savedScroll = sessionStorage.getItem('sing_sidebar_scroll');
+        const savedScroll = SafeStorage.getSession('sing_sidebar_scroll');
         if (savedScroll !== null) {
           sidebarMenu.scrollTop = parseInt(savedScroll, 10);
         }
       };
       restoreScrollPos();
       requestAnimationFrame(restoreScrollPos);
-      setTimeout(restoreScrollPos, 30);
-      setTimeout(restoreScrollPos, 100);
+      setTimeout(restoreScrollPos, 50);
 
+      // Debounced scroll listener to avoid firing storage events on every pixel
+      let scrollTimer = null;
       sidebarMenu.addEventListener('scroll', function () {
-        sessionStorage.setItem('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
+        if (scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          SafeStorage.setSession('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
+        }, 150);
       }, { passive: true });
     }
 
     // Save scroll on unload and on every link click
     window.addEventListener('beforeunload', function () {
       if (sidebarMenu) {
-        sessionStorage.setItem('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
+        SafeStorage.setSession('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
       }
     });
 
@@ -132,98 +195,11 @@
       link.addEventListener('click', function (e) {
         createRippleEffect(e, this);
         if (sidebarMenu) {
-          sessionStorage.setItem('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
+          SafeStorage.setSession('sing_sidebar_scroll', sidebarMenu.scrollTop.toString());
         }
-        if (this.getAttribute('href') && !this.getAttribute('href').startsWith('javascript')) {
-          sessionStorage.setItem('sing_sidebar_navigating', 'true');
-          document.cookie = "sing_sidebar_hover=true; path=/; max-age=15; SameSite=Lax";
-        }
+        // Click ripple and save scroll
       });
     });
-
-    // Hover & Interaction Management (Flatlogic Sing App signature: overlay hover with zero page displacement)
-    if (appSidebar) {
-      let isHoveringSidebar = false;
-
-      function setSidebarStatePersistence(active) {
-        if (active) {
-          try {
-            sessionStorage.setItem('sing_sidebar_navigating', 'true');
-            document.cookie = "sing_sidebar_hover=true; path=/; max-age=15; SameSite=Lax";
-          } catch (e) {}
-        } else {
-          try {
-            sessionStorage.removeItem('sing_sidebar_navigating');
-            document.cookie = "sing_sidebar_hover=; path=/; max-age=0; SameSite=Lax";
-          } catch (e) {}
-        }
-      }
-
-      let resizeDebounce = null;
-      function dispatchLayoutResize() {
-        clearTimeout(resizeDebounce);
-        resizeDebounce = setTimeout(() => {
-          window.dispatchEvent(new Event('resize'));
-        }, 310);
-      }
-
-      function expandSidebar() {
-        if (document.body.classList.contains('sidebar-collapsed')) {
-          appSidebar.classList.add('is-expanded-hold');
-          document.body.classList.add('sidebar-hover-active');
-          document.documentElement.classList.add('sidebar-hover-active');
-          setSidebarStatePersistence(true);
-          dispatchLayoutResize();
-        }
-      }
-
-      function collapseSidebar() {
-        appSidebar.classList.remove('is-expanded-hold');
-        document.body.classList.remove('sidebar-hover-active');
-        document.documentElement.classList.remove('sidebar-hover-active');
-        setSidebarStatePersistence(false);
-        dispatchLayoutResize();
-      }
-
-      // Check if arriving from a navigation click inside the sidebar
-      if (sessionStorage.getItem('sing_sidebar_navigating') === 'true' || document.cookie.indexOf('sing_sidebar_hover=true') !== -1) {
-        expandSidebar();
-        isHoveringSidebar = true;
-      }
-
-      appSidebar.addEventListener('mouseenter', function () {
-        isHoveringSidebar = true;
-        expandSidebar();
-      });
-
-      appSidebar.addEventListener('mouseleave', function (e) {
-        if (e.clientX > 260 || e.clientX <= 0 || e.clientY <= 0 || e.clientY >= window.innerHeight) {
-          isHoveringSidebar = false;
-          collapseSidebar();
-        }
-      });
-
-      // Mousemove watcher: seamlessly maintain open state while cursor is in sidebar (width <= 260px)
-      // and collapse cleanly when the mouse moves into the main content (x > 260px)
-      document.addEventListener('mousemove', function (e) {
-        if (window.innerWidth > 992 && document.body.classList.contains('sidebar-collapsed')) {
-          if (e.clientX <= 80 && !isHoveringSidebar) {
-            isHoveringSidebar = true;
-            expandSidebar();
-          } else if (e.clientX > 260 && isHoveringSidebar) {
-            isHoveringSidebar = false;
-            collapseSidebar();
-          }
-        }
-      });
-
-      // Keep open when clicking any element/button/submenu inside sidebar
-      appSidebar.addEventListener('click', function () {
-        isHoveringSidebar = true;
-        expandSidebar();
-        setSidebarStatePersistence(true);
-      });
-    }
   }
 
   /**
@@ -305,13 +281,40 @@
 
       if (fullscreenBtn) {
         e.preventDefault();
-        const card = fullscreenBtn.closest('.sing-card, .card');
+        const card = fullscreenBtn.closest('.sing-card, .card, .sing-card-excel-fullscreen');
         if (card) {
-          card.classList.toggle('is-fullscreen');
+          const isNativeFs = document.fullscreenElement || document.webkitFullscreenElement;
+          const isCssFs = card.classList.contains('is-fullscreen');
           const icon = fullscreenBtn.querySelector('i');
-          if (icon) {
-            icon.classList.toggle('bi-fullscreen');
-            icon.classList.toggle('bi-fullscreen-exit');
+
+          if (!isNativeFs && !isCssFs) {
+            // Enter Fullscreen (HTML5 API with CSS fallback)
+            if (card.requestFullscreen) {
+              card.requestFullscreen().catch(() => card.classList.add('is-fullscreen'));
+            } else if (card.webkitRequestFullscreen) {
+              card.webkitRequestFullscreen();
+            } else {
+              card.classList.add('is-fullscreen');
+            }
+            card.classList.add('is-fullscreen');
+            if (icon) {
+              icon.classList.remove('bi-fullscreen');
+              icon.classList.add('bi-fullscreen-exit');
+            }
+            fullscreenBtn.setAttribute('title', 'Salir de Pantalla Completa');
+          } else {
+            // Exit Fullscreen
+            if (document.exitFullscreen && document.fullscreenElement) {
+              document.exitFullscreen().catch(() => {});
+            } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+              document.webkitExitFullscreen();
+            }
+            card.classList.remove('is-fullscreen');
+            if (icon) {
+              icon.classList.remove('bi-fullscreen-exit');
+              icon.classList.add('bi-fullscreen');
+            }
+            fullscreenBtn.setAttribute('title', 'Pantalla Completa');
           }
         }
       }
@@ -325,6 +328,23 @@
           card.style.transform = 'scale(0.95)';
           setTimeout(() => card.remove(), 300);
         }
+      }
+    });
+
+    // Sync fullscreen state when exiting via ESC key
+    document.addEventListener('fullscreenchange', function () {
+      if (!document.fullscreenElement) {
+        document.querySelectorAll('.sing-card.is-fullscreen, .card.is-fullscreen, .sing-card-excel-fullscreen.is-fullscreen').forEach(card => {
+          card.classList.remove('is-fullscreen');
+        });
+        document.querySelectorAll('[data-action="fullscreen"]').forEach(btn => {
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.classList.remove('bi-fullscreen-exit');
+            icon.classList.add('bi-fullscreen');
+          }
+          btn.setAttribute('title', 'Pantalla Completa');
+        });
       }
     });
   }
@@ -418,7 +438,8 @@
       initDropdowns();
       initTodoList();
     },
-    toast: showToast
+    toast: showToast,
+    storage: SafeStorage
   };
 
   // Auto initialize on DOM ready

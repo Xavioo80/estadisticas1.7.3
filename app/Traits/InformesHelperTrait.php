@@ -95,29 +95,50 @@ trait InformesHelperTrait
             7 => 'JULIO', 8 => 'AGOSTO', 9 => 'SEPTIEMBRE',
             10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE',
         ];
+        $mesOrder = [
+            'DICIEMBRE' => 12, 'NOVIEMBRE' => 11, 'OCTUBRE' => 10,
+            'SEPTIEMBRE' => 9, 'AGOSTO' => 8, 'JULIO' => 7,
+            'JUNIO' => 6, 'MAYO' => 5, 'ABRIL' => 4,
+            'MARZO' => 3, 'FEBRERO' => 2, 'ENERO' => 1
+        ];
         $currentMonth = $mesMap[(int)date('n')];
 
         /** @var \Illuminate\Database\Eloquent\Model $modelClass */
         $modelClass = $useRG ? RegistroGlobal::class : Informe::class;
 
-        // Obtener el último mes con registros para el año seleccionado (ordenado de DICIEMBRE a ENERO)
-        $lastWithData = $modelClass::where('ano', $ano)
+        // Obtener meses únicos con datos para el año (Ultra rápido vía distinct)
+        $meses = $modelClass::where('ano', $ano)
             ->whereNotNull('mes')
             ->where('mes', '!=', '')
-            ->orderByRaw("FIELD(UPPER(TRIM(mes)), 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE') DESC")
-            ->first();
+            ->distinct()
+            ->pluck('mes')
+            ->toArray();
 
-        if ($lastWithData && !empty($lastWithData->mes)) {
-            return strtoupper(trim($lastWithData->mes));
+        if (empty($meses) && !$useRG) {
+            $meses = RegistroGlobal::where('ano', $ano)
+                ->whereNotNull('mes')
+                ->where('mes', '!=', '')
+                ->distinct()
+                ->pluck('mes')
+                ->toArray();
         }
 
-        // Si no hay datos en Informe, probar con RegistroGlobal
-        $lastWithDataRG = RegistroGlobal::where('ano', $ano)
-            ->whereNotNull('mes')
-            ->where('mes', '!=', '')
-            ->orderByRaw("FIELD(UPPER(TRIM(mes)), 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE') DESC")
-            ->first();
+        if (!empty($meses)) {
+            $latestMonth = null;
+            $maxScore = -1;
+            foreach ($meses as $m) {
+                $upper = strtoupper(trim($m));
+                $score = $mesOrder[$upper] ?? -1;
+                if ($score > $maxScore) {
+                    $maxScore = $score;
+                    $latestMonth = $upper;
+                }
+            }
+            if ($latestMonth) {
+                return $latestMonth;
+            }
+        }
 
-        return ($lastWithDataRG && !empty($lastWithDataRG->mes)) ? strtoupper(trim($lastWithDataRG->mes)) : $currentMonth;
+        return $currentMonth;
     }
 }

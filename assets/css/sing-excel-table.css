@@ -1,0 +1,508 @@
+/**
+ * ============================================================================
+ * SING APP - EXCEL TABLE COMPONENT (CSS SPECIFICATION & DESIGN SYSTEM)
+ * Supports Fullscreen, Dual-Theme (Light & Dark), Sticky Headers/Columns,
+ * Filter Popovers, Date Trees, Badges, and Action Toolbars.
+ * ============================================================================
+ */
+
+/* 1. Fullscreen Container & Scroll Area */
+.sing-card-excel-fullscreen {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin-bottom: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  border-radius: var(--radius-md, 6px);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.sing-card-excel-fullscreen.is-fullscreen,
+.sing-card-excel-fullscreen:fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: var(--bg-surface) !important;
+}
+
+.excel-table-scroll {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  position: relative !important;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  transform: translateZ(0);
+}
+
+/* Custom Modern Scrollbars */
+.excel-table-scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+.excel-table-scroll::-webkit-scrollbar-track {
+  background: var(--bg-body, #0b1120);
+}
+.excel-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-color, #1e293b);
+  border-radius: 3px;
+}
+.excel-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #4d7cfe);
+}
+
+/* 2. Table Core, Sticky Columns & Cells */
+.sing-table-excel {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.77rem;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+.sing-table-excel thead {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+}
+
+.sing-table-excel thead th {
+  background-color: var(--bg-surface-elevated, #161f36);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.sing-table-excel th.col-row-num,
+.sing-table-excel td.col-row-num {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  text-align: center;
+  font-weight: 600;
+  background-color: var(--bg-surface-elevated, #161f36) !important;
+  color: var(--text-muted);
+  border-right: 2px solid var(--border-color);
+}
+
+.sing-table-excel thead th.col-row-num {
+  z-index: 30 !important;
+}
+
+.sing-table-excel tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.sing-table-excel tbody tr:nth-child(even) {
+  background-color: var(--bg-surface-hover, rgba(255,255,255,0.018));
+}
+
+.sing-table-excel tbody tr:hover {
+  background-color: rgba(var(--color-primary-rgb, 77, 124, 254), 0.08) !important;
+}
+
+.sing-table-excel tbody td {
+  padding: 0.3rem 0.55rem;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+  color: var(--text-primary);
+  line-height: 1.35;
+  outline: none;
+}
+
+.sing-table-excel tbody td.excel-cell-active {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: -2px;
+  background-color: rgba(var(--color-primary-rgb, 77, 124, 254), 0.12) !important;
+}
+
+/* 3. Header Filter Buttons */
+.excel-th-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.excel-filter-btn {
+  width: 17px;
+  height: 17px;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.65rem;
+  padding: 0;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.excel-filter-btn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--color-primary);
+  border-color: var(--border-color);
+}
+
+.excel-filter-btn.has-filter {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+}
+
+/* 4. Filter Popovers (Dual-Theme & Fullscreen-Compatible) */
+.excel-popover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10080 !important;
+  background: transparent;
+}
+
+.excel-filter-popover {
+  position: fixed !important;
+  z-index: 10090 !important;
+  width: 285px;
+  background-color: var(--bg-surface-elevated, #1a233a) !important;
+  border: 1px solid var(--border-color, #334155) !important;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !important;
+  display: flex;
+  flex-direction: column;
+  animation: popoverFadeIn 0.15s ease-out;
+  font-size: 0.82rem;
+  overflow: hidden;
+  color: var(--text-primary) !important;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.excel-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background-color: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text-primary) !important;
+}
+
+.excel-popover-actions {
+  padding: 0.3rem 0;
+  background-color: var(--bg-surface-elevated, #1a233a) !important;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.excel-popover-action-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary) !important;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.excel-popover-action-item:hover {
+  background-color: var(--bg-surface-hover) !important;
+  color: var(--color-primary) !important;
+}
+
+.excel-popover-search {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface) !important;
+}
+
+.excel-popover-search input {
+  width: 100%;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.78rem;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  outline: none;
+}
+
+.excel-popover-search input:focus {
+  border-color: var(--color-primary);
+}
+
+.excel-popover-add-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.55rem;
+  margin-top: 0.45rem;
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.excel-popover-add-wrap:hover {
+  border-color: var(--color-primary);
+  background: var(--bg-surface-elevated);
+}
+
+.excel-popover-add-wrap input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.excel-popover-add-wrap span {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.25;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-popover-add-wrap input[type="checkbox"]:checked ~ span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.excel-popover-list {
+  max-height: 185px;
+  overflow-y: auto;
+  padding: 0.35rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background-color: var(--bg-surface-elevated, #1a233a) !important;
+}
+
+.excel-popover-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  font-size: 0.78rem;
+  user-select: none;
+  color: var(--text-primary) !important;
+  transition: background-color var(--transition-fast);
+}
+
+.excel-popover-list-item:hover {
+  background-color: var(--bg-surface-hover) !important;
+}
+
+.excel-popover-list-item input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.excel-popover-list-item .item-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.05rem 0.35rem;
+  border-radius: 10px;
+}
+
+.excel-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  background-color: var(--bg-surface) !important;
+  border-top: 1px solid var(--border-color);
+}
+
+/* 5. Date Tree Hierarchy in Filters */
+.excel-date-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.excel-tree-node {
+  display: flex;
+  flex-direction: column;
+}
+
+.excel-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+}
+
+.excel-tree-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  transition: transform var(--transition-fast);
+}
+
+.excel-tree-toggle.expanded i {
+  transform: rotate(90deg);
+}
+
+.excel-tree-children {
+  margin-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.excel-tree-children.collapsed {
+  display: none;
+}
+
+/* 6. Footer Status Bar */
+.table-excel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.77rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.table-excel-footer-left,
+.table-excel-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 7. Action Toolbar Buttons */
+.btn-toolbar-consultar {
+  background: linear-gradient(135deg, var(--color-primary, #4d7cfe), #3b82f6) !important;
+  border: 1px solid var(--color-primary) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-xs, 4px) !important;
+}
+
+.btn-toolbar-clear {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-xs, 4px) !important;
+}
+
+.btn-toolbar-clear:hover {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+.btn-toolbar-reset {
+  background: var(--bg-surface-hover) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  border-radius: var(--radius-xs, 4px) !important;
+}
+
+.btn-toolbar-reset:hover {
+  color: var(--color-primary) !important;
+}
+
+.btn-toolbar-add {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: 1px solid #047857 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-xs, 4px) !important;
+}
+
+.btn-toolbar-xlsx {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: 1px solid #047857 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-xs, 4px) !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25) !important;
+  transition: all var(--transition-fast);
+}
+
+.btn-toolbar-xlsx:hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  color: #ffffff !important;
+}

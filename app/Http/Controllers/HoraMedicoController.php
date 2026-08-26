@@ -13,8 +13,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+use App\Traits\InformesHelperTrait;
+
 class HoraMedicoController extends Controller
 {
+    use InformesHelperTrait;
+
     private $mesMap = [
         'ENERO' => 1,
         'FEBRERO' => 2,
@@ -32,8 +36,12 @@ class HoraMedicoController extends Controller
 
     public function index(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
-        $mesNombre = $request->input('mes', mb_strtoupper(Carbon::now()->locale('es')->monthName));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
+        $mesNombre = $request->input('mes', '');
+        if (empty($mesNombre)) {
+            $mesNombre = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = $request->input('jornada', 'MATUTINA');
         $nombreBusqueda = $request->input('nombre');
 
@@ -70,25 +78,29 @@ class HoraMedicoController extends Controller
             foreach ($jornadasList as $j)
                 $dataByJornada[$j] = $this->getJornadaData($ano, $mesNombre, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana);
 
-            $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
+            $anos = RegistroGlobal::distinct()->whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->pluck('ano');
             if ($anos->isEmpty())
-                $anos = [date('Y')];
+                $anos = collect([date('Y')]);
             $meses = array_keys($this->mesMap);
             return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico', compact('dataByJornada', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'diasLaborables', 'diasFinSemana', 'semanasResumen', 'totalDias', 'nombreBusqueda', 'todosLosMedicos', 'settings', 'currentDirectorId'));
         }
 
         $data = $this->getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana);
-        $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
+        $anos = RegistroGlobal::distinct()->whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->pluck('ano');
         if ($anos->isEmpty())
-            $anos = [date('Y')];
+            $anos = collect([date('Y')]);
         $meses = array_keys($this->mesMap);
         return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico', compact('data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'diasLaborables', 'diasFinSemana', 'semanasResumen', 'totalDias', 'nombreBusqueda', 'todosLosMedicos', 'settings', 'currentDirectorId'));
     }
 
     public function imprimir(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
-        $mesNombre = $request->input('mes', mb_strtoupper(Carbon::now()->locale('es')->monthName));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
+        $mesNombre = $request->input('mes', '');
+        if (empty($mesNombre)) {
+            $mesNombre = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = $request->input('jornada', 'MATUTINA');
         $nombreBusqueda = $request->input('nombre');
 
@@ -269,30 +281,33 @@ class HoraMedicoController extends Controller
 
     private function getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS = false)
     {
-        $medicosConRegistros = RegistroGlobal::where('ano', $ano)
-            ->whereRaw('UPPER(mes) = ?', [strtoupper($mesNombre)])
-            ->distinct()
-            ->pluck('medico')
-            ->map(fn($n) => trim($n))
-            ->filter()
-            ->unique()
-            ->values()
+        $mesVariants = array_unique(array_filter([
+            strtoupper($mesNombre),
+            strtolower($mesNombre),
+            ucfirst(strtolower($mesNombre)),
+            $mesNombre
+        ]));
+
+        // 🚀 Optimización de Rendimiento Extrema: Uso del índice compuesto (ano, mes) de MySQL
+        $allHSC = HoraSinConsulta::where('ano', $ano)
+            ->whereIn('mes', $mesVariants)
+            ->get()
+            ->keyBy('medico_id');
+
+        $atencionesCounts = RegistroGlobal::where('ano', $ano)
+            ->whereIn('mes', $mesVariants)
+            ->selectRaw('TRIM(medico) as m_name, COUNT(*) as total')
+            ->groupBy(DB::raw('TRIM(medico)'))
+            ->pluck('total', 'm_name')
             ->toArray();
 
-        $medicosConHSC = HoraSinConsulta::where('ano', $ano)
-            ->whereRaw('UPPER(mes) = ?', [strtoupper($mesNombre)])
-            ->pluck('medico_id')
-            ->toArray();
+        $medicosConRegistros = array_keys($atencionesCounts);
+        $medicosConHSC = $allHSC->keys()->toArray();
 
         $query = Medico::where('estado', 'activo')
             ->where(function ($q) use ($medicosConRegistros, $medicosConHSC) {
                 $q->whereIn('id', $medicosConHSC)
-                  ->orWhereIn('NOM_MED', $medicosConRegistros)
-                  ->orWhere(function($sub) use ($medicosConRegistros) {
-                      foreach ($medicosConRegistros as $rgName) {
-                          $sub->orWhereRaw('TRIM(NOM_MED) = ?', [$rgName]);
-                      }
-                  });
+                  ->orWhereIn('NOM_MED', $medicosConRegistros);
             });
 
         if ($jornada !== 'TOTAL JORNADAS' && $jornada !== 'TODAS LAS JORNADAS' && $jornada !== 'TODAS') {
@@ -327,17 +342,13 @@ class HoraMedicoController extends Controller
             $query->where('NOM_MED', 'like', '%' . $nombreBusqueda . '%');
 
         $medicos = $query->get();
+
         $data = [];
 
         foreach ($medicos as $medico) {
-            $hsc = HoraSinConsulta::where('medico_id', $medico->id)->where('ano', $ano)->whereRaw('UPPER(mes) = ?', [strtoupper($mesNombre)])->first();
-            $atenciones = RegistroGlobal::where('ano', $ano)
-                ->whereRaw('UPPER(mes) = ?', [strtoupper($mesNombre)])
-                ->where(function($q) use ($medico) {
-                    $q->where('medico', $medico->NOM_MED)
-                      ->orWhereRaw('TRIM(medico) = ?', [trim($medico->NOM_MED)]);
-                })
-                ->count();
+            $hsc = $allHSC->get($medico->id);
+            $trimmedName = trim($medico->NOM_MED);
+            $atenciones = $atencionesCounts[$trimmedName] ?? ($atencionesCounts[$medico->NOM_MED] ?? 0);
 
             // Detectar si es ONG
             $nomina    = strtoupper($medico->NOMINA ?? '');
@@ -361,12 +372,18 @@ class HoraMedicoController extends Controller
             }
             $horasContratadasMes = $horasPorDia * $diasContratados;
 
-            $totalOfic = $hsc ? $hsc->total_horas_oficiales : 0;
-            $totalVac = $hsc ? $hsc->total_vacaciones : 0;
-            $totalPers = $hsc ? $hsc->total_horas_personales : 0;
+            // 2. Horas Sin Consulta Totales
+            $totalOfic = 0;
+            $totalVac  = 0;
+            $totalPers = 0;
+            if ($hsc) {
+                $totalOfic = $hsc->total_horas_oficiales ?? 0;
+                $totalVac  = $hsc->total_vacaciones ?? 0;
+                $totalPers = $hsc->total_horas_personales ?? 0;
+            }
 
-            // 2. Pacientes por Hora (Factor de Productividad)
-            $pacientesPorHour = $medico->consultas_por_hora ?: 0;
+            // 3. Pacientes por Hora
+            $pacientesPorHour = (float)($medico->PACIENTES_POR_HORA ?? 0);
 
             // Si no tiene nada configurado en la ficha, usamos la lógica por defecto del manual
             if ($pacientesPorHour <= 0) {
@@ -424,8 +441,6 @@ class HoraMedicoController extends Controller
             ->toArray();
 
         if (empty($posicionesExistentes)) {
-            // No existe orden histórico guardado para este mes/jornada aún:
-            // Ordenar primero con el algoritmo de prioridad (Director Mensual -> Especialistas -> Gen Acuerdo -> Gen Contrato -> OTROS -> ONG)
             usort($data, function ($a, $b) use ($ano, $mesNombre) {
                 $pA = $this->getDoctorPriority($a['medico'], $ano, $mesNombre);
                 $pB = $this->getDoctorPriority($b['medico'], $ano, $mesNombre);
@@ -436,25 +451,32 @@ class HoraMedicoController extends Controller
                 return $pA <=> $pB;
             });
 
-            // Guardar el snapshot histórico inicial en la BD
+            // Guardar el snapshot histórico inicial en la BD en lote
             $pos = 1;
+            $bulkPos = [];
+            $now = Carbon::now();
             foreach ($data as &$item) {
                 $item['posicion'] = $pos;
-                HoraMedicoPosicion::updateOrCreate(
-                    [
-                        'ano' => $ano,
-                        'mes' => $mesNombre,
-                        'jornada' => $jornada,
-                        'medico_id' => $item['medico']->id
-                    ],
-                    ['posicion' => $pos]
-                );
+                $bulkPos[] = [
+                    'ano' => $ano,
+                    'mes' => $mesNombre,
+                    'jornada' => $jornada,
+                    'medico_id' => $item['medico']->id,
+                    'posicion' => $pos,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ];
                 $pos++;
             }
             unset($item);
+            if (!empty($bulkPos)) {
+                HoraMedicoPosicion::insert($bulkPos);
+            }
         } else {
             // Ya existe un snapshot histórico guardado para este mes/jornada:
             $maxPos = !empty($posicionesExistentes) ? max($posicionesExistentes) : 0;
+            $bulkNew = [];
+            $now = Carbon::now();
 
             foreach ($data as &$item) {
                 $mId = $item['medico']->id;
@@ -463,16 +485,21 @@ class HoraMedicoController extends Controller
                 } else {
                     $maxPos++;
                     $item['posicion'] = $maxPos;
-                    HoraMedicoPosicion::create([
+                    $bulkNew[] = [
                         'ano' => $ano,
                         'mes' => $mesNombre,
                         'jornada' => $jornada,
                         'medico_id' => $mId,
-                        'posicion' => $maxPos
-                    ]);
+                        'posicion' => $maxPos,
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ];
                 }
             }
             unset($item);
+            if (!empty($bulkNew)) {
+                HoraMedicoPosicion::insert($bulkNew);
+            }
 
             usort($data, function ($a, $b) {
                 return $a['posicion'] <=> $b['posicion'];
@@ -484,8 +511,12 @@ class HoraMedicoController extends Controller
 
     public function servicioSocial(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
-        $mesNombre = $request->input('mes', mb_strtoupper(Carbon::now()->locale('es')->monthName));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
+        $mesNombre = $request->input('mes', '');
+        if (empty($mesNombre)) {
+            $mesNombre = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = 'TOTAL JORNADAS';
         $nombreBusqueda = $request->input('search', $request->input('nombre', ''));
 
@@ -657,8 +688,12 @@ class HoraMedicoController extends Controller
 
     public function imprimirConsolidado(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
-        $mes = $request->input('mes', mb_strtoupper(Carbon::now()->locale('es')->monthName));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
+        $mes = $request->input('mes', '');
+        if (empty($mes)) {
+            $mes = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = $request->input('jornada', 'MATUTINA');
 
         $mesNum = $this->mesMap[$mes] ?? date('n');
@@ -685,8 +720,12 @@ class HoraMedicoController extends Controller
 
     public function consolidado(Request $request)
     {
-        $ano = $request->input('ano', date('Y'));
-        $mes = $request->input('mes', mb_strtoupper(Carbon::now()->locale('es')->monthName));
+        $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
+        $ano = $request->input('ano', $latestAno ?: date('Y'));
+        $mes = $request->input('mes', '');
+        if (empty($mes)) {
+            $mes = $this->resolverMesPorDefecto((string)$ano, true);
+        }
         $jornada = $request->input('jornada', 'MATUTINA');
 
         $mesNum = $this->mesMap[$mes] ?? date('n');

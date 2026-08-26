@@ -64,14 +64,15 @@ body {
   z-index: var(--z-sidebar);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.22s ease,
               background-color var(--transition-base),
               border-color var(--transition-base);
   overflow: hidden;
   will-change: width, transform;
   transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Sidebar Brand Header (Fixed at top like header) */
@@ -442,12 +443,15 @@ body {
    ========================================================================== */
 .app-main {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: margin-left 0.22s cubic-bezier(0.4, 0, 0.2, 1), width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   width: calc(100% - var(--sidebar-width));
+  will-change: margin-left, width;
 }
 
 /* ==========================================================================
@@ -532,6 +536,32 @@ body {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(77, 124, 254, 0.15);
   width: 300px;
+}
+
+/* Quick Add New Record Button (Green with Plus Icon) */
+.btn-navbar-add-green {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm, 6px);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+  cursor: pointer;
+}
+
+.btn-navbar-add-green:hover {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+  filter: brightness(1.08);
+  color: #ffffff !important;
 }
 
 /* Theme Toggle Button (Sun/Moon switch) */
@@ -824,12 +854,15 @@ body {
 }
 
 /* ==========================================================================
-   APP FOOTER
+   APP FOOTER (PINNED / STATIC AND ALWAYS VISIBLE AT BOTTOM)
    ========================================================================== */
 .app-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
   height: var(--footer-height);
-  background-color: var(--bg-surface);
-  border-top: 1px solid var(--border-color);
+  background-color: var(--sidebar-bg);
+  border-top: 1px solid var(--sidebar-border);
   padding: 0 1.75rem;
   display: flex;
   align-items: center;
@@ -837,6 +870,7 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
   flex-shrink: 0;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.12);
   transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
@@ -881,69 +915,79 @@ body.sidebar-collapsed .app-main {
   width: calc(100% - var(--sidebar-collapsed-width));
 }
 
-/* When not hovering or holding collapsed sidebar: fold text & active level submenus synchronously */
+/* When not hovering collapsed sidebar: smoothly collapse text width to 0 */
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-logo .logo-text,
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-user-info,
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-heading,
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .nav-label,
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .nav-badge,
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .nav-arrow {
-  display: none !important;
   opacity: 0 !important;
+  visibility: hidden !important;
   pointer-events: none !important;
-  transform: translateX(-10px) !important;
-  transition: opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
-              transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  width: 0 !important;
+  max-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 0 !important;
+  overflow: hidden !important;
+  transform: translateX(-6px) !important;
+  transition: opacity 0.15s ease, transform 0.15s ease, width 0.2s ease, flex 0.2s ease !important;
 }
 
-/* Submenu level wrappers collapse grid rows synchronously from 1fr to 0fr alongside sidebar contracting */
+/* Submenu level wrappers collapse grid rows cleanly */
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-submenu-wrapper {
   grid-template-rows: 0fr !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: grid-template-rows 0.32s cubic-bezier(0.25, 0.8, 0.25, 1),
-              opacity 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-}
-
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-submenu .sidebar-link {
-  opacity: 0 !important;
-  transform: translateX(-8px) !important;
-  transition: opacity 0.2s ease,
-              transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  transition: grid-template-rows 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-brand {
-  justify-content: center;
-  padding: 0;
-  transition: padding 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), justify-content 0.3s ease;
+  justify-content: center !important;
+  padding: 0 !important;
 }
 
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-user {
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-logo {
+  justify-content: center !important;
+  gap: 0 !important;
+}
+
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-user {
   padding: 0.75rem 0;
-  margin: 1rem 0.5rem;
+  margin: 0.75rem 0.5rem;
   justify-content: center;
   background: transparent;
   border-color: transparent;
-  transition: padding 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), margin 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-link {
-  justify-content: center;
-  padding: 0.75rem 0;
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-link {
+  justify-content: center !important;
+  padding: 0.75rem 0 !important;
+  gap: 0 !important;
+  display: flex !important;
+  align-items: center !important;
   transform: none !important;
-  transition: padding 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), justify-content 0.3s ease, background-color 0.2s ease;
 }
 
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-link i,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-link .nav-icon {
-  width: auto;
-  font-size: 1.3rem;
-  transition: font-size 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.2s ease, transform 0.2s ease;
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-link i,
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-link .nav-icon {
+  font-size: 1.35rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: var(--sidebar-text-muted) !important;
+  flex-shrink: 0 !important;
 }
 
 /* Highlight active icon in collapsed mode with active pill background */
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.active > .sidebar-link,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.open > .sidebar-link {
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.active > .sidebar-link,
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.open > .sidebar-link {
   background: var(--sidebar-item-active-bg) !important;
   color: var(--color-primary) !important;
   border-radius: var(--radius-md) !important;
@@ -951,83 +995,80 @@ body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.18) !important;
 }
 
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.active > .sidebar-link .nav-icon,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.open > .sidebar-link .nav-icon,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.active > .sidebar-link i,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.open > .sidebar-link i {
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.active > .sidebar-link .nav-icon,
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.open > .sidebar-link .nav-icon,
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.active > .sidebar-link i,
+body.sidebar-collapsed .app-sidebar:not(:hover) .sidebar-item.open > .sidebar-link i {
   color: var(--color-primary) !important;
-  transform: scale(1.15) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.active > .sidebar-link::before,
-body.sidebar-collapsed:not(.sidebar-hover-active) .app-sidebar:not(:hover):not(.is-expanded-hold) .sidebar-item.open > .sidebar-link::before {
-  transform: translateY(-50%) scaleY(1);
-  left: 0;
-  height: 60%;
-}
-
-/* Auto-expand on hover/hold and smoothly displace main content (Responsive Push) */
-body.sidebar-collapsed .app-sidebar:hover,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold,
-body.sidebar-hover-active .app-sidebar,
-html.sidebar-hover-active .app-sidebar {
+/* Responsive Expansion on Hover in Collapsed Mode (Coupled with Main Content) */
+body.sidebar-collapsed .app-sidebar:hover {
   width: var(--sidebar-width);
-  box-shadow: 6px 0 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
   z-index: var(--z-sidebar);
 }
 
-/* Fluid responsive displacement of main content */
-body.sidebar-collapsed .app-sidebar:hover ~ .app-main,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold ~ .app-main,
-body.sidebar-hover-active .app-sidebar ~ .app-main,
-html.sidebar-hover-active .app-sidebar ~ .app-main {
+/* Fluid synchronized displacement of main content when sidebar expands */
+body.sidebar-collapsed .app-sidebar:hover ~ .app-main {
   margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
 }
 
 body.sidebar-collapsed .app-sidebar:hover .sidebar-logo .logo-text,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-logo .logo-text,
-body.sidebar-hover-active .app-sidebar .sidebar-logo .logo-text,
-html.sidebar-hover-active .app-sidebar .sidebar-logo .logo-text,
 body.sidebar-collapsed .app-sidebar:hover .sidebar-user-info,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-user-info,
-body.sidebar-hover-active .app-sidebar .sidebar-user-info,
-html.sidebar-hover-active .app-sidebar .sidebar-user-info,
-body.sidebar-collapsed .app-sidebar:hover .sidebar-heading,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-heading,
-body.sidebar-hover-active .app-sidebar .sidebar-heading,
-html.sidebar-hover-active .app-sidebar .sidebar-heading,
-body.sidebar-collapsed .app-sidebar:hover .nav-label,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .nav-label,
-body.sidebar-hover-active .app-sidebar .nav-label,
-html.sidebar-hover-active .app-sidebar .nav-label,
-body.sidebar-collapsed .app-sidebar:hover .nav-badge,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .nav-badge,
-body.sidebar-hover-active .app-sidebar .nav-badge,
-html.sidebar-hover-active .app-sidebar .nav-badge,
-body.sidebar-collapsed .app-sidebar:hover .nav-arrow,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .nav-arrow,
-body.sidebar-hover-active .app-sidebar .nav-arrow,
-html.sidebar-hover-active .app-sidebar .nav-arrow {
+body.sidebar-collapsed .app-sidebar:hover .sidebar-heading {
   opacity: 1 !important;
+  visibility: visible !important;
   pointer-events: auto !important;
+  width: auto !important;
+  max-width: 200px !important;
+  flex: 1 !important;
   transform: translateX(0) !important;
-  display: block !important;
-  transition: opacity 0.25s 0.08s ease, transform 0.25s 0.08s ease;
+  transition: opacity 0.2s 0.04s ease, transform 0.2s 0.04s ease !important;
 }
 
-body.sidebar-collapsed .app-sidebar:hover .sidebar-brand,
-body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-brand,
-body.sidebar-hover-active .app-sidebar .sidebar-brand,
-html.sidebar-hover-active .app-sidebar .sidebar-brand {
+body.sidebar-collapsed .app-sidebar:hover .nav-label {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  max-width: 200px !important;
+  flex: 1 !important;
+  transform: translateX(0) !important;
+  transition: opacity 0.2s 0.04s ease, transform 0.2s 0.04s ease !important;
+}
+
+body.sidebar-collapsed .app-sidebar:hover .nav-badge {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  max-width: 50px !important;
+  flex: 0 0 auto !important;
+  transform: translateX(0) !important;
+}
+
+body.sidebar-collapsed .app-sidebar:hover .nav-arrow {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  width: auto !important;
+  max-width: 30px !important;
+  flex: 0 0 auto !important;
+  transform: translateX(0) !important;
+}
+
+body.sidebar-collapsed .app-sidebar:hover .sidebar-brand {
   padding: 0 1.5rem;
   justify-content: space-between;
 }
 
 body.sidebar-collapsed .app-sidebar:hover .sidebar-user,
 body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-user,
-body.sidebar-hover-active .app-sidebar .sidebar-user,
-html.sidebar-hover-active .app-sidebar .sidebar-user {
+body.sidebar-hover-active .app-sidebar .sidebar-user {
   padding: 1.1rem 1.25rem;
   margin: 1rem 1rem 0.5rem 1rem;
   justify-content: flex-start;
@@ -1037,26 +1078,22 @@ html.sidebar-hover-active .app-sidebar .sidebar-user {
 
 body.sidebar-collapsed .app-sidebar:hover .sidebar-link,
 body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-link,
-body.sidebar-hover-active .app-sidebar .sidebar-link,
-html.sidebar-hover-active .app-sidebar .sidebar-link {
+body.sidebar-hover-active .app-sidebar .sidebar-link {
   justify-content: flex-start;
   padding: 0.7rem 0.875rem;
 }
 
 body.sidebar-collapsed .app-sidebar:hover .sidebar-link .nav-icon,
 body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-link .nav-icon,
-body.sidebar-hover-active .app-sidebar .sidebar-link .nav-icon,
-html.sidebar-hover-active .app-sidebar .sidebar-link .nav-icon {
+body.sidebar-hover-active .app-sidebar .sidebar-link .nav-icon {
   font-size: 1.15rem;
   width: 22px;
 }
 
-/* When hovering or holding collapsed sidebar, automatically restore & expand any open submenus / levels */
+/* Restore Submenus when hovering */
 body.sidebar-collapsed .app-sidebar:hover .sidebar-item.open > .sidebar-submenu-wrapper,
 body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-item.open > .sidebar-submenu-wrapper,
-body.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper,
-html.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper {
-  display: grid !important;
+body.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper {
   grid-template-rows: 1fr !important;
   pointer-events: auto !important;
   opacity: 1 !important;
@@ -1064,8 +1101,7 @@ html.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wra
 
 body.sidebar-collapsed .app-sidebar:hover .sidebar-item.open > .sidebar-submenu-wrapper > .sidebar-submenu > li > .sidebar-link,
 body.sidebar-collapsed .app-sidebar.is-expanded-hold .sidebar-item.open > .sidebar-submenu-wrapper > .sidebar-submenu > li > .sidebar-link,
-body.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper > .sidebar-submenu > li > .sidebar-link,
-html.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper > .sidebar-submenu > li > .sidebar-link {
+body.sidebar-hover-active .app-sidebar .sidebar-item.open > .sidebar-submenu-wrapper > .sidebar-submenu > li > .sidebar-link {
   opacity: 1 !important;
   transform: translateX(0) !important;
 }

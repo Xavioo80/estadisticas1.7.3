@@ -26,103 +26,87 @@ class IngresoController extends Controller
     public function index(Request $request)
     {
         try {
-            // Filtros opcionales
+            // ── Filtros de entrada ────────────────────────────────────────────
             $jornada = $request->input('jornada');
-            $medico = $request->input('medico'); // Filtro por médico
-            $ano = $request->input('ano', date('Y')); // Default al año actual
-            $mesInput = $request->input('mes', $this->getCurrentMonthName()); // Default al mes actual
-            
-            // Normalizar: Si recibimos un número, convertirlo a nombre (ej: "03" -> "Marzo")
+            $medico  = $request->input('medico');
+
+            // Mes/año por defecto: registro más reciente (sólo 3 columnas)
+            $latestRegistro = RegistroGlobal::select('ano', 'mes', 'fecha')
+                ->whereNotNull('fecha')->whereNotNull('mes')->where('mes', '!=', '')
+                ->orderBy('fecha', 'desc')
+                ->first();
+
+            $defaultAno = $latestRegistro ? ($latestRegistro->ano ?: date('Y')) : date('Y');
+            $defaultMes = $latestRegistro ? ($latestRegistro->mes ?: 'Agosto') : 'Agosto';
+
             $mesesNombres = [
-                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-                5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo',    4 => 'Abril',
+                5 => 'Mayo',  6 => 'Junio',   7 => 'Julio',    8 => 'Agosto',
                 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
             ];
-            
-            $mes = is_numeric($mesInput) ? ($mesesNombres[(int)$mesInput] ?? $mesInput) : $mesInput;
-            $fechaCalendario = $request->input('fecha_calendario', ''); // Fecha del calendario
 
-            // Construir fecha completa para filtro
+            $ano = $request->filled('ano') ? $request->input('ano') : $defaultAno;
+
+            if ($request->filled('mes')) {
+                $mesInput = $request->input('mes');
+                $mes = is_numeric($mesInput) ? ($mesesNombres[(int)$mesInput] ?? $mesInput)
+                                             : ucfirst(strtolower(trim($mesInput)));
+            } else {
+                $mes = is_numeric($defaultMes) ? ($mesesNombres[(int)$defaultMes] ?? $defaultMes)
+                                               : ucfirst(strtolower(trim($defaultMes)));
+            }
+
+            $fechaCalendario = $request->input('fecha_calendario', '');
+
             if (!empty($fechaCalendario)) {
-                // Filtro por fecha específica del calendario (independiente de año/mes)
-                $fechaFiltro = $fechaCalendario;
-                $tipoFiltro = 'fecha_calendario';
-            }
-            else {
-                // Filtro por año-mes
-                $mesNumero = $this->getMonthNumber($mes);
+                $fechaFiltro = Carbon::parse($fechaCalendario)->format('Y-m-d');
+                $tipoFiltro  = 'fecha_calendario';
+            } else {
+                $mesNumero  = $this->getMonthNumber($mes);
                 $fechaFiltro = $ano . '-' . str_pad($mesNumero, 2, '0', STR_PAD_LEFT);
-                $tipoFiltro = 'ano_mes';
+                $tipoFiltro  = 'ano_mes';
             }
 
-            Log::info('IngresoController@index iniciado', [
-                'jornada' => $jornada,
-                'ano' => $ano,
-                'mes' => $mes,
-                'fecha_calendario' => $fechaCalendario,
-                'fechaFiltro' => $fechaFiltro,
-                'tipoFiltro' => $tipoFiltro
-            ]);
+            // ── UNA SOLA QUERY PRINCIPAL ─────────────────────────────────────
+            // Traemos todos los registros del período con sólo las columnas necesarias.
+            // Eliminamos el N+1 (antes: 1 query por fecha × N fechas en el mes).
+            $camposNecesarios = [
+                'rg.id', 'rg.fecha', 'rg.medico', 'rg.jornada',
+                'rg.user_id', 'rg.edad', 'rg.created_at',
+                'rg.cod_1', 'rg.cod_2', 'rg.cod_3', 'rg.cod_4',
+                'rg.cod_5', 'rg.cod_6', 'rg.cod_7',
+                'u.name as user_name',
+            ];
 
-            // Query base para obtener registros agrupados por fecha primero
-            $query = RegistroGlobal::query()
-                ->select('fecha')
-                ->selectRaw('COUNT(*) as total_atenciones_fecha')
-                ->whereNotNull('fecha')
-                ->whereNotNull('medico')
-                ->where('medico', '!=', '');
+            $bulkQuery = DB::table('registros_globales as rg')
+                ->leftJoin('users as u', 'rg.user_id', '=', 'u.id')
+                ->select($camposNecesarios)
+                ->whereNotNull('rg.fecha')
+                ->whereNotNull('rg.medico')
+                ->where('rg.medico', '!=', '');
 
-            // Aplicar filtros
-            if (!empty($jornada)) {
-                $query->where('jornada', $jornada);
-            }
-
-            if (!empty($medico)) {
-                $query->where('medico', $medico);
-            }
-
-            // Aplicar filtro de fecha según el tipo
             if ($tipoFiltro === 'fecha_calendario') {
-                // fechaFiltro ya viene en Y-m-d desde el calendario
-                $fechaDbFormat = Carbon::parse($fechaFiltro)->format('Y-m-d');
-                $query->where('fecha', $fechaDbFormat);
-            }
-            else {
-                // Usar columnas directas para mayor velocidad y precisión
-                $query->where('ano', $ano)->where('mes', $mes);
+                $bulkQuery->where('rg.fecha', $fechaFiltro);
+            } else {
+                $bulkQuery->where('rg.ano', $ano)
+                          ->whereRaw('UPPER(TRIM(rg.mes)) = ?', [strtoupper(trim($mes))]);
             }
 
-            // Agrupar por fecha y ordenar
-            $fechasAgrupadas = $query
-                ->groupBy('fecha')
-                ->orderBy('fecha', 'desc')
-                ->get();
+            if (!empty($jornada)) { $bulkQuery->where('rg.jornada', $jornada); }
+            if (!empty($medico))  { $bulkQuery->where('rg.medico', $medico);   }
 
-            // Para cada fecha, obtener los médicos y sus estadísticas
-            $fechasConMedicos = $fechasAgrupadas->map(function ($fechaGrupo) use ($jornada, $medico, $fechaFiltro) {
-                // 1. Obtener todos los registros de la fecha con sus usuarios
-                $registrosBase = RegistroGlobal::query()
-                    ->leftJoin('users', 'registros_globales.user_id', '=', 'users.id')
-                    ->select('registros_globales.*', 'users.name as user_name')
-                    ->where('fecha', $fechaGrupo->fecha)
-                    ->whereNotNull('medico')
-                    ->where('medico', '!=', '');
+            // Ordenar por fecha desc, luego por id asc (para mantener orden de inserción por lote)
+            $todosLosRegistros = $bulkQuery->orderBy('rg.fecha', 'desc')->orderBy('rg.id', 'asc')->get();
 
-                if (!empty($jornada)) {
-                    $registrosBase->where('jornada', $jornada);
-                }
+            // ── AGRUPACIÓN EN PHP (0 queries adicionales) ─────────────────────
+            // Agrupar por fecha → médico → lote (user+jornada+minuto)
+            $porFecha = $todosLosRegistros->groupBy('fecha');
 
-                if (!empty($medico)) {
-                    $registrosBase->where('medico', $medico);
-                }
+            $fechasConMedicos = $porFecha->map(function ($registrosFecha, $fecha) {
+                $porMedico = $registrosFecha->groupBy('medico');
 
-                $todosRegistros = $registrosBase->orderBy('id', 'asc')->get();
-
-                // 2. Agrupar por médico
-                $medicosAgrupados = $todosRegistros->groupBy('medico');
-
-                $medicos = $medicosAgrupados->map(function ($itemsMedico, $nomMed) {
-                    // Agrupar sub-registros por usuario + jornada + timestamp (o minuto de envío)
+                $medicos = $porMedico->map(function ($itemsMedico, $nomMed) {
+                    // Sub-lotes: agrupados por user_id + jornada + minuto de created_at
                     $subGruposRaw = $itemsMedico->groupBy(function ($item) {
                         $u = $item->user_id ?? '0';
                         $j = $item->jornada ?? 'SIN_JORNADA';
@@ -133,191 +117,123 @@ class IngresoController extends Controller
                     $subRegistros = $subGruposRaw->map(function ($subItems, $key) {
                         $first = $subItems->first();
 
+                        // Contar diagnósticos válidos en SQL sería mejor, pero aquí ya tenemos los datos
                         $totalDiag = $subItems->sum(function ($r) {
                             $count = 0;
-                            for ($i = 1; $i <= 7; $i++) {
-                                $cod = $r->{"cod_$i"};
-                                if ($cod !== null && $cod !== '' && $cod !== 'N') {
-                                    $count++;
-                                }
+                            foreach (['cod_1','cod_2','cod_3','cod_4','cod_5','cod_6','cod_7'] as $col) {
+                                $v = $r->$col ?? null;
+                                if ($v !== null && $v !== '' && $v !== 'N') $count++;
                             }
                             return $count;
                         });
 
-                        $totalMenores5 = $subItems->filter(function ($r) {
-                            return is_numeric($r->edad) && (int)$r->edad < 5;
-                        })->count();
+                        $totalMenores5 = $subItems->filter(fn($r) =>
+                            is_numeric($r->edad) && (int)$r->edad < 5
+                        )->count();
 
                         return (object)[
-                            'key' => $key,
-                            'jornada' => $first->jornada ?: 'Sin jornada',
-                            'user_id' => $first->user_id,
-                            'user_name' => $first->user_name ?: 'S/U',
-                            'created_at' => $first->created_at,
-                            'created_at_formatted' => $first->created_at ? Carbon::parse($first->created_at)->format('h:i A') : null,
-                            'total_registros' => $subItems->count(),
-                            'total_diagnosticos' => $totalDiag,
-                            'total_menores_5' => $totalMenores5,
-                            'record_ids' => $subItems->pluck('id')->toArray(),
+                            'key'                 => $key,
+                            'jornada'             => $first->jornada ?: 'Sin jornada',
+                            'user_id'             => $first->user_id,
+                            'user_name'           => $first->user_name ?: 'S/U',
+                            'created_at'          => $first->created_at,
+                            'created_at_formatted'=> $first->created_at
+                                                        ? Carbon::parse($first->created_at)->format('h:i A')
+                                                        : null,
+                            'total_registros'     => $subItems->count(),
+                            'total_diagnosticos'  => $totalDiag,
+                            'total_menores_5'     => $totalMenores5,
+                            'record_ids'          => $subItems->pluck('id')->toArray(),
                         ];
                     })->values();
 
-                    // Totales para el médico
-                    $totalAtencionesMedico = $subRegistros->sum('total_registros');
-                    $totalDiagMedico = $subRegistros->sum('total_diagnosticos');
-                    $totalMenores5Medico = $subRegistros->sum('total_menores_5');
-
-                    $jornadasUnicas = $subRegistros->pluck('jornada')->unique();
-                    $jornadaPrincipal = ($jornadasUnicas->count() === 1) ? $jornadasUnicas->first() : 'VARIAS';
-
-                    $usuariosUnicos = $subRegistros->pluck('user_name')->unique();
-                    $usuarioPrincipal = ($usuariosUnicos->count() === 1) ? $usuariosUnicos->first() : 'VARIOS USUARIOS';
+                    $jornadasUnicas    = $subRegistros->pluck('jornada')->unique();
+                    $jornadaPrincipal  = $jornadasUnicas->count() === 1 ? $jornadasUnicas->first() : 'VARIAS';
+                    $usuariosUnicos    = $subRegistros->pluck('user_name')->unique();
+                    $usuarioPrincipal  = $usuariosUnicos->count() === 1 ? $usuariosUnicos->first() : 'VARIOS USUARIOS';
 
                     return (object)[
-                        'nom_med' => $nomMed,
-                        'cod_med' => '',
-                        'jornada' => $jornadaPrincipal,
-                        'user_name' => $usuarioPrincipal,
-                        'total_registros' => $totalAtencionesMedico,
-                        'total_diagnosticos' => $totalDiagMedico,
-                        'total_menores_5' => $totalMenores5Medico,
-                        'total_subregistros' => $subRegistros->count(),
-                        'sub_registros' => $subRegistros,
+                        'nom_med'           => $nomMed,
+                        'cod_med'           => '',
+                        'jornada'           => $jornadaPrincipal,
+                        'user_name'         => $usuarioPrincipal,
+                        'total_registros'   => $subRegistros->sum('total_registros'),
+                        'total_diagnosticos'=> $subRegistros->sum('total_diagnosticos'),
+                        'total_menores_5'   => $subRegistros->sum('total_menores_5'),
+                        'total_subregistros'=> $subRegistros->count(),
+                        'sub_registros'     => $subRegistros,
                     ];
                 })->values();
 
                 return (object)[
-                    'fecha' => $fechaGrupo->fecha,
-                    'total_atenciones_fecha' => $fechaGrupo->total_atenciones_fecha,
-                    'medicos' => $medicos
+                    'fecha'                  => $fecha,
+                    'total_atenciones_fecha' => $registrosFecha->count(),
+                    'medicos'                => $medicos,
                 ];
             });
 
-            Log::info('Fechas agrupadas encontradas', [
-                'total_fechas' => $fechasConMedicos->count(),
-                'filtros_aplicados' => [
-                    'ano' => $ano,
-                    'mes' => $mes,
-                    'fechaFiltro' => $fechaFiltro,
-                    'tipoFiltro' => $tipoFiltro
-                ]
-            ]);
+            // ── ESTADÍSTICAS: derivadas de la colección ya cargada ────────────
+            $totalRegistrosFiltrados = $todosLosRegistros->count();
+            $totalMedicosFiltrados   = $todosLosRegistros->pluck('medico')->unique()->count();
 
-            // Calcular estadísticas FILTRADAS basadas en los mismos criterios de búsqueda
-            $estadisticasQuery = RegistroGlobal::query()
-                ->whereNotNull('fecha')
-                ->whereNotNull('medico')
-                ->where('medico', '!=', '');
-
-            // Aplicar los mismos filtros que se usaron para obtener los datos
-            if (!empty($jornada)) {
-                $estadisticasQuery->where('jornada', $jornada);
-            }
-
-            if (!empty($medico)) {
-                $estadisticasQuery->where('medico', $medico);
-            }
-
-            // Aplicar filtro de fecha según el tipo
-            if ($tipoFiltro === 'fecha_calendario') {
-                $fechaDbFormat = Carbon::parse($fechaFiltro)->format('j/n/Y');
-                $estadisticasQuery->where('fecha', 'LIKE', "%$fechaDbFormat%");
-            }
-            else {
-                $estadisticasQuery->where('ano', $ano)->where('mes', $mes);
-            }
-
-            // Calcular estadísticas filtradas
-            $totalRegistrosFiltrados = $estadisticasQuery->count();
-            $totalMedicosFiltrados = $estadisticasQuery->distinct('medico')->count('medico');
-
-            // Registros de hoy (siempre global, no filtrado)
-            $registrosHoy = RegistroGlobal::whereDate('fecha', Carbon::today())->count();
+            // Registros de HOY: query liviana sobre sólo la fecha de hoy
+            $registrosHoy = DB::table('registros_globales')
+                ->whereDate('fecha', Carbon::today()->format('Y-m-d'))
+                ->count();
 
             $estadisticas = [
                 'total_registros' => $totalRegistrosFiltrados,
-                'total_medicos' => $totalMedicosFiltrados,
-                'registros_hoy' => $registrosHoy
+                'total_medicos'   => $totalMedicosFiltrados,
+                'registros_hoy'   => $registrosHoy,
             ];
 
-            // Obtener jornadas, profesiones y médicos FILTRADOS SOLO POR MES/FECHA
-            // El mes es el filtro principal que controla todos los demás
-            $filtrosBaseQuery = RegistroGlobal::query()
-                ->whereNotNull('fecha')
-                ->whereNotNull('medico')
-                ->where('medico', '!=', '');
+            // ── FILTROS PARA SELECTORES (jornadas / médicos / años) ───────────
+            // Derivados de la colección: 0 queries adicionales
+            $jornadas     = $todosLosRegistros->pluck('jornada')->filter()->unique()->sort()->values();
+            $medicosUnicos = $todosLosRegistros->pluck('medico')->filter()->unique()->sort()->values();
 
-            // Aplicar SOLO filtro de fecha (mes/año o fecha específica)
-            if ($tipoFiltro === 'fecha_calendario') {
-                $fechaDbFormat = Carbon::parse($fechaFiltro)->format('j/n/Y');
-                $filtrosBaseQuery->where('fecha', 'LIKE', "%$fechaDbFormat%");
-            }
-            else {
-                $filtrosBaseQuery->where('ano', $ano)->where('mes', $mes);
-            }
+            // Años disponibles: query liviana sólo sobre columna `ano`
+            $anosDisponibles = DB::table('registros_globales')
+                ->select('ano')->distinct()
+                ->whereNotNull('ano')->where('ano', '!=', '')
+                ->orderBy('ano', 'desc')->pluck('ano')->toArray();
 
-            // Clonar query base para cada filtro (SIN aplicar otros filtros)
-            $jornadasQuery = clone $filtrosBaseQuery;
-            $medicosQuery = clone $filtrosBaseQuery;
+            if (!in_array(date('Y'), $anosDisponibles)) $anosDisponibles[] = date('Y');
+            if (!in_array($ano, $anosDisponibles)) $anosDisponibles[] = $ano;
+            rsort($anosDisponibles);
+            $anos = array_unique($anosDisponibles);
 
-            // Obtener valores únicos basados SOLO en el mes seleccionado
-            $jornadas = $jornadasQuery->distinct('jornada')
-                ->whereNotNull('jornada')
-                ->where('jornada', '!=', '')
-                ->orderBy('jornada')
-                ->pluck('jornada');
+            return view('ingresos.index', compact(
+                'fechasConMedicos', 'jornadas', 'medicosUnicos', 'estadisticas',
+                'jornada', 'medico', 'ano', 'mes', 'fechaCalendario', 'anos'
+            ));
 
-            $medicosUnicos = $medicosQuery->distinct('medico')
-                ->whereNotNull('medico')
-                ->where('medico', '!=', '')
-                ->orderBy('medico')
-                ->pluck('medico');
-
-            // Obtener todos los años disponibles en la base de datos para el selector (sin límites hardcoded)
-            $anosDisponibles = RegistroGlobal::distinct()
-                ->whereNotNull('ano')
-                ->where('ano', '!=', '')
-                ->orderBy('ano', 'desc')
-                ->pluck('ano');
-            
-            // Asegurarse de que el año actual y el año seleccionado estén en la lista
-            $anos = $anosDisponibles->toArray();
-            if (!in_array(date('Y'), $anos)) $anos[] = date('Y');
-            if (!in_array($ano, $anos)) $anos[] = $ano;
-            rsort($anos);
-            $anos = array_unique($anos);
-
-            return view('ingresos.index', compact('fechasConMedicos', 'jornadas', 'medicosUnicos', 'estadisticas', 'jornada', 'medico', 'ano', 'mes', 'fechaCalendario', 'anos'));
-
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Error en IngresoController@index', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return view('ingresos.index', [
                 'fechasConMedicos' => collect(),
-                'jornadas' => collect(),
-                'medicosUnicos' => collect(),
-                'estadisticas' => [
-                    'total_registros' => 0,
-                    'total_medicos' => 0,
-                    'registros_hoy' => 0
-                ],
-                'jornada' => null,
-                'medico' => null,
-                'ano' => date('Y'),
-                'mes' => $this->getCurrentMonthName(),
-                'fechaCalendario' => null,
-                'anos' => [date('Y')]
+                'jornadas'         => collect(),
+                'medicosUnicos'    => collect(),
+                'estadisticas'     => ['total_registros' => 0, 'total_medicos' => 0, 'registros_hoy' => 0],
+                'jornada'          => null,
+                'medico'           => null,
+                'ano'              => date('Y'),
+                'mes'              => $this->getCurrentMonthName(),
+                'fechaCalendario'  => null,
+                'anos'             => [date('Y')],
             ]);
         }
     }
 
+
     /**
      * Obtener profesiones filtradas por fecha (AJAX)
      */
+
     public function profesionesPorFecha(Request $request)
     {
         try {

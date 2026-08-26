@@ -317,12 +317,29 @@ class At2rNController extends Controller
             }
         }
 
+        // ── Obtener referencia de Morbilidad para comprobación ────────────
+        $morbRef = $this->getMorbilidadReferenceData($ano, $mes, $jornada);
+        $morbMap = [
+            'No. De niños/as menores de 5 años con diarrea nuevo' => ['val' => $morbRef['diarreas_nuevas'], 'key' => 'diarreas_nuevas'],
+            'No. De niños/as menores de 5 años con diarrea que acuden a cita de seguimiento' => ['val' => $morbRef['diarreas_subs'], 'key' => 'diarreas_subs'],
+            'No. De Niños/as menores de 5 años con casos de Neumonía nuevos en el año' => ['val' => $morbRef['neumonias_nuevas'], 'key' => 'neumonias_nuevas'],
+            'No. De Niños/as menores de 5 años con Neumonía que acuden a su cita de Seguimiento' => ['val' => $morbRef['neumonias_subs'], 'key' => 'neumonias_subs'],
+            'No. de niños/as menores de 5 años con algun grado de Síndrome anémico diagnosticado' => ['val' => $morbRef['anemias_nuevas'], 'key' => 'anemias_nuevas'],
+            'Número de atenciones brindadas Nuevas de Diabetes Mellitus' => ['val' => $morbRef['diabetes_nuevas'], 'key' => 'diabetes_nuevas'],
+            'Número de atenciones brindadas Subsiguientes de Diabetes Mellitus' => ['val' => $morbRef['diabetes_subs'], 'key' => 'diabetes_subs'],
+            'Número de atenciones brindadas Nuevas de Hipertensión Arterial' => ['val' => $morbRef['hta_nuevas'], 'key' => 'hta_nuevas'],
+            'Número de atenciones brindadas Subsiguientes de Hipertensión Arterial' => ['val' => $morbRef['hta_subs'], 'key' => 'hta_subs'],
+            'Número de atenciones brindadas Nuevas de Enfermedad Renal Crónica' => ['val' => $morbRef['erc_nuevas'], 'key' => 'erc_nuevas'],
+            'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica' => ['val' => $morbRef['erc_subs'], 'key' => 'erc_subs'],
+        ];
+
         // ── Formatear datos finales ────────────────────────────────────────
         $allRows = array_merge($ageRows, $progRows);
         $finalData = [];
         foreach ($allRows as $idx => $row) {
+            $label = $row['label'];
             $finalData[] = [
-                'label' => $row['label'],
+                'label' => $label,
                 'cols' => $results[$idx],
                 'total' => array_sum($results[$idx]),
                 'color' => $row['color'] ?? '',
@@ -330,6 +347,8 @@ class At2rNController extends Controller
                 'header' => $row['header'] ?? false,
                 'is_manual' => $row['is_manual'] ?? false,
                 'manual_key' => $row['manual_key'] ?? null,
+                'morbilidad_val' => isset($morbMap[$label]) ? $morbMap[$label]['val'] : null,
+                'morbilidad_key' => isset($morbMap[$label]) ? $morbMap[$label]['key'] : null,
             ];
         }
 
@@ -706,6 +725,222 @@ class At2rNController extends Controller
         ]);
     }
 
+    public function morbilidadAudit(Request $request)
+    {
+        $ano = $request->input('ano', date('Y'));
+        $mes = $request->input('mes', '');
+        $jornada = $request->input('jornada', 'TODAS');
+        $conceptKey = $request->input('concept_key', '');
+
+        $matchers = [
+            'diarreas_nuevas' => [
+                'label' => 'No. De niños/as menores de 5 años con diarrea nuevo',
+                'is_menor5' => true,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'DIARREA') || $cod === 'A09.X') && $c === 'N',
+            ],
+            'diarreas_subs' => [
+                'label' => 'No. De niños/as menores de 5 años con diarrea que acuden a cita de seguimiento',
+                'is_menor5' => true,
+                'cond' => 'S',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'DIARREA') || $cod === 'A09.X') && $c === 'S',
+            ],
+            'neumonias_nuevas' => [
+                'label' => 'No. De Niños/as menores de 5 años con casos de Neumonía nuevos en el año',
+                'is_menor5' => true,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA')) && $c === 'N',
+            ],
+            'neumonias_subs' => [
+                'label' => 'No. De Niños/as menores de 5 años con Neumonía que acuden a su cita de Seguimiento',
+                'is_menor5' => true,
+                'cond' => 'S',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA')) && $c === 'S',
+            ],
+            'anemias_nuevas' => [
+                'label' => 'No. de niños/as menores de 5 años con algun grado de Síndrome anémico diagnosticado',
+                'is_menor5' => true,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => str_contains($d, 'ANEMIA') && $c === 'N',
+            ],
+            'diabetes_nuevas' => [
+                'label' => 'Número de atenciones brindadas Nuevas de Diabetes Mellitus',
+                'is_menor5' => false,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'DIABETES') || $cod === 'E14.9' || $d === 'DM2') && $c === 'N',
+            ],
+            'diabetes_subs' => [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Diabetes Mellitus',
+                'is_menor5' => false,
+                'cond' => 'S',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'DIABETES') || $cod === 'E14.9' || $d === 'DM2') && $c === 'S',
+            ],
+            'hta_nuevas' => [
+                'label' => 'Número de atenciones brindadas Nuevas de Hipertensión Arterial',
+                'is_menor5' => false,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || $cod === 'I10.X') && $c === 'N',
+            ],
+            'hta_subs' => [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Hipertensión Arterial',
+                'is_menor5' => false,
+                'cond' => 'S',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || $cod === 'I10.X') && $c === 'S',
+            ],
+            'erc_nuevas' => [
+                'label' => 'Número de atenciones brindadas Nuevas de Enfermedad Renal Crónica',
+                'is_menor5' => false,
+                'cond' => 'N',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && $c === 'N',
+            ],
+            'erc_subs' => [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica',
+                'is_menor5' => false,
+                'cond' => 'S',
+                'test' => fn($d, $c, $cod) => (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && $c === 'S',
+            ],
+        ];
+
+        if (!isset($matchers[$conceptKey])) {
+            return response()->json(['error' => 'Concepto no configurado para auditoría de morbilidad.'], 404);
+        }
+
+        $def = $matchers[$conceptKey];
+
+        // 1. Pacientes en AT2 (RegistroGlobal)
+        $rgQuery = RegistroGlobal::where('ano', $ano)->where('mes', $mes);
+        if ($jornada !== 'TODAS') $rgQuery->where('jornada', $jornada);
+        $rgRecords = $rgQuery->get();
+
+        $at2Patients = [];
+        $duplicatesInRG = [];
+        $excludedProfessions = [];
+
+        foreach ($rgRecords as $r) {
+            $t = strtoupper(trim($r->tipo ?? ''));
+            $e = (int)($r->edad ?? 0);
+            if ($def['is_menor5']) {
+                if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
+            }
+
+            $col = $this->resolveColumnaProfesion($r->prof, $r->medico ?? '', false);
+
+            $matchedDiags = [];
+            for ($i = 1; $i <= 7; $i++) {
+                $diag = $this->cleanDiag($r->{"diagnostico_$i"} ?? '');
+                $cond = strtoupper(trim($r->{"cond_$i"} ?? ($r->cond ?? '')));
+                $cod = strtoupper(trim($r->{"cod_$i"} ?? ''));
+                if ($def['test']($diag, $cond, $cod)) {
+                    $matchedDiags[] = [
+                        'pos' => $i,
+                        'diag' => $r->{"diagnostico_$i"},
+                        'cond' => $cond,
+                        'cod' => $cod
+                    ];
+                }
+            }
+
+            if (count($matchedDiags) > 0) {
+                if (!$col) {
+                    $excludedProfessions[] = [
+                        'registro_id' => $r->id,
+                        'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
+                        'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
+                        'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
+                        'prof' => $r->prof ?: 'SIN PROFESIÓN',
+                        'diagnosticos' => $matchedDiags,
+                        'motivo' => "La profesión '{$r->prof}' está excluida o no pertenece a las 4 columnas del AT2-r N."
+                    ];
+                } else {
+                    $at2Patients[$r->id] = [
+                        'registro_id' => $r->id,
+                        'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
+                        'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
+                        'edad' => ($r->edad !== null ? $r->edad . ' ' . $r->tipo : 'S/E'),
+                        'sexo' => $r->sexo ?: 'S/S',
+                        'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
+                        'prof' => $r->prof ?: 'SIN PROFESIÓN',
+                        'col' => $col,
+                        'diagnosticos' => $matchedDiags
+                    ];
+
+                    if (count($matchedDiags) > 1) {
+                        $duplicatesInRG[] = [
+                            'registro_id' => $r->id,
+                            'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
+                            'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
+                            'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
+                            'prof' => $r->prof ?: 'SIN PROFESIÓN',
+                            'count' => count($matchedDiags),
+                            'diagnosticos' => $matchedDiags,
+                            'motivo' => "El diagnóstico se registró en " . count($matchedDiags) . " casillas de la misma atención. En AT2 cuenta 1 paciente; en Morbilidad suma " . count($matchedDiags) . " líneas."
+                        ];
+                    }
+                }
+            }
+        }
+
+        // 2. Líneas en Informe (Morbilidad)
+        $infQuery = \App\Models\Informe::where('ano', $ano)->where('mes', $mes);
+        if ($jornada !== 'TODAS') $infQuery->where('jornada', $jornada);
+        $infRecords = $infQuery->get();
+
+        $morbMatched = [];
+        $orphansInMorb = [];
+
+        foreach ($infRecords as $inf) {
+            $t = strtoupper(trim($inf->tipo ?? ''));
+            $e = (int)($inf->edad ?? 0);
+            if ($def['is_menor5']) {
+                if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
+            }
+
+            $diag = $this->cleanDiag($inf->diagnostico ?? '');
+            $cond = strtoupper(trim($inf->cond_diagnostico ?? ''));
+            $cod = strtoupper(trim($inf->cod ?? ''));
+
+            if ($def['test']($diag, $cond, $cod)) {
+                $morbMatched[] = $inf;
+
+                if (!isset($at2Patients[$inf->registro_id])) {
+                    $isExcluded = false;
+                    foreach ($excludedProfessions as $ex) {
+                        if ($ex['registro_id'] == $inf->registro_id) $isExcluded = true;
+                    }
+                    if (!$isExcluded) {
+                        $orphansInMorb[] = [
+                            'informe_id' => $inf->id,
+                            'registro_id' => $inf->registro_id,
+                            'fecha' => $inf->fecha ? \Carbon\Carbon::parse($inf->fecha)->format('d/m/Y') : 'SIN FECHA',
+                            'paciente' => trim($inf->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
+                            'medico' => trim($inf->medico ?? '') ?: 'NO ESPECIFICADO',
+                            'prof' => $inf->prof ?: 'SIN PROFESIÓN',
+                            'diagnostico' => $inf->diagnostico . ($cond ? " ($cond)" : ''),
+                            'motivo' => "El registro existe en la tabla de Morbilidad, pero la atención original ID #{$inf->registro_id} fue eliminada o no existe en Registro Global."
+                        ];
+                    }
+                }
+            }
+        }
+
+        $at2Total = count($at2Patients);
+        $morbTotal = count($morbMatched);
+        $diferencia = $morbTotal - $at2Total;
+        $cuadra = ($diferencia === 0);
+
+        return response()->json([
+            'concepto' => $def['label'],
+            'at2_total' => $at2Total,
+            'morb_total' => $morbTotal,
+            'diferencia' => $diferencia,
+            'cuadra' => $cuadra,
+            'duplicados' => $duplicatesInRG,
+            'huerfanos' => $orphansInMorb,
+            'excluidos_profesion' => $excludedProfessions,
+            'pacientes' => array_values($at2Patients),
+        ]);
+    }
+
     public function export(Request $request)
     {
         // Reutiliza la lógica de exportación si existe un Export específico
@@ -773,6 +1008,92 @@ class At2rNController extends Controller
             $c = strtoupper(trim($r->cond_1 ?? ''));
         }
         return $c;
+    }
+
+    private function cleanDiag($str): string
+    {
+        $str = strtoupper(trim((string)$str));
+        return str_replace(['Á','É','Í','Ó','Ú','á','é','í','ó','ú'], ['A','E','I','O','U','a','e','i','o','u'], $str);
+    }
+
+    private function getMorbilidadReferenceData($ano, $mes, $jornada): array
+    {
+        $query = \App\Models\Informe::query()->where('ano', $ano)->where('mes', $mes);
+        if ($jornada !== 'TODAS') {
+            $query->where('jornada', $jornada);
+        }
+
+        $records = $query->get(['cod', 'diagnostico', 'cond_diagnostico', 'edad', 'tipo']);
+
+        $diarreasN = 0;
+        $diarreasS = 0;
+        $neumoniasN = 0;
+        $neumoniasS = 0;
+        $anemiasN = 0;
+        $diabetesN = 0;
+        $diabetesS = 0;
+        $htaN = 0;
+        $htaS = 0;
+        $ercN = 0;
+        $ercS = 0;
+
+        foreach ($records as $r) {
+            $diag = $this->cleanDiag($r->diagnostico ?? '');
+            $cod = strtoupper(trim($r->cod ?? ''));
+            $cond = strtoupper(trim($r->cond_diagnostico ?? ''));
+            $tipo = strtoupper(trim($r->tipo ?? ''));
+            $edad = (int)($r->edad ?? 0);
+            $isMenor5 = ($tipo === 'D' || $tipo === 'M' || ($tipo === 'A' && $edad <= 4));
+
+            // Diarreas (< 5 años)
+            if ($isMenor5 && (str_contains($diag, 'DIARREA') || $cod === 'A09.X')) {
+                if ($cond === 'N') $diarreasN++;
+                elseif ($cond === 'S') $diarreasS++;
+            }
+
+            // Neumonías (< 5 años)
+            if ($isMenor5 && (str_contains($diag, 'NEUMONIA') || str_contains($diag, 'BRONCONEUMONIA'))) {
+                if ($cond === 'N') $neumoniasN++;
+                elseif ($cond === 'S') $neumoniasS++;
+            }
+
+            // Anemias (< 5 años)
+            if ($isMenor5 && str_contains($diag, 'ANEMIA')) {
+                if ($cond === 'N') $anemiasN++;
+            }
+
+            // Diabetes (Todas las edades)
+            if (str_contains($diag, 'DIABETES') || $cod === 'E14.9' || $diag === 'DM2') {
+                if ($cond === 'N') $diabetesN++;
+                elseif ($cond === 'S') $diabetesS++;
+            }
+
+            // Hipertensión (Todas las edades)
+            if (str_contains($diag, 'HIPERTENSION') || $diag === 'HTA' || $cod === 'I10.X') {
+                if ($cond === 'N') $htaN++;
+                elseif ($cond === 'S') $htaS++;
+            }
+
+            // ERC (Todas las edades)
+            if (str_contains($diag, 'RENAL CRONICA') || str_contains($diag, 'ENFERMEDAD RENAL') || $diag === 'ERC') {
+                if ($cond === 'N') $ercN++;
+                elseif ($cond === 'S') $ercS++;
+            }
+        }
+
+        return [
+            'diarreas_nuevas' => $diarreasN,
+            'diarreas_subs' => $diarreasS,
+            'neumonias_nuevas' => $neumoniasN,
+            'neumonias_subs' => $neumoniasS,
+            'anemias_nuevas' => $anemiasN,
+            'diabetes_nuevas' => $diabetesN,
+            'diabetes_subs' => $diabetesS,
+            'hta_nuevas' => $htaN,
+            'hta_subs' => $htaS,
+            'erc_nuevas' => $ercN,
+            'erc_subs' => $ercS,
+        ];
     }
 
     private function resolveColumnaProfesion($prof, $medico = '', bool $force = false): ?int
@@ -858,27 +1179,27 @@ class At2rNController extends Controller
     private function getAgeRows(): array
     {
         return [
-            ['label' => 'menores de 1 mes primera vez', 'match' => fn($r) => $r->tipo == 'D' && $this->getCondRecord($r) == 'N'],
-            ['label' => 'menores de 1 mes subsiguiente', 'match' => fn($r) => $r->tipo == 'D' && $this->getCondRecord($r) == 'S'],
-            ['label' => '1 mes a un año primera vez', 'match' => fn($r) => $r->tipo == 'M' && $this->getCondRecord($r) == 'N'],
-            ['label' => '1 mes a un año subsiguiente', 'match' => fn($r) => $r->tipo == 'M' && $this->getCondRecord($r) == 'S'],
-            ['label' => '1-4 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 1 && $r->edad <= 4 && $this->getCondRecord($r) == 'N'],
-            ['label' => '1-4 años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 1 && $r->edad <= 4 && $this->getCondRecord($r) == 'S'],
-            ['label' => '5-9 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 5 && $r->edad <= 9 && $this->getCondRecord($r) == 'N'],
-            ['label' => '5-9 años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 5 && $r->edad <= 9 && $this->getCondRecord($r) == 'S'],
-            ['label' => '10-14 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 10 && $r->edad <= 14 && $this->getCondRecord($r) == 'N'],
-            ['label' => '10-14 años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 10 && $r->edad <= 14 && $this->getCondRecord($r) == 'S'],
-            ['label' => '15-19 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 15 && $r->edad <= 19 && $this->getCondRecord($r) == 'N'],
-            ['label' => '15-19 años sub siguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 15 && $r->edad <= 19 && $this->getCondRecord($r) == 'S'],
-            ['label' => '20-49 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 20 && $r->edad <= 49 && $this->getCondRecord($r) == 'N'],
-            ['label' => '20-49 años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 20 && $r->edad <= 49 && $this->getCondRecord($r) == 'S'],
-            ['label' => '50-59 años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 50 && $r->edad <= 59 && $this->getCondRecord($r) == 'N'],
-            ['label' => '50-59 años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 50 && $r->edad <= 59 && $this->getCondRecord($r) == 'S'],
-            ['label' => '60...- años primera vez', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 60 && $this->getCondRecord($r) == 'N'],
-            ['label' => '60...- años subsiguiente', 'match' => fn($r) => $r->tipo == 'A' && $r->edad >= 60 && $this->getCondRecord($r) == 'S'],
+            ['label' => 'menores de 1 mes primera vez', 'match' => fn($r) => (strtoupper(trim($r->tipo ?? '')) === 'D' || (strtoupper(trim($r->tipo ?? '')) === 'M' && (int)$r->edad === 0)) && $this->getCondRecord($r) === 'N'],
+            ['label' => 'menores de 1 mes subsiguiente', 'match' => fn($r) => (strtoupper(trim($r->tipo ?? '')) === 'D' || (strtoupper(trim($r->tipo ?? '')) === 'M' && (int)$r->edad === 0)) && $this->getCondRecord($r) === 'S'],
+            ['label' => '1 mes a un año primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'M' && (int)$r->edad >= 1 && $this->getCondRecord($r) === 'N'],
+            ['label' => '1 mes a un año subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'M' && (int)$r->edad >= 1 && $this->getCondRecord($r) === 'S'],
+            ['label' => '1-4 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad <= 4 && $this->getCondRecord($r) === 'N'],
+            ['label' => '1-4 años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad <= 4 && $this->getCondRecord($r) === 'S'],
+            ['label' => '5-9 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 5 && (int)$r->edad <= 9 && $this->getCondRecord($r) === 'N'],
+            ['label' => '5-9 años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 5 && (int)$r->edad <= 9 && $this->getCondRecord($r) === 'S'],
+            ['label' => '10-14 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 10 && (int)$r->edad <= 14 && $this->getCondRecord($r) === 'N'],
+            ['label' => '10-14 años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 10 && (int)$r->edad <= 14 && $this->getCondRecord($r) === 'S'],
+            ['label' => '15-19 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 15 && (int)$r->edad <= 19 && $this->getCondRecord($r) === 'N'],
+            ['label' => '15-19 años sub siguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 15 && (int)$r->edad <= 19 && $this->getCondRecord($r) === 'S'],
+            ['label' => '20-49 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 20 && (int)$r->edad <= 49 && $this->getCondRecord($r) === 'N'],
+            ['label' => '20-49 años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 20 && (int)$r->edad <= 49 && $this->getCondRecord($r) === 'S'],
+            ['label' => '50-59 años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 50 && (int)$r->edad <= 59 && $this->getCondRecord($r) === 'N'],
+            ['label' => '50-59 años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 50 && (int)$r->edad <= 59 && $this->getCondRecord($r) === 'S'],
+            ['label' => '60...- años primera vez', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 60 && $this->getCondRecord($r) === 'N'],
+            ['label' => '60...- años subsiguiente', 'match' => fn($r) => strtoupper(trim($r->tipo ?? '')) === 'A' && (int)$r->edad >= 60 && $this->getCondRecord($r) === 'S'],
             ['label' => 'TOTAL PACIENTES ATENDIDOS', 'sum' => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], 'color' => 'bg-info-soft'],
-            ['label' => 'No. Atenciones de mujeres', 'match' => fn($r) => strtoupper($r->sexo ?? '') === 'M'],
-            ['label' => 'No. Atenciones de hombres', 'match' => fn($r) => strtoupper($r->sexo ?? '') === 'H'],
+            ['label' => 'No. Atenciones de mujeres', 'match' => fn($r) => strtoupper(trim($r->sexo ?? '')) === 'M'],
+            ['label' => 'No. Atenciones de hombres', 'match' => fn($r) => strtoupper(trim($r->sexo ?? '')) === 'H'],
             ['label' => 'Total atenciones a mujeres y hombres', 'sum' => [19, 20], 'color' => 'bg-info-soft'],
             ['label' => 'No. Consultas espontaneas', 'diff' => [24, 23]],
             ['label' => 'No. Consultas referidas', 'match' => fn($r) => trim($r->referido_de ?? '') !== '' || (
@@ -890,7 +1211,7 @@ class At2rNController extends Controller
                  strtoupper($r->diagnostico_6 ?? '') == 'REFERENCIAS RECIBIDAS' ||
                  strtoupper($r->diagnostico_7 ?? '') == 'REFERENCIAS RECIBIDAS')
             )],
-            ['label' => 'TOTAL DE CONSULTAS', 'sum' => [21], 'color' => 'bg-info-soft'],
+            ['label' => 'TOTAL DE CONSULTAS', 'sum' => [18], 'color' => 'bg-info-soft'],
             ['label' => 'H: N < 5', 'sum' => [0, 2, 4], 'hidden' => true],
             ['label' => 'H: S < 5', 'sum' => [1, 3, 5], 'hidden' => true],
             ['label' => 'H: All < 5', 'sum' => [25, 26], 'hidden' => true],
@@ -1018,16 +1339,24 @@ class At2rNController extends Controller
             ],
             [
                 'label' => 'Número de atenciones puerperales entre los 3 a 7 días',
-                'match' => fn($r) => str_contains(strtoupper($r->diagnostico ?? ''), 'ATENCIÓN PUERPERAL')
-                    && str_contains(strtoupper($r->diagnostico ?? ''), 'PRIMEROS 7')
-                    && in_array(strtoupper(trim($r->cond_diag ?? '')), ['N', 'S']),
+                'match' => function($r) {
+                    $diag = $this->cleanDiag($r->diagnostico ?? '');
+                    $cod = trim((string)($r->cod ?? ''));
+                    if ($cod === '114') return true;
+                    return (str_contains($diag, 'PUERP') || str_contains($diag, 'PARTO'))
+                        && (str_contains($diag, '3 A 7') || str_contains($diag, '3-7') || str_contains($diag, 'PRIMEROS 7') || str_contains($diag, 'PRIMEROS 10'));
+                },
                 'color' => 'bg-orange-soft'
             ],
             [
                 'label' => 'Número de Atenciones puerperales después de los 7 días',
-                'match' => fn($r) => str_contains(strtoupper($r->diagnostico ?? ''), 'ATENCIÓN PUERPERAL')
-                    && str_contains(strtoupper($r->diagnostico ?? ''), 'DESPUES DE LOS 7')
-                    && in_array(strtoupper(trim($r->cond_diag ?? '')), ['N', 'S']),
+                'match' => function($r) {
+                    $diag = $this->cleanDiag($r->diagnostico ?? '');
+                    $cod = trim((string)($r->cod ?? ''));
+                    if ($cod === '115') return true;
+                    return (str_contains($diag, 'PUERP') || str_contains($diag, 'PARTO'))
+                        && (str_contains($diag, 'DESPUES') || str_contains($diag, 'DESP') || str_contains($diag, '11 Y 40') || str_contains($diag, 'MAYOR'));
+                },
                 'color' => 'bg-orange-soft'
             ],
             [
@@ -1039,12 +1368,54 @@ class At2rNController extends Controller
             ['label' => 'Número de atencion de adolescentes de 10 a 19 años mujeres', 'match_atencion' => fn($r) => $r->tipo == 'A' && $r->edad >= 10 && $r->edad <= 19 && strtoupper($r->sexo) == 'M' && !$this->isPrenatalNuevaRecord($r), 'color' => 'bg-info-soft'],
             ['label' => 'Número de atencion de adolescentes de 10 a 19 años varones', 'match_atencion' => fn($r) => $r->tipo == 'A' && $r->edad >= 10 && $r->edad <= 19 && strtoupper($r->sexo) == 'H', 'color' => 'bg-info-soft'],
             ['label' => 'Detección de Casos presuntivos de Tuberculosis', 'diag' => ['DETECCIÓN DE CASOS PRESUNTIVOS DE TUBERCULOSIS', 'CASO PRESUNTIVO DE TUBERCULOSIS', 'SINTOMATICO RESPIRATORIO'], 'cond' => 'N', 'color' => 'bg-info-soft'],
-            ['label' => 'Número de atenciones brindadas Nuevas de Diabetes Mellitus', 'diag' => ['DIABETES', 'DIABETES MELLITUS', 'DM2', 'DIABETES MELLITUS TIPO 2'], 'cond' => 'N', 'color' => 'bg-green-soft'],
-            ['label' => 'Número de atenciones brindadas Subsiguientes de Diabetes Mellitus', 'diag' => ['DIABETES', 'DIABETES MELLITUS', 'DM2', 'DIABETES MELLITUS TIPO 2'], 'cond' => 'S', 'color' => 'bg-green-soft'],
-            ['label' => 'Número de atenciones brindadas Nuevas de Hipertensión Arterial', 'diag' => ['ATENCIONES BRINDADAS NUEVAS DE HIPERTENSIÓN ARTERIAL', 'HIPERTENSION ARTERIAL'], 'cond' => 'N', 'color' => 'bg-green-soft'],
-            ['label' => 'Número de atenciones brindadas Subsiguientes de Hipertensión Arterial', 'diag' => ['ATENCIONES BRINDADAS SUBSIGUIENTES DE HIPERTENSIÓN ARTERIAL', 'HIPERTENSION ARTERIAL'], 'cond' => 'S', 'color' => 'bg-green-soft'],
-            ['label' => 'Número de atenciones brindadas Nuevas de Enfermedad Renal Crónica', 'diag' => ['ENFERMEDAD RENAL CRONICA', 'ENFERMEDAD RENAL CRÓNICA', 'ERC'], 'cond' => 'N', 'color' => 'bg-orange-soft'],
-            ['label' => 'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica', 'diag' => ['ENFERMEDAD RENAL CRONICA', 'ENFERMEDAD RENAL CRÓNICA', 'ERC'], 'cond' => 'S', 'color' => 'bg-orange-soft'],
+            [
+                'label' => 'Número de atenciones brindadas Nuevas de Diabetes Mellitus',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'DIABETES') || $d === 'DM2' || trim($r->cod ?? '') === 'E14.9') && strtoupper(trim($r->cond_diag ?? '')) === 'N';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Diabetes Mellitus',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'DIABETES') || $d === 'DM2' || trim($r->cod ?? '') === 'E14.9') && strtoupper(trim($r->cond_diag ?? '')) === 'S';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'Número de atenciones brindadas Nuevas de Hipertensión Arterial',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || trim($r->cod ?? '') === 'I10.X') && strtoupper(trim($r->cond_diag ?? '')) === 'N';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Hipertensión Arterial',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || trim($r->cod ?? '') === 'I10.X') && strtoupper(trim($r->cond_diag ?? '')) === 'S';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'Número de atenciones brindadas Nuevas de Enfermedad Renal Crónica',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && strtoupper(trim($r->cond_diag ?? '')) === 'N';
+                },
+                'color' => 'bg-orange-soft'
+            ],
+            [
+                'label' => 'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica',
+                'match' => function($r) {
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    return (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && strtoupper(trim($r->cond_diag ?? '')) === 'S';
+                },
+                'color' => 'bg-orange-soft'
+            ],
             ['label' => 'Número de atenciones brindadas Nuevas de Cáncer Cérvico Uterino', 'diag' => ['CANCER DE CERVIX', 'CCU', 'CANCER CCU', 'CANCER CERVICO UTERINO', 'CÁNCER CÉRVICO UTERINO'], 'cond' => 'N', 'color' => 'bg-orange-soft'],
             ['label' => 'Número de atenciones brindadas Subsiguientes de Cáncer Cérvico Uterino', 'diag' => ['CANCER DE CERVIX', 'CCU', 'CANCER CCU', 'CANCER CERVICO UTERINO', 'CÁNCER CÉRVICO UTERINO'], 'cond' => 'S', 'color' => 'bg-orange-soft'],
 

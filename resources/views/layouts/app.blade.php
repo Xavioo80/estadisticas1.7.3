@@ -10,26 +10,33 @@
   <script>
     (function() {
       try {
-        var theme = localStorage.getItem('sing_theme');
+        var theme = null;
+        try {
+          if (window.localStorage) {
+            theme = localStorage.getItem('sing_theme');
+          }
+        } catch(e){}
+        
+        if (!theme) {
+          try {
+            var match = document.cookie.match(new RegExp('(^| )sing_theme=([^;]+)'));
+            if (match) theme = match[2];
+          } catch(e){}
+        }
+        
         if (theme) {
           document.documentElement.setAttribute('data-theme', theme);
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        var isSidebarPinned = localStorage.getItem('sing_sidebar_collapsed');
+        var isSidebarPinned = null;
+        try { isSidebarPinned = window.localStorage ? localStorage.getItem('sing_sidebar_collapsed') : null; } catch(e){}
         if (isSidebarPinned === 'false') {
           document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.remove('sidebar-collapsed');
-          });
-        }
-
-        if (sessionStorage.getItem('sing_sidebar_navigating') === 'true' || document.cookie.indexOf('sing_sidebar_hover=true') !== -1) {
-          document.documentElement.classList.add('sidebar-hover-active');
-          document.addEventListener('DOMContentLoaded', function() {
-            document.body.classList.add('sidebar-hover-active');
-            var appSidebar = document.querySelector('.app-sidebar');
-            if (appSidebar) appSidebar.classList.add('is-expanded-hold');
           });
         }
       } catch (e) {}
@@ -44,6 +51,12 @@
   <!-- Bootstrap Icons CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <!-- Core Libraries: jQuery, Popper, Bootstrap 4 JS, SweetAlert2 -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <!-- ApexCharts CDN -->
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
@@ -51,12 +64,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 
   <!-- Sing App / Estadísticas 1.7 Core Stylesheets -->
-  <link rel="stylesheet" href="{{ asset('assets/css/sing-theme.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/css/sing-layout.css') }}">
-  <link rel="stylesheet" href="{{ asset('assets/css/sing-components.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/sing-theme.css') }}?v={{ @filemtime(public_path('assets/css/sing-theme.css')) }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/sing-layout.css') }}?v={{ @filemtime(public_path('assets/css/sing-layout.css')) }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/sing-components.css') }}?v={{ @filemtime(public_path('assets/css/sing-components.css')) }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/sing-informes.css') }}?v={{ @filemtime(public_path('assets/css/sing-informes.css')) }}">
   @stack('styles')
 </head>
-<body class="sidebar-collapsed {{ request()->cookie('sing_sidebar_hover') === 'true' ? 'sidebar-hover-active' : '' }}" data-theme="{{ request()->cookie('sing_theme', 'dark') }}">
+<body class="sidebar-collapsed">
 <div class="app-wrapper">
 
   <!-- Sidebar Navigation -->
@@ -71,6 +85,7 @@
     <!-- Content Area -->
     <main class="app-content">
       @yield('content')
+      {{ $slot ?? '' }}
     </main>
 
     <!-- Footer -->
@@ -80,9 +95,9 @@
 </div>
 
 <!-- Scripts -->
-<script src="{{ asset('assets/js/sing-theme.js') }}"></script>
-<script src="{{ asset('assets/js/sing-app.js') }}"></script>
-<script src="{{ asset('assets/js/sing-charts.js') }}"></script>
+<script src="{{ asset('assets/js/sing-theme.js') }}?v={{ @filemtime(public_path('assets/js/sing-theme.js')) }}"></script>
+<script src="{{ asset('assets/js/sing-app.js') }}?v={{ @filemtime(public_path('assets/js/sing-app.js')) }}"></script>
+<script src="{{ asset('assets/js/sing-charts.js') }}?v={{ @filemtime(public_path('assets/js/sing-charts.js')) }}"></script>
 @stack('scripts')
 
 </body>

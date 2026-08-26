@@ -1,6 +1,6 @@
 /**
  * Sing App Theme Switcher Engine
- * Handles Dark/Light Mode switching, dual persistence (localStorage + cookies for PHP),
+ * Handles Dark/Light Mode switching, dual persistence (safe localStorage + cookies for PHP),
  * and custom events for Chart re-rendering without page refresh.
  */
 
@@ -12,17 +12,40 @@
   const THEME_LIGHT = 'light';
   const THEME_DARK = 'dark';
 
+  // Safe Memory Fallback for environments with Tracking Prevention / Blocked Storage
+  const memoryStore = {};
+
+  function safeGetStorage(key) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {}
+    return memoryStore[key] || null;
+  }
+
+  function safeSetStorage(key, value) {
+    memoryStore[key] = value;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {}
+  }
+
   /**
    * Set cookie helper for PHP synchronization
    */
   function setCookie(name, value, days) {
-    let expires = '';
-    if (days) {
-      const date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      expires = '; expires=' + date.toUTCString();
-    }
-    document.cookie = name + '=' + (value || '') + expires + '; path=/; SameSite=Lax';
+    try {
+      let expires = '';
+      if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = '; expires=' + date.toUTCString();
+      }
+      document.cookie = name + '=' + (value || '') + expires + '; path=/; SameSite=Lax';
+    } catch (e) {}
   }
 
   /**
@@ -44,10 +67,12 @@
     }
 
     try {
-      localStorage.setItem(STORAGE_KEY, validTheme);
-    } catch (e) {
-      console.warn('localStorage is not accessible', e);
-    }
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('sing_theme', validTheme);
+      }
+    } catch(e) {}
+
+    safeSetStorage(STORAGE_KEY, validTheme);
 
     // Set cookie for PHP server-side recognition (1 year)
     setCookie(COOKIE_KEY, validTheme, 365);
@@ -90,12 +115,14 @@
     });
 
     // Listen to system preference changes if no manual preference stored
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem(STORAGE_KEY)) {
-          setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
-        }
-      });
+    if (!safeGetStorage(STORAGE_KEY)) {
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          if (!safeGetStorage(STORAGE_KEY)) {
+            setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
+          }
+        });
+      }
     }
   }
 
@@ -104,7 +131,9 @@
     get: getTheme,
     set: setTheme,
     toggle: toggleTheme,
-    init: initTheme
+    init: initTheme,
+    safeGet: safeGetStorage,
+    safeSet: safeSetStorage
   };
 
   // Auto initialize on DOM ready

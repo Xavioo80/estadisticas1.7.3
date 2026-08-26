@@ -83,6 +83,7 @@ require_once __DIR__ . '/includes/sidebar.php';
     gap: 4px !important;
     scrollbar-width: none !important;
   }
+
   .select2-container--default .select2-selection--multiple .select2-selection__rendered::-webkit-scrollbar {
     display: none !important;
   }
@@ -206,170 +207,189 @@ require_once __DIR__ . '/includes/sidebar.php';
   }
 
   [data-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  /* ==========================================================================
+
+    /* ==========================================================================
      Top Table Toolbar Colored Buttons (Adapted to Light & Dark Theme)
      ========================================================================== */
-  .btn-toolbar-consultar {
-    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-    border: 1px solid #1d4ed8 !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
-    transition: all 0.2s ease !important;
-    border-radius: var(--radius-sm, 5px) !important;
-  }
-  .btn-toolbar-consultar:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    border-color: #1e40af !important;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
-    transform: translateY(-1px);
-    color: #ffffff !important;
-  }
-  [data-theme="dark"] .btn-toolbar-consultar {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    border: 1px solid #60a5fa !important;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4) !important;
-  }
-  [data-theme="dark"] .btn-toolbar-consultar:hover {
-    border-color: #93c5fd !important;
-    box-shadow: 0 4px 14px rgba(96, 165, 250, 0.45) !important;
-  }
+    .btn-toolbar-consultar {
+      background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+      border: 1px solid #1d4ed8 !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+      transition: all 0.2s ease !important;
+      border-radius: var(--radius-sm, 5px) !important;
+    }
 
-  /* Reset Period Button (Cyan / Slate Soft) */
-  .btn-toolbar-reset {
-    background: #f1f5f9 !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #475569 !important;
-    border-radius: var(--radius-sm, 5px) !important;
-    transition: all 0.2s ease !important;
-  }
-  .btn-toolbar-reset:hover {
-    background: #e0f2fe !important;
-    border-color: #0284c7 !important;
-    color: #0284c7 !important;
-    transform: translateY(-1px) rotate(-15deg);
-  }
-  [data-theme="dark"] .btn-toolbar-reset {
-    background: #1e293b !important;
-    border: 1px solid #334155 !important;
-    color: #94a3b8 !important;
-  }
-  [data-theme="dark"] .btn-toolbar-reset:hover {
-    background: #0f172a !important;
-    border-color: #38bdf8 !important;
-    color: #38bdf8 !important;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.25) !important;
-  }
+    .btn-toolbar-consultar:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      border-color: #1e40af !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+      transform: translateY(-1px);
+      color: #ffffff !important;
+    }
 
-  /* Clear Filters Button (Warm Amber / Orange) */
-  .btn-toolbar-clear {
-    background: #fff7ed !important;
-    border: 1px solid #fdba74 !important;
-    color: #c2410c !important;
-    font-weight: 600 !important;
-    border-radius: var(--radius-sm, 5px) !important;
-    transition: all 0.2s ease !important;
-  }
-  .btn-toolbar-clear:hover {
-    background: #ffedd5 !important;
-    border-color: #ea580c !important;
-    color: #9a3412 !important;
-    transform: translateY(-1px);
-  }
-  [data-theme="dark"] .btn-toolbar-clear {
-    background: rgba(234, 88, 12, 0.15) !important;
-    border: 1px solid rgba(251, 146, 60, 0.45) !important;
-    color: #fb923c !important;
-  }
-  [data-theme="dark"] .btn-toolbar-clear:hover {
-    background: rgba(234, 88, 12, 0.28) !important;
-    border-color: #fb923c !important;
-    color: #fdba74 !important;
-    box-shadow: 0 0 10px rgba(251, 146, 60, 0.25) !important;
-  }
+    [data-theme="dark"] .btn-toolbar-consultar {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      border: 1px solid #60a5fa !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4) !important;
+    }
 
-  /* Add Record Button (Fresh Emerald Green) */
-  .btn-toolbar-add {
-    background: linear-gradient(135deg, #10b981, #059669) !important;
-    border: 1px solid #047857 !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25) !important;
-    border-radius: var(--radius-sm, 5px) !important;
-    transition: all 0.2s ease !important;
-  }
-  .btn-toolbar-add:hover {
-    background: linear-gradient(135deg, #059669, #047857) !important;
-    border-color: #065f46 !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35) !important;
-    transform: translateY(-1px);
-    color: #ffffff !important;
-  }
-  [data-theme="dark"] .btn-toolbar-add {
-    background: linear-gradient(135deg, #059669, #047857) !important;
-    border: 1px solid #34d399 !important;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important;
-  }
-  [data-theme="dark"] .btn-toolbar-add:hover {
-    border-color: #6ee7b7 !important;
-    box-shadow: 0 4px 14px rgba(52, 211, 153, 0.45) !important;
-  }
+    [data-theme="dark"] .btn-toolbar-consultar:hover {
+      border-color: #93c5fd !important;
+      box-shadow: 0 4px 14px rgba(96, 165, 250, 0.45) !important;
+    }
 
-  /* CSV Export Button (Teal / Excel Green Soft) */
-  .btn-toolbar-csv {
-    background: #f0fdf4 !important;
-    border: 1px solid #86efac !important;
-    color: #15803d !important;
-    font-weight: 600 !important;
-    border-radius: var(--radius-sm, 5px) !important;
-    transition: all 0.2s ease !important;
-  }
-  .btn-toolbar-csv:hover {
-    background: #dcfce7 !important;
-    border-color: #22c55e !important;
-    color: #166534 !important;
-    transform: translateY(-1px);
-  }
-  [data-theme="dark"] .btn-toolbar-csv {
-    background: rgba(34, 197, 94, 0.12) !important;
-    border: 1px solid rgba(74, 222, 128, 0.4) !important;
-    color: #4ade80 !important;
-  }
-  [data-theme="dark"] .btn-toolbar-csv:hover {
-    background: rgba(34, 197, 94, 0.22) !important;
-    border-color: #86efac !important;
-    color: #86efac !important;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.25) !important;
-  }
+    /* Reset Period Button (Cyan / Slate Soft) */
+    .btn-toolbar-reset {
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #475569 !important;
+      border-radius: var(--radius-sm, 5px) !important;
+      transition: all 0.2s ease !important;
+    }
 
-  /* Fullscreen Button */
-  .btn-toolbar-fullscreen {
-    background: #f8fafc !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #64748b !important;
-    border-radius: var(--radius-sm, 5px) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.2s ease !important;
-  }
-  .btn-toolbar-fullscreen:hover {
-    background: #f1f5f9 !important;
-    border-color: #6366f1 !important;
-    color: #6366f1 !important;
-    transform: translateY(-1px);
-  }
-  [data-theme="dark"] .btn-toolbar-fullscreen {
-    background: #1e293b !important;
-    border: 1px solid #475569 !important;
-    color: #94a3b8 !important;
-  }
-  [data-theme="dark"] .btn-toolbar-fullscreen:hover {
-    background: #0f172a !important;
-    border-color: #818cf8 !important;
-    color: #a5b4fc !important;
-    box-shadow: 0 0 10px rgba(129, 140, 248, 0.25) !important;
-  }
+    .btn-toolbar-reset:hover {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+      transform: translateY(-1px) rotate(-15deg);
+    }
+
+    [data-theme="dark"] .btn-toolbar-reset {
+      background: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #94a3b8 !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-reset:hover {
+      background: #0f172a !important;
+      border-color: #38bdf8 !important;
+      color: #38bdf8 !important;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25) !important;
+    }
+
+    /* Clear Filters Button (Warm Amber / Orange) */
+    .btn-toolbar-clear {
+      background: #fff7ed !important;
+      border: 1px solid #fdba74 !important;
+      color: #c2410c !important;
+      font-weight: 600 !important;
+      border-radius: var(--radius-sm, 5px) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-toolbar-clear:hover {
+      background: #ffedd5 !important;
+      border-color: #ea580c !important;
+      color: #9a3412 !important;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .btn-toolbar-clear {
+      background: rgba(234, 88, 12, 0.15) !important;
+      border: 1px solid rgba(251, 146, 60, 0.45) !important;
+      color: #fb923c !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-clear:hover {
+      background: rgba(234, 88, 12, 0.28) !important;
+      border-color: #fb923c !important;
+      color: #fdba74 !important;
+      box-shadow: 0 0 10px rgba(251, 146, 60, 0.25) !important;
+    }
+
+    /* Add Record Button (Fresh Emerald Green) */
+    .btn-toolbar-add {
+      background: linear-gradient(135deg, #10b981, #059669) !important;
+      border: 1px solid #047857 !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25) !important;
+      border-radius: var(--radius-sm, 5px) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-toolbar-add:hover {
+      background: linear-gradient(135deg, #059669, #047857) !important;
+      border-color: #065f46 !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35) !important;
+      transform: translateY(-1px);
+      color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-add {
+      background: linear-gradient(135deg, #059669, #047857) !important;
+      border: 1px solid #34d399 !important;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35) !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-add:hover {
+      border-color: #6ee7b7 !important;
+      box-shadow: 0 4px 14px rgba(52, 211, 153, 0.45) !important;
+    }
+
+    /* CSV Export Button (Teal / Excel Green Soft) */
+    .btn-toolbar-csv {
+      background: #f0fdf4 !important;
+      border: 1px solid #86efac !important;
+      color: #15803d !important;
+      font-weight: 600 !important;
+      border-radius: var(--radius-sm, 5px) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-toolbar-csv:hover {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #166534 !important;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .btn-toolbar-csv {
+      background: rgba(34, 197, 94, 0.12) !important;
+      border: 1px solid rgba(74, 222, 128, 0.4) !important;
+      color: #4ade80 !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-csv:hover {
+      background: rgba(34, 197, 94, 0.22) !important;
+      border-color: #86efac !important;
+      color: #86efac !important;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.25) !important;
+    }
+
+    /* Fullscreen Button */
+    .btn-toolbar-fullscreen {
+      background: #f8fafc !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #64748b !important;
+      border-radius: var(--radius-sm, 5px) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-toolbar-fullscreen:hover {
+      background: #f1f5f9 !important;
+      border-color: #6366f1 !important;
+      color: #6366f1 !important;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .btn-toolbar-fullscreen {
+      background: #1e293b !important;
+      border: 1px solid #475569 !important;
+      color: #94a3b8 !important;
+    }
+
+    [data-theme="dark"] .btn-toolbar-fullscreen:hover {
+      background: #0f172a !important;
+      border-color: #818cf8 !important;
+      color: #a5b4fc !important;
+      box-shadow: 0 0 10px rgba(129, 140, 248, 0.25) !important;
+    }
 </style>
 
 <div class="app-main">
@@ -379,14 +399,17 @@ require_once __DIR__ . '/includes/sidebar.php';
   <main class="app-content">
     <div class="sing-card-excel-fullscreen">
       <!-- Card Header con Título, Búsqueda Rápida, Filtros de Período (Años/Meses) y Botones -->
-      <div class="card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-color);">
+      <div class="card-header"
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-color);">
         <!-- Título de la Tabla -->
         <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--color-primary), #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 2px 8px rgba(77, 124, 254, 0.35); flex-shrink: 0;">
+          <div
+            style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--color-primary), #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; box-shadow: 0 2px 8px rgba(77, 124, 254, 0.35); flex-shrink: 0;">
             <i class="bi bi-table"></i>
           </div>
           <div>
-            <h2 class="card-title" style="font-size: 1rem; margin-bottom: 0; font-weight: 700; color: var(--text-primary); line-height: 1.2;">
+            <h2 class="card-title"
+              style="font-size: 1rem; margin-bottom: 0; font-weight: 700; color: var(--text-primary); line-height: 1.2;">
               Registros de Atención AT1
             </h2>
           </div>
@@ -396,8 +419,10 @@ require_once __DIR__ . '/includes/sidebar.php';
         <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
           <!-- Búsqueda Rápida Integrada Arriba -->
           <div style="position: relative; width: 190px;">
-            <i class="bi bi-search" style="position: absolute; left: 0.65rem; top: 0.5rem; color: var(--text-muted); font-size: 0.78rem;"></i>
-            <input type="text" id="excelGlobalSearch" class="form-control form-control-sm" style="padding-left: 1.85rem; height: 32px; font-size: 0.8rem;" placeholder="Búsqueda rápida...">
+            <i class="bi bi-search"
+              style="position: absolute; left: 0.65rem; top: 0.5rem; color: var(--text-muted); font-size: 0.78rem;"></i>
+            <input type="text" id="excelGlobalSearch" class="form-control form-control-sm"
+              style="padding-left: 1.85rem; height: 32px; font-size: 0.8rem;" placeholder="Búsqueda rápida...">
           </div>
 
           <!-- Select2 Años (Autoexpandible) -->
@@ -430,27 +455,36 @@ require_once __DIR__ . '/includes/sidebar.php';
           </div>
 
           <!-- Botones Consultar / Reset Período -->
-          <button type="button" id="btnApplyFilter" class="btn btn-toolbar-consultar btn-sm" style="height: 32px; padding: 0 0.8rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <button type="button" id="btnApplyFilter" class="btn btn-toolbar-consultar btn-sm"
+            style="height: 32px; padding: 0 0.8rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;">
             <i class="bi bi-search"></i> Consultar
           </button>
-          <button type="button" id="btnResetFilter" class="btn btn-toolbar-reset btn-sm btn-icon" style="height: 32px; width: 32px;" title="Restablecer período">
+          <button type="button" id="btnResetFilter" class="btn btn-toolbar-reset btn-sm btn-icon"
+            style="height: 32px; width: 32px;" title="Restablecer período">
             <i class="bi bi-arrow-counterclockwise"></i>
           </button>
 
-          <button class="btn btn-toolbar-clear btn-sm" id="btnResetAllExcelFilters" title="Limpiar todos los filtros de columna" style="display: none; height: 32px; font-size: 0.78rem; padding: 0 0.65rem;">
+          <button class="btn btn-toolbar-clear btn-sm" id="btnResetAllExcelFilters"
+            title="Limpiar todos los filtros de columna"
+            style="display: none; height: 32px; font-size: 0.78rem; padding: 0 0.65rem;">
             <i class="bi bi-funnel-fill"></i> Limpiar
           </button>
 
           <div style="height: 20px; width: 1px; background-color: var(--border-color); margin: 0 0.15rem;"></div>
 
           <!-- Botones de Acción -->
-          <button class="btn btn-toolbar-add btn-sm" style="height: 32px; padding: 0 0.8rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;" onclick="SingApp.toast({title: 'Nuevo Registro', message: 'Abriendo formulario de creación...', type: 'success'})">
+          <button class="btn btn-toolbar-add btn-sm"
+            style="height: 32px; padding: 0 0.8rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;"
+            onclick="SingApp.toast({title: 'Nuevo Registro', message: 'Abriendo formulario de creación...', type: 'success'})">
             <i class="bi bi-plus-lg"></i> Agregar
           </button>
-          <button class="btn btn-toolbar-csv btn-sm" id="btnExportExcelCSV" style="height: 32px; padding: 0 0.75rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;" title="Exportar a CSV">
+          <button class="btn btn-toolbar-csv btn-sm" id="btnExportExcelCSV"
+            style="height: 32px; padding: 0 0.75rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;"
+            title="Exportar a CSV">
             <i class="bi bi-file-earmark-excel"></i> CSV
           </button>
-          <button class="btn-toolbar-fullscreen" data-action="fullscreen" title="Pantalla Completa" style="height: 32px; width: 32px; cursor: pointer;"><i class="bi bi-fullscreen"></i></button>
+          <button class="btn-toolbar-fullscreen" data-action="fullscreen" title="Pantalla Completa"
+            style="height: 32px; width: 32px; cursor: pointer;"><i class="bi bi-fullscreen"></i></button>
         </div>
       </div>
 
@@ -508,7 +542,7 @@ require_once __DIR__ . '/includes/sidebar.php';
               <!-- Col 7: Diagnóstico -->
               <th data-col="7" data-title="Diagnóstico CIE-10" data-type="text">
                 <div class="excel-th-content">
-                  <span class="excel-th-title">Diagnóstico CIE-10</span>
+                  <span class="excel-th-title">Diagnóstico</span>
                   <button class="excel-filter-btn" title="Filtrar por Diagnóstico"><i class="bi bi-funnel"></i></button>
                 </div>
               </th>
@@ -885,7 +919,8 @@ require_once __DIR__ . '/includes/sidebar.php';
           </span>
         </div>
         <div class="table-excel-footer-right">
-          <span id="excelActiveFiltersText" style="font-size: 0.78rem; color: var(--text-muted);">Período: [2026] - [Agosto]</span>
+          <span id="excelActiveFiltersText" style="font-size: 0.78rem; color: var(--text-muted);">Período: [2026] -
+            [Agosto]</span>
         </div>
       </div>
     </div>
@@ -898,7 +933,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 <script src="assets/js/sing-theme.js"></script>
 <script src="assets/js/sing-app.js"></script>
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     // 1. Initialize Top Period Select2
     $('#selectYear').select2({
       placeholder: 'Años...',
@@ -959,7 +994,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 
         $('#selectYear, #selectMonth').on('change select2:select select2:unselect select2:clear', updatePeriodFilter);
 
-        $('#btnApplyFilter').on('click', function() {
+        $('#btnApplyFilter').on('click', function () {
           updatePeriodFilter();
           SingApp.toast({
             title: 'Tabla AT1 Filtrada',
@@ -968,7 +1003,7 @@ require_once __DIR__ . '/includes/sidebar.php';
           });
         });
 
-        $('#btnResetFilter').on('click', function() {
+        $('#btnResetFilter').on('click', function () {
           $('#selectYear').val(['2026']).trigger('change');
           $('#selectMonth').val(['08']).trigger('change');
           SingApp.toast({
@@ -1368,7 +1403,7 @@ require_once __DIR__ . '/includes/sidebar.php';
         setTimeout(() => searchInput.focus(), 60);
 
         // If Date Column: Bind Tree Toggles and Hierarchy Sync
-        let syncDateTreeState = () => {};
+        let syncDateTreeState = () => { };
         if (isDateCol) {
           // Tree Collapse/Expand Chevrons
           itemsContainer.querySelectorAll('.excel-tree-toggle').forEach(toggleBtn => {
@@ -1675,4 +1710,5 @@ require_once __DIR__ . '/includes/sidebar.php';
   });
 </script>
 </body>
+
 </html>

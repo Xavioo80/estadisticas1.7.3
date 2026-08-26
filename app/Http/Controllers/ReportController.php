@@ -11,6 +11,6 @@ class ReportController extends Controller
      */
     public function tables()
     {
-        return view('reports.tables');
+        return view('reports.registrosat1');
     }
 }

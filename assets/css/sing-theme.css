@@ -80,20 +80,20 @@
   --bg-surface-hover: #f8fafc;
   --bg-subtle: #f1f5f9;
 
-  /* Sidebar Light (Sing App Signature Style) */
-  --sidebar-bg: #ffffff;
-  --sidebar-border: #e8ecf4;
-  --sidebar-text: #475569;
-  --sidebar-text-muted: #94a3b8;
-  --sidebar-item-hover: #f1f5f9;
-  --sidebar-item-active-bg: rgba(77, 124, 254, 0.08);
+  /* Sidebar, Header & Footer Light (Gris Slate Medio Elegante) */
+  --sidebar-bg: #dbe0e8;
+  --sidebar-border: #cbd5e1;
+  --sidebar-text: #1e293b;
+  --sidebar-text-muted: #64748b;
+  --sidebar-item-hover: #ccd3de;
+  --sidebar-item-active-bg: #ffffff;
   --sidebar-item-active-text: var(--color-primary);
 
   /* Top Navbar */
-  --navbar-bg: rgba(255, 255, 255, 0.85);
-  --navbar-border: #e8ecf4;
-  --navbar-text: #334155;
-  --navbar-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --navbar-bg: #dbe0e8;
+  --navbar-border: #cbd5e1;
+  --navbar-text: #1e293b;
+  --navbar-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
 
   /* Typography Colors */
   --text-primary: #1e293b;
@@ -224,3 +224,16 @@
   --chart-tooltip-bg: #1e293b;
   --chart-tooltip-text: #f8fafc;
 }
+
+/* ==========================================================================
+   GLOBAL LAYOUT BACKGROUND ENFORCEMENT
+   ========================================================================== */
+html,
+body,
+.app-wrapper,
+.app-main,
+.app-content {
+  background-color: var(--bg-body) !important;
+  color: var(--text-primary) !important;
+}
+

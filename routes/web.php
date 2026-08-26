@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RegistroGlobalController;
 use App\Http\Controllers\DataController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\IngresoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,17 +21,168 @@ Route::get('/informes/dashboard-epi', [DashboardController::class, 'visits'])->n
 Route::get('/charts', [DashboardController::class, 'charts'])->name('charts');
 Route::get('/informes/dashboard2', [DashboardController::class, 'charts'])->name('dashboard2');
 
-// Report & Output Routes
-Route::get('/tables', [ReportController::class, 'tables'])->name('tables');
-Route::get('/registros', [ReportController::class, 'tables'])->name('registros');
-Route::get('/informes', [DashboardController::class, 'charts'])->name('informes');
+// Report & Output Routes (Registros AT1 & Informes AT1)
+Route::get('/registrosat1', [RegistroGlobalController::class, 'index'])->name('registrosat1');
+Route::get('/informesat1', [RegistroGlobalController::class, 'informesAt1'])->name('informesat1');
+Route::get('/tables', [RegistroGlobalController::class, 'index'])->name('tables');
+Route::get('/registros', [RegistroGlobalController::class, 'index'])->name('registros');
+Route::get('/informes', [RegistroGlobalController::class, 'informesAt1'])->name('informes');
 
-// Data Entry Routes
-Route::get('/forms', [DataController::class, 'forms'])->name('forms');
-Route::get('/ingresos', [DataController::class, 'forms'])->name('ingresos');
+// Módulo: Ingresos (Data Entry & Batch Management)
+Route::prefix('ingresos')->name('ingresos.')->group(function () {
+    Route::get('/', [IngresoController::class, 'index'])->name('index');
+    Route::get('/create', [IngresoController::class, 'create'])->name('create');
+    Route::post('/', [IngresoController::class, 'store'])->name('store');
+    Route::post('/store-massive', [IngresoController::class, 'storeMassive'])->name('storeMassive');
+    Route::get('/profesiones', [IngresoController::class, 'profesionesPorFecha'])->name('profesiones-por-fecha');
+    Route::get('/medicos', [IngresoController::class, 'medicosPorProfesion'])->name('medicos-por-profesion');
+    Route::get('/medicos-fecha', [IngresoController::class, 'medicosPorFecha'])->name('medicos-por-fecha');
+    Route::get('/jornadas-medico', [IngresoController::class, 'jornadasPorMedico'])->name('jornadas-por-medico');
+    Route::post('/eliminar-grupo', [IngresoController::class, 'eliminarGrupo'])->name('eliminar-grupo');
+    Route::get('/detalles-medico/{fecha}/{medico}', [IngresoController::class, 'detallesMedico'])->name('detalles-medico');
+    Route::get('/datatable', [IngresoController::class, 'datatable'])->name('datatable');
+    Route::put('/{ingreso}', [IngresoController::class, 'update'])->name('update');
+    Route::delete('/{ingreso}', [IngresoController::class, 'destroy'])->name('destroy');
+    Route::get('/detalles-fecha/{fecha}', [IngresoController::class, 'detallesFecha'])->name('detalles-fecha');
+    Route::post('/update-batch', [IngresoController::class, 'batchUpdate'])->name('update-batch');
+});
+Route::get('/forms', [IngresoController::class, 'index'])->name('forms');
 
 // Admin & UI Routes
+use App\Http\Controllers\AdminController;
 Route::get('/typography', [AdminController::class, 'typography'])->name('typography');
 Route::get('/customization', [AdminController::class, 'typography'])->name('customization');
 Route::get('/ui-elements', [AdminController::class, 'uiElements'])->name('ui-elements');
 Route::get('/components', [AdminController::class, 'uiElements'])->name('components');
+
+// ── Módulo: Informes (Migrado) ─────────────────────────────────────────────
+use App\Http\Controllers\Informes\At1Controller;
+use App\Http\Controllers\Informes\AtencionesController;
+use App\Http\Controllers\Informes\Tb9Controller;
+use App\Http\Controllers\Informes\ImplantesController;
+use App\Http\Controllers\Informes\At2Controller;
+use App\Http\Controllers\Informes\At2rController;
+use App\Http\Controllers\Informes\At2rNController;
+use App\Http\Controllers\Informes\At2rRsmController;
+use App\Http\Controllers\Informes\MorbilidadController;
+use App\Http\Controllers\Informes\ItsController;
+use App\Http\Controllers\Informes\Sm107Controller;
+use App\Http\Controllers\Informes\Sm2Controller;
+use App\Http\Controllers\Informes\Sm307Controller;
+use App\Http\Controllers\AlertaSemanalController;
+use App\Http\Controllers\Trans2Controller;
+use App\Http\Controllers\HoraMedicoController;
+use App\Http\Controllers\CalendarioEpiController;
+use App\Http\Controllers\NotificacionSvsController;
+
+Route::prefix('informes')->name('informes.')->group(function () {
+    Route::get('/', [At1Controller::class, 'index'])->name('index');
+    Route::get('/at1', [At1Controller::class, 'informesAt1'])->name('at1');
+
+    Route::get('/atenciones', [AtencionesController::class, 'index'])->name('atenciones');
+    Route::get('/atenciones/export', [AtencionesController::class, 'export'])->name('atenciones.export');
+
+    Route::get('/tb9', [Tb9Controller::class, 'index'])->name('tb9');
+    Route::get('/tb9/export', [Tb9Controller::class, 'export'])->name('tb9.export');
+
+    Route::get('/implantes', [ImplantesController::class, 'index'])->name('implantes');
+    Route::get('/implantes/export', [ImplantesController::class, 'export'])->name('implantes.export');
+
+    Route::get('/at2', [At2Controller::class, 'index'])->name('at2');
+    Route::post('/at2/save-manual', [At2Controller::class, 'saveManual'])->name('at2.save-manual');
+
+    Route::get('/at2r', [At2rController::class, 'index'])->name('at2r');
+    Route::get('/at2r/export', [At2rController::class, 'export'])->name('at2r.export');
+
+    Route::get('/at2r-n', [At2rNController::class, 'index'])->name('at2r-n');
+    Route::get('/at2r-n/audit', [At2rNController::class, 'audit'])->name('at2r-n.audit');
+    Route::get('/at2r-n/cell-details', [At2rNController::class, 'cellDetails'])->name('at2r-n.cell-details');
+    Route::get('/at2r-n/morbilidad-audit', [At2rNController::class, 'morbilidadAudit'])->name('at2r-n.morbilidad-audit');
+    Route::get('/at2r-n/export', [At2rNController::class, 'export'])->name('at2r-n.export');
+    Route::post('/at2r-n/save-manual', [At2rNController::class, 'saveManual'])->name('at2r-n.save-manual');
+
+    Route::get('/at2r-rsm', [At2rRsmController::class, 'index'])->name('at2r-rsm');
+    Route::get('/at2r-rsm/export', [At2rRsmController::class, 'export'])->name('at2r-rsm.export');
+
+    Route::get('/morbilidad', [MorbilidadController::class, 'index'])->name('morbilidad');
+    Route::get('/morbilidad/export', [MorbilidadController::class, 'export'])->name('morbilidad.export');
+
+    Route::get('/its', [ItsController::class, 'index'])->name('its');
+    Route::get('/its/details', [ItsController::class, 'details'])->name('its.details');
+    Route::get('/its/export', [ItsController::class, 'export'])->name('its.export');
+
+    Route::get('/alerta-semanal', [AlertaSemanalController::class, 'index'])->name('alerta-semanal');
+    Route::get('/alerta-semanal/details', [AlertaSemanalController::class, 'getDetails'])->name('alerta-semanal.details');
+
+    Route::get('/trans2', [Trans2Controller::class, 'index'])->name('trans2');
+    Route::get('/trans2/details', [Trans2Controller::class, 'getDetails'])->name('trans2.details');
+
+    Route::get('/sm107', [Sm107Controller::class, 'index'])->name('sm107');
+    Route::get('/sm107/details', [Sm107Controller::class, 'details'])->name('sm107.details');
+    Route::get('/sm107/export', [Sm107Controller::class, 'export'])->name('sm107.export');
+
+    Route::get('/sm2', [Sm2Controller::class, 'index'])->name('sm2');
+    Route::get('/sm2/export', [Sm2Controller::class, 'export'])->name('sm2.export');
+
+    Route::get('/sm307', [Sm307Controller::class, 'index'])->name('sm307');
+    Route::get('/sm307/cell-details', [Sm307Controller::class, 'cellDetails'])->name('sm307.cell-details');
+    Route::get('/sm307/export', [Sm307Controller::class, 'export'])->name('sm307.export');
+
+    Route::get('/hora-medico', [HoraMedicoController::class, 'index'])->name('hora-medico');
+    Route::get('/hora-medico/servicio-social', [HoraMedicoController::class, 'servicioSocial'])->name('hora-medico.servicio-social');
+    Route::get('/hora-medico/imprimir', [HoraMedicoController::class, 'imprimir'])->name('hora-medico.imprimir');
+    Route::post('/hora-medico/upload-logo', [HoraMedicoController::class, 'uploadLogo'])->name('hora-medico.upload-logo');
+    Route::post('/hora-medico/save-setting', [HoraMedicoController::class, 'saveSetting'])->name('hora-medico.save-setting');
+    Route::post('/hora-medico/save-director-mensual', [HoraMedicoController::class, 'saveDirectorMensual'])->name('hora-medico.save-director-mensual');
+    Route::post('/hora-medico/save-observacion', [HoraMedicoController::class, 'saveObservacion'])->name('hora-medico.save-observacion');
+    Route::get('/hora-medico/consolidado', [HoraMedicoController::class, 'consolidado'])->name('hora-medico.consolidado');
+    Route::get('/hora-medico/consolidado/imprimir', [HoraMedicoController::class, 'imprimirConsolidado'])->name('hora-medico.consolidado.imprimir');
+    Route::get('/hora-medico/consolidado/export', [HoraMedicoController::class, 'exportConsolidado'])->name('hora-medico.consolidado.export');
+    Route::get('/hora-medico/hsc', [HoraMedicoController::class, 'getHSC'])->name('hora-medico.get-hsc');
+    Route::post('/hora-medico/save-hsc', [HoraMedicoController::class, 'saveHSC'])->name('hora-medico.save-hsc');
+    Route::get('/hora-medico/export-excel', [HoraMedicoController::class, 'exportExcel'])->name('hora-medico.export-excel');
+    Route::post('/hora-medico/agregar-medico-hsc', [HoraMedicoController::class, 'agregarMedicoHSC'])->name('hora-medico.add-medico-hsc');
+});
+
+// Notificación SVS & Calendario Epi
+Route::get('/notificacion-svs', [NotificacionSvsController::class, 'index'])->name('informes.notificacion_svs');
+Route::post('/notificacion-svs/update-disease', [NotificacionSvsController::class, 'updateDisease'])->name('informes.notificacion_svs.update_disease');
+Route::match(['GET', 'POST'], '/notificacion-svs/buscar-paciente', [NotificacionSvsController::class, 'buscarPaciente'])->name('informes.notificacion_svs.buscar_paciente');
+Route::post('/notificacion-svs/save-form', [NotificacionSvsController::class, 'saveFullForm'])->name('informes.notificacion_svs.save_form');
+Route::post('/notificacion-svs/toggle-notificado', [NotificacionSvsController::class, 'toggleNotificado'])->name('informes.notificacion_svs.toggle_notificado');
+Route::post('/notificacion-svs/update-telefono', [NotificacionSvsController::class, 'updateTelefono'])->name('informes.notificacion_svs.update_telefono');
+
+Route::get('/calendario-epi', [CalendarioEpiController::class, 'index'])->name('calendario_epi');
+Route::post('/calendario-epi/upload', [CalendarioEpiController::class, 'upload'])->name('calendario_epi.upload');
+Route::get('/calendario-epi/download', [CalendarioEpiController::class, 'download'])->name('calendario_epi.download');
+
+// Rutas para Diagnósticos
+use App\Http\Controllers\DiagnosticoController;
+Route::prefix('diagnosticos')->name('diagnosticos.')->group(function () {
+    Route::get('/', [DiagnosticoController::class, 'index'])->name('index');
+    Route::get('/buscar', [DiagnosticoController::class, 'buscar'])->name('buscar');
+    Route::get('/condicionamientos', [DiagnosticoController::class, 'condicionamientos'])->name('condicionamientos');
+    Route::get('/validaciones-json', [DiagnosticoController::class, 'obtenerValidacionesJson'])->name('validaciones-json');
+});
+
+// Rutas para Médicos
+use App\Http\Controllers\MedicoController;
+Route::prefix('medicos')->name('medicos.')->group(function () {
+    Route::get('/buscar-codigo', [MedicoController::class, 'buscarPorCodigo'])->name('buscar-codigo');
+    Route::get('/obtener-todos', [MedicoController::class, 'obtenerTodos'])->name('obtener-todos');
+});
+
+// Rutas para Adolescentes
+use App\Http\Controllers\AdolescenteController;
+Route::prefix('adolescentes')->name('adolescentes.')->group(function () {
+    Route::get('/', [AdolescenteController::class, 'index'])->name('index');
+    Route::get('/buscar', [AdolescenteController::class, 'checkIdentity'])->name('buscar');
+    Route::post('/guardar', [AdolescenteController::class, 'storeBatch'])->name('guardar');
+});
+
+// Rutas para Colonias y Referencias
+use App\Http\Controllers\ColoniaController;
+use App\Http\Controllers\ReferenciaController;
+Route::resource('colonias', ColoniaController::class)->only(['index', 'show']);
+Route::resource('referencias', ReferenciaController::class)->only(['index', 'show']);
+

@@ -14,59 +14,293 @@ use Carbon\Carbon;
 class RegistroGlobalController extends Controller
 {
     /**
-     * Mostrar lista de registros con paginación
+     * Mostrar lista de registros con filtros dinámicos y tabla Excel
      */
     public function index(Request $request)
     {
-        $anoActual = $request->input('ano', date('Y'));
-        $ultimoMes = RegistroGlobal::where('ano', $anoActual)->max('mes') ?? date('n');
-        $mesSeleccionado = $request->input('mes', $ultimoMes);
-        
-        $cacheKey = "registros.{$anoActual}.{$mesSeleccionado}";
-        
+        // Obtener todos los años disponibles en la BD (excluyendo 0 y nulos)
+        $anos = Cache::remember('registros.anos', 3600, function() {
+            return RegistroGlobal::select('ano')
+                ->distinct()
+                ->whereNotNull('ano')
+                ->where('ano', '!=', 0)
+                ->orderBy('ano', 'desc')
+                ->pluck('ano')
+                ->map(fn($val) => (string)$val)
+                ->values()
+                ->toArray();
+        });
+
+        if (empty($anos)) {
+            $anos = [(string)date('Y')];
+        }
+
+        // Determinar años seleccionados (array o single)
+        $selectedYears = $request->input('years', []);
+        if (empty($selectedYears) && $request->has('ano')) {
+            $selectedYears = [(string)$request->input('ano')];
+        }
+        if (empty($selectedYears)) {
+            $selectedYears = [$anos[0]]; // Por defecto el año más reciente
+        }
+
+        // Obtener meses disponibles para los años seleccionados
+        $mesesDisponibles = RegistroGlobal::whereIn('ano', $selectedYears)
+            ->select('mes')
+            ->distinct()
+            ->whereNotNull('mes')
+            ->where('mes', '!=', '')
+            ->pluck('mes')
+            ->toArray();
+
+        // Orden de meses estándar en español para ordenar los tabs/opciones
+        $ordenMeses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+        usort($mesesDisponibles, function($a, $b) use ($ordenMeses) {
+            $idxA = array_search(strtoupper($a), $ordenMeses);
+            $idxB = array_search(strtoupper($b), $ordenMeses);
+            $idxA = $idxA === false ? 99 : $idxA;
+            $idxB = $idxB === false ? 99 : $idxB;
+            return $idxA - $idxB;
+        });
+
+        // Determinar meses seleccionados (array o single)
+        $selectedMonths = $request->input('months', []);
+        if (empty($selectedMonths) && $request->has('mes')) {
+            $selectedMonths = [(string)$request->input('mes')];
+        }
+        if (empty($selectedMonths) && !empty($mesesDisponibles)) {
+            // Por defecto el último mes disponible con datos (ej. AGOSTO)
+            $ultimoMes = end($mesesDisponibles);
+            $selectedMonths = [$ultimoMes];
+        }
+
+        $query = RegistroGlobal::query();
+
+        if (!empty($selectedYears)) {
+            $query->whereIn('ano', $selectedYears);
+        }
+        if (!empty($selectedMonths)) {
+            $query->whereIn('mes', $selectedMonths);
+        }
+
+        // Ordenar fecha ascendente y número de menor a mayor (1, 2, 3...)
+        $registros = $query->orderBy('fecha', 'asc')->orderBy('numero', 'asc')->orderBy('id', 'asc')->limit(10000)->get();
+
+        $stats = [
+            'total' => $registros->count(),
+            'total_bd' => RegistroGlobal::count()
+        ];
+
+        $anoActual = implode(',', $selectedYears);
+        $mesSeleccionado = implode(',', $selectedMonths);
+
         if ($request->ajax()) {
-            $registros = Cache::remember($cacheKey, 1800, function () use ($anoActual, $mesSeleccionado) {
-                return RegistroGlobal::where('ano', $anoActual)
-                    ->where('mes', $mesSeleccionado)
-                    ->orderBy('fecha', 'desc')
-                    ->get()
-                    ->map(function($registro) {
-                        if ($registro->fecha) {
-                            try {
-                                $registro->fecha = Carbon::parse($registro->fecha)->format('d-m-Y');
-                            } catch (\Exception $e) {}
-                        }
-                        return $registro;
-                    });
-            });
-            
             return response()->json([
                 'success' => true,
                 'data' => $registros,
                 'total' => $registros->count()
             ]);
         }
-        
-        $registros = Cache::remember($cacheKey, 1800, function () use ($anoActual, $mesSeleccionado) {
-            return RegistroGlobal::where('ano', $anoActual)
-                ->where('mes', $mesSeleccionado)
-                ->orderBy('fecha', 'desc')
-                ->get()
-                ->map(function($registro) {
-                    if ($registro->fecha) {
-                        try {
-                            $registro->fecha = Carbon::parse($registro->fecha)->format('d-m-Y');
-                        } catch (\Exception $e) {}
-                    }
-                    return $registro;
-                });
+
+        return view('reports.registrosat1', compact(
+            'registros',
+            'stats',
+            'anos',
+            'selectedYears',
+            'mesesDisponibles',
+            'selectedMonths',
+            'anoActual',
+            'mesSeleccionado'
+        ));
+    }
+
+    /**
+     * Mostrar vista Informes AT1 segmentada individualmente por Diagnóstico
+     */
+    public function informesAt1(Request $request)
+    {
+        // 1. Obtener todos los años disponibles en la BD
+        $anos = Cache::remember('registros.anos', 3600, function() {
+            return RegistroGlobal::select('ano')
+                ->distinct()
+                ->whereNotNull('ano')
+                ->where('ano', '!=', 0)
+                ->orderBy('ano', 'desc')
+                ->pluck('ano')
+                ->map(fn($val) => (string)$val)
+                ->values()
+                ->toArray();
         });
-        
-        $anos = RegistroGlobal::select('ano')->distinct()->whereNotNull('ano')->orderBy('ano', 'desc')->pluck('ano');
-        $mesesDisponibles = RegistroGlobal::where('ano', $anoActual)->select('mes')->distinct()->whereNotNull('mes')->orderBy('mes')->pluck('mes');
-        $stats = ['total' => $registros->count()];
-        
-        return view('registros.index', compact('registros', 'stats', 'anos', 'anoActual', 'mesSeleccionado', 'mesesDisponibles'));
+
+        if (empty($anos)) {
+            $anos = [(string)date('Y')];
+        }
+
+        $selectedYears = $request->input('years', []);
+        if (empty($selectedYears) && $request->has('ano')) {
+            $selectedYears = [(string)$request->input('ano')];
+        }
+        if (empty($selectedYears)) {
+            $selectedYears = [$anos[0]];
+        }
+
+        // 2. Obtener meses disponibles
+        $mesesDisponibles = RegistroGlobal::whereIn('ano', $selectedYears)
+            ->select('mes')
+            ->distinct()
+            ->whereNotNull('mes')
+            ->where('mes', '!=', '')
+            ->pluck('mes')
+            ->toArray();
+
+        $ordenMeses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+        usort($mesesDisponibles, function($a, $b) use ($ordenMeses) {
+            $idxA = array_search(strtoupper($a), $ordenMeses);
+            $idxB = array_search(strtoupper($b), $ordenMeses);
+            return ($idxA === false ? 99 : $idxA) - ($idxB === false ? 99 : $idxB);
+        });
+
+        $selectedMonths = $request->input('months', []);
+        if (empty($selectedMonths) && $request->has('mes')) {
+            $selectedMonths = [(string)$request->input('mes')];
+        }
+        if (empty($selectedMonths) && !empty($mesesDisponibles)) {
+            $ultimoMes = end($mesesDisponibles);
+            $selectedMonths = [$ultimoMes];
+        }
+
+        $query = RegistroGlobal::query();
+        if (!empty($selectedYears)) {
+            $query->whereIn('ano', $selectedYears);
+        }
+        if (!empty($selectedMonths)) {
+            $query->whereIn('mes', $selectedMonths);
+        }
+
+        // Ordenar fecha ascendente y número de menor a mayor (1, 2, 3...)
+        $registrosRaw = $query->orderBy('fecha', 'asc')->orderBy('numero', 'asc')->orderBy('id', 'asc')->limit(10000)->get();
+
+        // 3. Segmentación / Unpivot de Registros por Diagnóstico (1 a 7)
+        $segmentedRows = [];
+        $totalDiagnosticos = 0;
+
+        foreach ($registrosRaw as $r) {
+            $diags = [
+                1 => ['cod' => $r->cod_1, 'diag' => $r->diagnostico_1, 'cond' => $r->cond_1 ?: $r->cond],
+                2 => ['cod' => $r->cod_2, 'diag' => $r->diagnostico_2, 'cond' => $r->cond_2],
+                3 => ['cod' => $r->cod_3, 'diag' => $r->diagnostico_3, 'cond' => $r->cond_3],
+                4 => ['cod' => $r->cod_4, 'diag' => $r->diagnostico_4, 'cond' => $r->cond_4],
+                5 => ['cod' => $r->cod_5, 'diag' => $r->diagnostico_5, 'cond' => $r->cond_5],
+                6 => ['cod' => $r->cod_6, 'diag' => $r->diagnostico_6, 'cond' => $r->cond_6],
+                7 => ['cod' => $r->cod_7, 'diag' => $r->diagnostico_7, 'cond' => $r->cond_7],
+            ];
+
+            $emittedCount = 0;
+            foreach ($diags as $diagNum => $d) {
+                $diagText = trim($d['diag'] ?? '');
+                $codText = trim($d['cod'] ?? '');
+
+                if ($diagText !== '' || $codText !== '') {
+                    $segmentedRows[] = [
+                        $r->numero ?? '',
+                        $r->cm ?? '',
+                        $r->medico ?? '',
+                        $r->prof ?? '',
+                        $r->fecha ? Carbon::parse($r->fecha)->format('Y-m-d') : '',
+                        $r->se ?? '',
+                        $r->exp ?? '',
+                        $r->nombre_paciente ?? '',
+                        $r->identidad ?? '',
+                        $r->telefono ?? '',
+                        $r->fecha_nacimiento ? Carbon::parse($r->fecha_nacimiento)->format('Y-m-d') : '',
+                        $r->etnia ?? '',
+                        $r->sexo ?? '',
+                        $r->edad ?? '',
+                        $r->tipo ?? '',
+                        $r->rango ?? '',
+                        $r->colonia ?? '',
+                        'D' . $diagNum,               // N° Diagnóstico (D1, D2, D3...)
+                        $codText,                     // Código CIE-10
+                        $diagText,                    // Diagnóstico
+                        $d['cond'] ?? '',             // Condición
+                        $r->sg ?? '',                 // Semanas Gestacionales
+                        $r->referido_a ?? '',         // Referencia Enviada
+                        $r->referido_de ?? '',        // Referencia Recibida
+                        $r->pg_emb ?? '',             // Población General / Embarazada
+                        $r->jornada ?? '',            // Jornada
+                        $r->ano ?? '',                // Año
+                        $r->mes ?? '',                // Mes
+                        $r->id ?? ''                  // ID BD
+                    ];
+                    $emittedCount++;
+                    $totalDiagnosticos++;
+                }
+            }
+
+            // Si el registro no tenía diagnósticos explícitos, emitir al menos una fila con los datos de consulta
+            if ($emittedCount === 0) {
+                $segmentedRows[] = [
+                    $r->numero ?? '',
+                    $r->cm ?? '',
+                    $r->medico ?? '',
+                    $r->prof ?? '',
+                    $r->fecha ? Carbon::parse($r->fecha)->format('Y-m-d') : '',
+                    $r->se ?? '',
+                    $r->exp ?? '',
+                    $r->nombre_paciente ?? '',
+                    $r->identidad ?? '',
+                    $r->telefono ?? '',
+                    $r->fecha_nacimiento ? Carbon::parse($r->fecha_nacimiento)->format('Y-m-d') : '',
+                    $r->etnia ?? '',
+                    $r->sexo ?? '',
+                    $r->edad ?? '',
+                    $r->tipo ?? '',
+                    $r->rango ?? '',
+                    $r->colonia ?? '',
+                    'D1',
+                    '',
+                    '(Sin Diagnóstico)',
+                    $r->cond ?? '',
+                    $r->sg ?? '',
+                    $r->referido_a ?? '',
+                    $r->referido_de ?? '',
+                    $r->pg_emb ?? '',
+                    $r->jornada ?? '',
+                    $r->ano ?? '',
+                    $r->mes ?? '',
+                    $r->id ?? ''
+                ];
+                $totalDiagnosticos++;
+            }
+        }
+
+        $stats = [
+            'total_consultas' => $registrosRaw->count(),
+            'total_diagnosticos' => $totalDiagnosticos,
+            'total_bd' => RegistroGlobal::count()
+        ];
+
+        $anoActual = implode(',', $selectedYears);
+        $mesSeleccionado = implode(',', $selectedMonths);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => $segmentedRows,
+                'total' => count($segmentedRows)
+            ]);
+        }
+
+        return view('reports.informesat1', compact(
+            'segmentedRows',
+            'stats',
+            'anos',
+            'selectedYears',
+            'mesesDisponibles',
+            'selectedMonths',
+            'anoActual',
+            'mesSeleccionado'
+        ));
     }
     
     /**
