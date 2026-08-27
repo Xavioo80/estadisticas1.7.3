@@ -4,8 +4,22 @@
 
 @push('styles')
 <style>
+    .app-footer {
+        display: none !important;
+    }
+    .app-content {
+        padding: 0.6rem 0.85rem !important;
+        height: calc(100vh - var(--navbar-height)) !important;
+        max-height: calc(100vh - var(--navbar-height)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
     .cell-clickable:hover {
-        background-color: var(--color-primary-light) !important;
+        background-color: var(--color-primary-light, rgba(99, 102, 241, 0.15)) !important;
     }
     @media print {
         .no-print { display: none !important; }
@@ -16,24 +30,28 @@
 @endpush
 
 @section('content')
-<div class="informe-page-wrapper">
+<div class="informe-page-wrapper" style="flex: 1 1 0%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; width: 100%;">
     <!-- Header -->
-    <div class="informe-header">
+    <div class="informe-header no-print" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); padding: 0.65rem 1rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-shrink: 0;">
         <div>
-            <h2><i class="bi bi-exclamation-triangle text-primary mr-1"></i> Alerta Semanal</h2>
-            <p>Vigilancia de Alertas Epidemiológicas Semanales (Telegrama Semanal)</p>
+            <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="bi bi-exclamation-triangle text-primary"></i> Alerta Semanal
+            </h2>
+            <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0.15rem 0 0 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+                Vigilancia de Alertas Epidemiológicas Semanales (Telegrama Semanal)
+            </p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm" style="font-weight: 600;">
+            <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm" style="font-weight: 600; font-size: 0.78rem; padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-primary);">
                 <i class="bi bi-arrow-clockwise mr-1"></i> Actualizar
             </button>
         </div>
     </div>
 
     <!-- Dynamic Content Area -->
-    <div id="dynamic-content" style="flex: 1 1 0%; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+    <div id="dynamic-content" style="flex: 1 1 0%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; width: 100%;">
         <!-- Loading Overlay -->
-        <div id="table-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-surface); opacity: 0.8; z-index: 1000; align-items: center; justify-content: center;">
+        <div id="table-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-surface); opacity: 0.85; z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Cargando...</span>
             </div>
@@ -68,85 +86,73 @@
         const ano = $('select[name="ano"]').val() || '{{ $anoDefault }}';
         const se = $('select[name="se"]').val() || '{{ $seDefault }}';
 
-        $('#modalAlertaTitle').text('Cargando detalles...');
-        $('#modalAlertaRangeLabel').text('...');
-        $('#modalSummaryTotal').text('...');
-        $('#modalSummaryDays').empty();
-        $('#modalSummaryRanges').empty();
-        $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm mr-1"></div> Cargando pacientes...</td></tr>');
+        $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary mr-1"></div> Cargando registros...</td></tr>');
         $('#modalAlertaDetalles').modal('show');
 
-        const url = `{{ route('informes.alerta-semanal.details') }}?ano=${ano}&se=${se}&idx=${idx}&range=${range}`;
+        $.ajax({
+            url: "{{ route('informes.alerta-semanal.details') }}",
+            type: 'GET',
+            data: { ano: ano, se: se, idx: idx, range: range },
+            success: function(res) {
+                $('#modalAlertaTitle').text(res.title);
+                $('#modalAlertaRangeLabel').text(res.range_label);
 
-        $.getJSON(url, function(data) {
-            $('#modalAlertaTitle').text(data.label);
-            $('#modalAlertaRangeLabel').text(data.range_label);
-            $('#modalSummaryTotal').text(data.count);
+                $('#modalSummaryTotal').text(res.total);
 
-            // Resumen por día
-            let daysHtml = '';
-            if (data.summaryByDay) {
-                $.each(data.summaryByDay, function(date, count) {
-                    const dayNum = date.split('-')[2] || date;
-                    daysHtml += `<div class="px-2 py-1 text-center"><span class="small text-muted d-block">${dayNum}</span><strong class="text-primary">${count}</strong></div>`;
-                });
+                let daysHtml = '';
+                if (res.summary_days) {
+                    for (const [day, count] of Object.entries(res.summary_days)) {
+                        daysHtml += `<span class="badge badge-subtle px-2 py-1 border" style="font-size: 0.75rem; border-color: var(--border-color); color: var(--text-primary);"><span class="text-muted font-weight-normal">${day}:</span> <strong>${count}</strong></span>`;
+                    }
+                }
+                $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin datos</span>');
+
+                let rangesHtml = '';
+                if (res.summary_ranges) {
+                    for (const [r, count] of Object.entries(res.summary_ranges)) {
+                        rangesHtml += `<span class="badge badge-subtle px-2 py-1 border" style="font-size: 0.75rem; border-color: var(--border-color); color: var(--text-primary);"><span class="text-muted font-weight-normal">${r}:</span> <strong>${count}</strong></span>`;
+                    }
+                }
+                $('#modalSummaryRanges').html(rangesHtml || '<span class="text-muted small">Sin datos</span>');
+
+                let rows = '';
+                if (res.patients && res.patients.length > 0) {
+                    res.patients.forEach(p => {
+                        rows += `
+                            <tr style="border-color: var(--border-color);">
+                                <td class="font-weight-bold text-primary">${p.fecha}</td>
+                                <td class="font-weight-bold" style="color: var(--text-primary);">${p.expediente}</td>
+                                <td>${p.sexo}</td>
+                                <td>${p.edad}</td>
+                                <td style="color: var(--text-primary);">${p.diagnostico}</td>
+                                <td class="text-muted">${p.medico}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rows = '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron pacientes para este rango.</td></tr>';
+                }
+                $('#modalAlertaTableBody').html(rows);
+            },
+            error: function() {
+                $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">Error al cargar los datos</td></tr>');
             }
-            $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin datos</span>');
-
-            // Resumen por rango
-            let rangesHtml = '';
-            const rangeLabels = { 'less_1': '<1', '1_4': '1-4', '5_14': '5-14', '15_plus': '+15' };
-            if (data.summaryByRange) {
-                $.each(data.summaryByRange, function(rng, count) {
-                    const label = rangeLabels[rng] || rng;
-                    rangesHtml += `<div class="px-2 py-1 text-center"><span class="small text-muted d-block">${label}</span><strong class="text-primary">${count}</strong></div>`;
-                });
-            }
-            $('#modalSummaryRanges').html(rangesHtml || '<span class="text-muted small">Sin datos</span>');
-
-            // Tabla de pacientes
-            let rowsHtml = '';
-            if (data.details && data.details.length > 0) {
-                $.each(data.details, function(i, item) {
-                    rowsHtml += `
-                        <tr>
-                            <td class="font-weight-600">${item.fecha}</td>
-                            <td>${item.exp || '-'}</td>
-                            <td>${item.sexo || '-'}</td>
-                            <td>${item.edad || '-'}</td>
-                            <td class="font-weight-600 text-dark">${item.diagnostico || '-'}</td>
-                            <td class="small text-muted">${item.medico || '-'}</td>
-                        </tr>
-                    `;
-                });
-            } else {
-                rowsHtml = '<tr><td colspan="6" class="text-center py-3 text-muted">No se encontraron pacientes para este criterio.</td></tr>';
-            }
-            $('#modalAlertaTableBody').html(rowsHtml);
-        }).fail(function() {
-            $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center text-danger py-3">Error al cargar los datos.</td></tr>');
         });
     }
 
     function copyToExcel() {
-        const table = document.querySelector('.table-alerta');
+        let table = document.querySelector('.table-alerta');
         if (!table) return;
 
         let text = "";
-        const rows = table.querySelectorAll('tbody tr');
+        let rows = table.querySelectorAll("tr");
         rows.forEach(row => {
-            const cols = row.querySelectorAll('td');
+            let cols = row.querySelectorAll("th, td");
             let rowData = [];
-            for (let i = 1; i < cols.length; i++) {
-                let val = cols[i].innerText.trim().replace(/\s+/g, " ");
-                rowData.push(val);
-                let colspan = cols[i].getAttribute('colspan');
-                if (colspan) {
-                    for (let c = 1; c < parseInt(colspan); c++) {
-                        rowData.push("");
-                    }
-                }
-            }
+            cols.forEach(col => {
+                let cellText = col.innerText.trim().replace(/\n/g, " ");
+                rowData.push(cellText);
+            });
             if (rowData.length > 0) {
                 text += rowData.join("\t") + "\n";
             }
@@ -154,7 +160,7 @@
 
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(() => {
-                Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles listos para pegar en Excel.', icon: 'success', confirmButtonColor: '#4d7cfe' });
+                Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles listos para pegar en Excel.', icon: 'success', timer: 1500, showConfirmButton: false });
             });
         } else {
             const textArea = document.createElement("textarea");
@@ -163,7 +169,7 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles.', icon: 'success', confirmButtonColor: '#4d7cfe' });
+            Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles.', icon: 'success', timer: 1500, showConfirmButton: false });
         }
     }
 
@@ -181,6 +187,7 @@
                 url: url,
                 type: 'GET',
                 data: data,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 success: function(response) {
                     $('#dynamic-content').html(response);
                     $('#table-loader').fadeOut(200);
