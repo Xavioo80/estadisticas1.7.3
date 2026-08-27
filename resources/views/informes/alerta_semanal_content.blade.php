@@ -29,10 +29,17 @@
             </select>
         </div>
 
-        <!-- Rango Epidemiológico -->
-        <div class="d-flex align-items-center px-2.5" style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; height: 34px; white-space: nowrap; flex-shrink: 0;">
-            <span class="text-muted mr-1.5" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Rango:</span>
-            <span class="font-weight-bold text-primary" style="font-size: 0.82rem;">{{ $fechaInfo['start'] }} al {{ $fechaInfo['end'] }}</span>
+        <!-- Rango Epidemiológico Badge -->
+        <div class="d-inline-flex align-items-center px-3" style="background: linear-gradient(135deg, var(--bg-subtle), var(--bg-surface)); border: 1px solid var(--border-color); border-radius: 9999px; height: 34px; white-space: nowrap; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); gap: 6px;">
+            <div style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary-light, rgba(99, 102, 241, 0.15)); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; flex-shrink: 0;">
+                <i class="bi bi-calendar3"></i>
+            </div>
+            <span style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);">Rango:</span>
+            <span class="font-weight-bold" style="font-size: 0.82rem; color: var(--color-primary); letter-spacing: 0.02em;">
+                {{ $fechaInfo['start'] }}
+                <i class="bi bi-arrow-right mx-1 text-muted" style="font-size: 0.70rem; opacity: 0.7;"></i>
+                {{ $fechaInfo['end'] }}
+            </span>
         </div>
     </form>
 
