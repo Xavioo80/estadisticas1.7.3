@@ -219,14 +219,14 @@
                     <!-- Resumen KPIs en una sola barra moderna y unificada -->
                     <div class="kpi-summary-bar mb-3 p-2.5 px-3 rounded-lg border" style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 12px;">
                         <!-- Bloque Izquierdo: Total General -->
-                        <div class="d-flex flex-column justify-content-center" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 14px; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); flex-shrink: 0;">
-                            <div class="d-flex align-items-center" style="gap: 8px;">
-                                <div style="width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);">
+                        <div class="d-flex flex-column align-items-center justify-content-center text-center" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 14px; min-width: 105px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); flex-shrink: 0;">
+                            <div class="d-flex align-items-center justify-content-center" style="gap: 7px; line-height: 1;">
+                                <div style="width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);">
                                     <i class="bi bi-people-fill"></i>
                                 </div>
-                                <span style="font-size: 1.35rem; font-weight: 800; color: var(--color-primary); line-height: 1;" id="modalSummaryTotal">0</span>
+                                <span style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary); line-height: 1; display: inline-block;" id="modalSummaryTotal">0</span>
                             </div>
-                            <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; line-height: 1;">TOTAL CASOS</span>
+                            <span style="font-size: 0.60rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; margin-top: 4px; line-height: 1; display: block;">TOTAL CASOS</span>
                         </div>
 
                         <!-- Divisor vertical sutil -->
