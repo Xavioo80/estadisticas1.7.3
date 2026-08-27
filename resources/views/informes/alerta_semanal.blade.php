@@ -153,31 +153,15 @@
                 const patientsList = res.patients || res.details || [];
                 if (patientsList.length > 0) {
                     patientsList.forEach((p, i) => {
-                        const sexoUpper = (p.sexo || '').trim().toUpperCase();
-                        let sexoBadge = '-';
-                        if (sexoUpper === 'M' || sexoUpper === 'MASCULINO') {
-                            sexoBadge = `<span class="badge font-weight-bold" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6; font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">M</span>`;
-                        } else if (sexoUpper === 'F' || sexoUpper === 'FEMENINO') {
-                            sexoBadge = `<span class="badge font-weight-bold" style="background: rgba(236, 72, 153, 0.12); color: #ec4899; font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">F</span>`;
-                        } else if (p.sexo) {
-                            sexoBadge = `<span class="badge badge-subtle" style="font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">${p.sexo}</span>`;
-                        }
-
                         rows += `
                             <tr>
-                                <td class="text-center font-weight-bold text-muted" style="padding: 9px 12px; font-size: 0.75rem;">${i + 1}</td>
-                                <td style="padding: 9px 12px; white-space: nowrap; font-weight: 700; color: var(--color-primary); font-size: 0.82rem;">${p.fecha}</td>
-                                <td style="padding: 9px 12px;">
-                                    <span class="badge" style="background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color); font-family: monospace; font-size: 0.78rem; font-weight: 700; border-radius: 6px; padding: 3px 8px;">
-                                        ${p.expediente || p.exp || '-'}
-                                    </span>
-                                </td>
-                                <td class="text-center" style="padding: 9px 12px;">${sexoBadge}</td>
-                                <td style="padding: 9px 12px; font-weight: 600; color: var(--text-primary); font-size: 0.80rem;">${p.edad || '-'}</td>
-                                <td style="padding: 9px 12px; font-weight: 700; color: var(--text-primary); font-size: 0.82rem;">${p.diagnostico || '-'}</td>
-                                <td style="padding: 9px 12px; color: var(--text-muted); font-size: 0.80rem; font-weight: 500;">
-                                    <i class="bi bi-person-fill text-primary mr-1" style="font-size: 0.75rem;"></i>${p.medico || '-'}
-                                </td>
+                                <td class="text-center text-muted" style="padding: 7px 10px; font-size: 0.80rem;">${i + 1}</td>
+                                <td style="padding: 7px 10px; white-space: nowrap; font-size: 0.80rem;">${p.fecha || '-'}</td>
+                                <td class="text-center" style="padding: 7px 10px; font-size: 0.80rem;">${p.expediente || p.exp || '-'}</td>
+                                <td class="text-center" style="padding: 7px 10px; font-size: 0.80rem;">${p.sexo || '-'}</td>
+                                <td class="text-center" style="padding: 7px 10px; font-size: 0.80rem;">${p.edad || '-'}</td>
+                                <td style="padding: 7px 10px; font-size: 0.80rem;">${p.diagnostico || '-'}</td>
+                                <td style="padding: 7px 10px; font-size: 0.80rem;">${p.medico || '-'}</td>
                             </tr>
                         `;
                     });
