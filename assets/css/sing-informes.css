@@ -1,0 +1,1842 @@
+/**
+ * Sing App - Informes & Tablas Matriciales Stylesheet
+ * Soporte completo para Modo Oscuro (data-theme="dark") y Modo Claro (data-theme="light")
+ */
+
+/* ─── UTILITY HELPERS (Compatibilidad Tailwind / Flex / Grid) ────────────── */
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+.flex-col { flex-direction: column !important; }
+.flex-row { flex-direction: row !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.flex-nowrap { flex-wrap: nowrap !important; }
+.flex-1 { flex: 1 1 0% !important; }
+.flex-auto { flex: 1 1 auto !important; }
+.flex-initial { flex: 0 1 auto !important; }
+.flex-none { flex: none !important; }
+.shrink-0 { flex-shrink: 0 !important; }
+
+.items-center { align-items: center !important; }
+.items-start { align-items: flex-start !important; }
+.items-end { align-items: flex-end !important; }
+.items-stretch { align-items: stretch !important; }
+
+.justify-start { justify-content: flex-start !important; }
+.justify-end { justify-content: flex-end !important; }
+.justify-center { justify-content: center !important; }
+.justify-between { justify-content: space-between !important; }
+.justify-around { justify-content: space-around !important; }
+
+.gap-0\.5 { gap: 0.125rem !important; }
+.gap-1 { gap: 0.25rem !important; }
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2 { gap: 0.5rem !important; }
+.gap-3 { gap: 0.75rem !important; }
+.gap-4 { gap: 1rem !important; }
+
+.space-x-1 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.25rem !important; }
+.space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem !important; }
+.space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem !important; }
+
+.w-full { width: 100% !important; }
+.w-auto { width: auto !important; }
+.w-16 { width: 4rem !important; }
+.w-20 { width: 5rem !important; }
+.w-24 { width: 6rem !important; }
+.w-28 { width: 7rem !important; }
+.w-32 { width: 8rem !important; }
+.w-36 { width: 9rem !important; }
+.w-40 { width: 10rem !important; }
+.w-48 { width: 12rem !important; }
+.w-56 { width: 14rem !important; }
+.w-64 { width: 16rem !important; }
+.w-7 { width: 1.75rem !important; }
+.h-7 { height: 1.75rem !important; }
+.h-8 { height: 2rem !important; }
+
+.max-w-\[220px\] { max-width: 220px !important; }
+.max-w-\[260px\] { max-width: 260px !important; }
+.max-w-\[300px\] { max-width: 300px !important; }
+
+.p-1 { padding: 0.25rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-3 { padding: 0.75rem !important; }
+.p-4 { padding: 1rem !important; }
+.py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+.rounded { border-radius: var(--radius-xs, 4px) !important; }
+.rounded-md { border-radius: var(--radius-sm, 8px) !important; }
+.rounded-lg { border-radius: var(--radius-md, 12px) !important; }
+.rounded-full { border-radius: var(--radius-full, 9999px) !important; }
+
+.text-xs { font-size: 0.75rem !important; }
+.text-sm { font-size: 0.875rem !important; }
+.text-base { font-size: 1rem !important; }
+.text-lg { font-size: 1.125rem !important; }
+.text-xl { font-size: 1.25rem !important; }
+.font-bold { font-weight: 700 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-medium { font-weight: 500 !important; }
+
+/* ─── ESTRUCTURA PRINCIPAL DE INFORMES ───────────────────────────────────── */
+
+/* 1. Bloquear scroll en body y app-wrapper — solo cuando hay un informe */
+body:has(.informe-page-wrapper),
+body:has(.informe-container-centered),
+body:has(.filter-container),
+body:has(#report-content-container) {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+body:has(.informe-page-wrapper) .app-wrapper,
+body:has(.informe-container-centered) .app-wrapper,
+body:has(.filter-container) .app-wrapper,
+body:has(#report-content-container) .app-wrapper {
+  overflow: hidden !important;
+  height: 100vh !important;
+  display: flex !important;
+}
+
+/* 2. app-main: flex column que llena exactamente el viewport */
+body:has(.informe-page-wrapper) .app-main,
+body:has(.informe-container-centered) .app-main,
+body:has(.filter-container) .app-main,
+body:has(#report-content-container) .app-main {
+  overflow: hidden !important;
+  height: 100vh !important;
+  min-height: unset !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 3. app-content: toma el espacio restante (debajo de navbar y footer) */
+.app-content:has(.informe-page-wrapper),
+.app-content:has(.informe-container-centered),
+.app-content:has(.filter-container),
+.app-content:has(#report-content-container) {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  padding: 0.75rem 1rem !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 4. Contenedores internos: puro flex sin height:100% */
+.informe-container-centered {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  overflow: hidden;
+}
+
+.informe-card-centered {
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 1060px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.informe-page-wrapper {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── HEADER DE INFORMES ─────────────────────────────────────────────────── */
+.informe-header,
+header.bg-white,
+header.shadow {
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0.6rem 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: none !important;
+  flex-shrink: 0 !important;
+}
+
+.informe-header h2,
+header h2 {
+  color: var(--text-primary) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+}
+
+.informe-header p,
+header p {
+  color: var(--text-muted) !important;
+  font-size: 0.72rem !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* ─── BARRA DE FILTROS ───────────────────────────────────────────────────── */
+.filter-container {
+  background: var(--bg-subtle) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  flex-shrink: 0 !important;
+  padding: 0.5rem 0.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+}
+
+.filter-select {
+  height: 32px !important;
+  padding: 0 26px 0 10px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  transition: all var(--transition-fast) !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.5rem center !important;
+  background-size: 1em 1em !important;
+}
+
+[data-theme="dark"] .filter-select {
+  background-color: #182238 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+.filter-select:focus {
+  border-color: var(--color-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(77, 124, 254, 0.25) !important;
+}
+
+/* Botones de Acción de Filtros (Fullscreen, Imprimir, Auditar, Excel) */
+.btn-action-fullscreen {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+}
+
+.btn-action-fullscreen:hover {
+  background: var(--bg-surface-hover) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.btn-action-print {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(71, 85, 105, 0.3) !important;
+  background: #475569 !important;
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.88rem !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: 0 1px 3px rgba(71, 85, 105, 0.2) !important;
+}
+
+.btn-action-print:hover {
+  background: #334155 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+[data-theme="dark"] .btn-action-print {
+  background: #334155 !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .btn-action-print:hover {
+  background: #475569 !important;
+}
+
+.btn-action-audit {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.88rem !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.25) !important;
+}
+
+.btn-action-audit:hover {
+  background: #d97706 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-action-excel {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.88rem !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25) !important;
+}
+
+.btn-action-excel:hover {
+  background: #059669 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ─── TABLA MATRICIAL DE INFORMES (ATENCIONES, TB9, IMPLANTES, ETC.) ────── */
+.table-container,
+.informe-card-centered .table-responsive,
+.informe-page-wrapper .table-responsive {
+  flex: 1 1 0% !important;
+  overflow: auto !important;
+  position: relative !important;
+  background: var(--bg-surface) !important;
+  min-height: 0 !important;
+}
+
+.table-container .table,
+table.table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 0 !important;
+}
+
+.table-container .table th,
+.table-container .table td,
+table.table th,
+table.table td {
+  vertical-align: middle !important;
+  text-align: center !important;
+  border: 1px solid #374151 !important;
+  padding: 5px 8px !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  color: var(--text-primary) !important;
+  background-color: var(--bg-surface) !important;
+}
+
+/* Solo los td de datos (números) — más grandes que el texto de CONCEPTO */
+table.table tbody td:not(.sticky-col-first) {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+/* Encabezado Fijo Superior (Sticky Header) */
+thead.thead-premium {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+}
+
+.thead-premium th {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  border: 1px solid var(--border-color) !important;
+  white-space: nowrap !important;
+}
+
+.thead-premium tr:first-child th,
+#at2rTable thead tr:first-child th {
+  top: 0 !important;
+  z-index: 25 !important;
+}
+
+.thead-premium tr:nth-child(2) th,
+#at2rTable thead tr:nth-child(2) th {
+  top: 27px !important;
+  z-index: 24 !important;
+}
+
+.thead-premium th.sticky-col-first,
+#at2rTable thead th.sticky-col-first {
+  z-index: 35 !important;
+  border-right: 2px solid var(--border-color) !important;
+}
+
+/* Columna Fija Izquierda (Nombres de Médicos / Diagnósticos) */
+.sticky-col-first {
+  position: sticky !important;
+  left: 0 !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  z-index: 15 !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+  font-weight: 600 !important;
+  padding-left: 12px !important;
+}
+
+/* Selector más específico para sobrescribir text-align:center del td general */
+table.table td.sticky-col-first,
+table.table th.sticky-col-first {
+  text-align: left !important;
+}
+
+/* Fila de Totales */
+.total-row td {
+  background-color: var(--bg-subtle) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800 !important;
+  border-top: 2px solid var(--color-primary) !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 18 !important;
+}
+
+.total-row .sticky-col-first {
+  background-color: var(--bg-subtle) !important;
+  color: var(--color-primary) !important;
+  z-index: 25 !important;
+}
+
+/* ─── TIPOS DE FILA ESPECIALES (alta especificidad para sobrescribir table.table td) ── */
+
+/* Encabezado de sección */
+table.table tr.row-section-header td {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  font-size: 0.78rem !important;
+}
+[data-theme="light"] table.table tr.row-section-header td {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+/* ── TOTAL: azul índigo — modo oscuro ── */
+table.table tr.row-total-highlight td {
+  background-color: rgba(77, 124, 254, 0.20) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+  border-top: 2px solid rgba(77, 124, 254, 0.45) !important;
+  border-bottom: 2px solid rgba(77, 124, 254, 0.45) !important;
+}
+table.table tr.row-total-highlight td.sticky-col-first {
+  background-color: rgba(77, 124, 254, 0.28) !important;
+  color: #93c5fd !important;
+}
+/* modo claro */
+[data-theme="light"] table.table tr.row-total-highlight td {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+[data-theme="light"] table.table tr.row-total-highlight td.sticky-col-first {
+  background-color: rgba(59, 130, 246, 0.20) !important;
+  color: #1d4ed8 !important;
+}
+
+/* ── MENORES DE 5: azul — modo oscuro ── */
+table.table tr.row-menores5 td {
+  background-color: rgba(59, 130, 246, 0.20) !important;
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  border-top: 2px solid rgba(59, 130, 246, 0.45) !important;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.45) !important;
+}
+table.table tr.row-menores5 td.sticky-col-first {
+  background-color: rgba(59, 130, 246, 0.30) !important;
+  color: #93c5fd !important;
+}
+/* modo claro */
+[data-theme="light"] table.table tr.row-menores5 td {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+}
+[data-theme="light"] table.table tr.row-menores5 td.sticky-col-first {
+  background-color: rgba(59, 130, 246, 0.20) !important;
+  color: #1d4ed8 !important;
+}
+
+/* ── EMBARAZO / PRENATAL: rosa — modo oscuro ── */
+table.table tr.row-embarazo td {
+  background-color: rgba(236, 72, 153, 0.18) !important;
+  color: var(--text-primary) !important;
+}
+table.table tr.row-embarazo td.sticky-col-first {
+  background-color: rgba(236, 72, 153, 0.28) !important;
+  color: #f9a8d4 !important;
+}
+/* modo claro */
+[data-theme="light"] table.table tr.row-embarazo td {
+  background-color: rgba(236, 72, 153, 0.10) !important;
+}
+[data-theme="light"] table.table tr.row-embarazo td.sticky-col-first {
+  background-color: rgba(236, 72, 153, 0.18) !important;
+  color: #be185d !important;
+}
+
+/* ── PUERPERIO: amarillo mostaza — modo oscuro ── */
+table.table tr.row-puerperio td {
+  background-color: rgba(202, 138, 4, 0.20) !important;
+  color: var(--text-primary) !important;
+}
+table.table tr.row-puerperio td.sticky-col-first {
+  background-color: rgba(202, 138, 4, 0.30) !important;
+  color: #fcd34d !important;
+}
+/* modo claro */
+[data-theme="light"] table.table tr.row-puerperio td {
+  background-color: rgba(202, 138, 4, 0.11) !important;
+}
+[data-theme="light"] table.table tr.row-puerperio td.sticky-col-first {
+  background-color: rgba(202, 138, 4, 0.20) !important;
+  color: #92400e !important;
+}
+
+/* ── NIÑO/NIÑA: verde esmeralda — modo oscuro ── */
+table.table tr.row-nino td {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+  color: var(--text-primary) !important;
+}
+table.table tr.row-nino td.sticky-col-first {
+  background-color: rgba(16, 185, 129, 0.28) !important;
+  color: #6ee7b7 !important;
+}
+/* modo claro */
+[data-theme="light"] table.table tr.row-nino td {
+  background-color: rgba(16, 185, 129, 0.10) !important;
+}
+[data-theme="light"] table.table tr.row-nino td.sticky-col-first {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+  color: #065f46 !important;
+}
+
+/* ── Columna de Total General (última columna) ── */
+table.table td.col-total {
+  font-weight: 800 !important;
+  color: var(--color-primary) !important;
+}
+
+/* ── Cuadros de Comprobación de Morbilidad ── */
+.col-morbilidad-head {
+  letter-spacing: 0.5px !important;
+}
+
+.morbilidad-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  padding: 0.2rem 0.55rem !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.15s ease !important;
+}
+
+.morbilidad-match {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+[data-theme="light"] .morbilidad-match {
+  background: rgba(16, 185, 129, 0.14) !important;
+  color: #065f46 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.morbilidad-mismatch {
+  background: rgba(245, 158, 11, 0.20) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+[data-theme="light"] .morbilidad-mismatch {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #b45309 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Celdas vacías sin cuadro ni borde en la columna de Morbilidad */
+table.table td.col-morbilidad-empty {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* ─── EFECTOS DE INTERACCIÓN Y RESALTADO ─────────────────────────────────── */
+
+/* Hover de FILA completa */
+table.table tbody tr:hover td:not(.sticky-col-first) {
+  background-color: rgba(77, 124, 254, 0.10) !important;
+  transition: background-color 0.12s ease !important;
+}
+[data-theme="light"] table.table tbody tr:hover td:not(.sticky-col-first) {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+.hover-row td:not(.sticky-col-first) {
+  background-color: rgba(77, 124, 254, 0.14) !important;
+  border-top: 1px solid rgba(77, 124, 254, 0.25) !important;
+  border-bottom: 1px solid rgba(77, 124, 254, 0.25) !important;
+}
+
+[data-theme="light"] .hover-row td:not(.sticky-col-first) {
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  border-top: 1px solid rgba(59, 130, 246, 0.18) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.18) !important;
+}
+
+.hover-col:not(.sticky-col-first) {
+  background-color: rgba(77, 124, 254, 0.10) !important;
+  border-left: 1px solid rgba(77, 124, 254, 0.25) !important;
+  border-right: 1px solid rgba(77, 124, 254, 0.25) !important;
+}
+
+[data-theme="light"] .hover-col:not(.sticky-col-first) {
+  background-color: rgba(59, 130, 246, 0.06) !important;
+  border-left: 1px solid rgba(59, 130, 246, 0.15) !important;
+  border-right: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+
+.hover-cell:not(.sticky-col-first) {
+  background-color: rgba(77, 124, 254, 0.22) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 0 2px var(--color-primary) !important;
+  z-index: 5 !important;
+}
+
+[data-theme="light"] .hover-cell:not(.sticky-col-first) {
+  background-color: rgba(59, 130, 246, 0.16) !important;
+  color: var(--color-primary, #1d4ed8) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 0 2px var(--color-primary, #3b82f6) !important;
+}
+
+.selected-cell {
+  background-color: rgba(34, 197, 94, 0.25) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+  outline: 2px solid var(--color-success) !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4) !important;
+  z-index: 10 !important;
+}
+
+.selected-cell.hover-cell {
+  background-color: rgba(34, 197, 94, 0.35) !important;
+  outline: 2px solid var(--color-primary) !important;
+}
+
+.cell-weekend {
+  color: var(--color-info) !important;
+  font-weight: 700 !important;
+}
+
+/* ── Inputs manuales ── */
+.manual-input {
+  width: 70px !important;
+  text-align: center !important;
+  background: var(--input-bg, var(--bg-surface)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 6px !important;
+  padding: 2px 4px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+.manual-input:focus {
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(77, 124, 254, 0.25) !important;
+}
+
+/* ─── MODO OSCURO ESPECÍFICO (DATA-THEME="DARK") ────────────────────────── */
+[data-theme="dark"] .informe-page-wrapper {
+  background: #182238 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .filter-container {
+  background: #131c31 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .filter-select {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .table-container .table,
+[data-theme="dark"] table.table {
+  background-color: #182238 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .table-container .table th,
+[data-theme="dark"] .table-container .table td,
+[data-theme="dark"] table.table th,
+[data-theme="dark"] table.table td {
+  background-color: #182238 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .thead-premium th {
+  background-color: #0f172a !important;
+  color: #93c5fd !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .sticky-col-first {
+  background-color: #182238 !important;
+  color: #f8fafc !important;
+  border-right-color: #475569 !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .total-row td {
+  background-color: #0f172a !important;
+  color: #60a5fa !important;
+  border-top-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .total-row .sticky-col-first {
+  background-color: #0f172a !important;
+  color: #60a5fa !important;
+}
+
+[data-theme="dark"] .cell-weekend {
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .hover-cell:not(.sticky-col-first) {
+  background-color: rgba(96, 165, 250, 0.28) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .selected-cell {
+  background-color: rgba(34, 197, 94, 0.3) !important;
+  color: #ffffff !important;
+}
+
+/* ─── MODAL DE DETALLE DE CASILLA (CELL DETAIL MODAL) ──────────────────── */
+.fixed { position: fixed !important; }
+.inset-0 { top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important; }
+.hidden { display: none !important; }
+.backdrop-blur-sm { backdrop-filter: blur(6px) !important; -webkit-backdrop-filter: blur(6px) !important; }
+.bg-slate-900\/70 { background-color: rgba(15, 23, 42, 0.75) !important; }
+
+#cellDetailModal {
+  z-index: 100000 !important;
+  display: flex;
+}
+
+#cellDetailModal.hidden {
+  display: none !important;
+}
+
+#cellDetailModal .modal-container {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg, 16px) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  color: var(--text-primary) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 820px !important;
+  max-height: 85vh !important;
+  animation: modalScaleIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+#cellDetailModal .modal-header {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  padding: 1rem 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+#cellDetailModal .modal-search-bar {
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+#cellDetailModal .modal-search-input {
+  width: 100% !important;
+  padding: 0.5rem 1rem 0.5rem 2.5rem !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: var(--radius-md, 10px) !important;
+  color: var(--input-text) !important;
+  font-size: 0.85rem !important;
+  outline: none !important;
+  transition: all var(--transition-fast) !important;
+}
+
+#cellDetailModal .modal-search-input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(77, 124, 254, 0.25) !important;
+  background: var(--bg-surface) !important;
+}
+
+#cellDetailModal .modal-scroll-body {
+  padding: 1.25rem 1.5rem !important;
+  background: var(--bg-body) !important;
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+}
+
+/* Tarjetas de médicos dentro del modal */
+.medico-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md, 12px) !important;
+  padding: 1rem 1.25rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all var(--transition-fast) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.medico-card:hover {
+  border-color: var(--color-primary) !important;
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-1px) !important;
+}
+
+.medico-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--radius-full) !important;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.medico-name {
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  color: var(--text-primary) !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.medico-prof {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+.medico-badge-count {
+  padding: 0.25rem 0.75rem !important;
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #15803d !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+  font-weight: 700 !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  font-size: 0.75rem !important;
+}
+
+[data-theme="dark"] .medico-badge-count {
+  background: rgba(34, 197, 94, 0.2) !important;
+  color: #4ade80 !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+.fecha-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.25rem 0.6rem !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--border-color) !important;
+  font-size: 0.75rem !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+.fecha-tag strong {
+  color: var(--color-primary) !important;
+  font-weight: 700 !important;
+}
+
+/* Celdas clickeables en AT2-r N */
+.cell-clickable {
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  position: relative !important;
+}
+
+.cell-clickable:hover {
+  background-color: rgba(77, 124, 254, 0.18) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800 !important;
+  box-shadow: inset 0 0 0 2px var(--color-primary) !important;
+}
+
+[data-theme="dark"] .cell-clickable:hover {
+  background-color: rgba(96, 165, 250, 0.25) !important;
+  color: #93c5fd !important;
+}
+
+/* Fila de Total Destacada */
+.row-total-highlight td {
+  background-color: var(--bg-subtle) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800 !important;
+  font-size: 0.88rem !important;
+}
+
+[data-theme="dark"] .row-total-highlight td {
+  background-color: #172554 !important;
+  color: #60a5fa !important;
+}
+
+/* ─── PANTALLA COMPLETA ──────────────────────────────────────────────────── */
+.fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ─── MODALES: OVERLAYS Y VISIBILIDAD (Normal & Fullscreen) ─────────────── */
+#cellDetailModal,
+#morbilidadAuditModal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(15, 23, 42, 0.78) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.25rem !important;
+  z-index: 100000 !important;
+}
+
+#cellDetailModal.hidden,
+#morbilidadAuditModal.hidden {
+  display: none !important;
+}
+
+:fullscreen #cellDetailModal,
+:fullscreen #morbilidadAuditModal,
+:-webkit-full-screen #cellDetailModal,
+:-webkit-full-screen #morbilidadAuditModal,
+:-moz-full-screen #cellDetailModal,
+:-moz-full-screen #morbilidadAuditModal {
+  position: fixed !important;
+  z-index: 100000 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ─── ESTILOS MODAL AUDITORÍA DE MORBILIDAD ───────────────────────────────── */
+.morbilidad-clickable {
+  cursor: pointer !important;
+}
+.morbilidad-clickable:hover {
+  transform: scale(1.08) translateY(-1px) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+.audit-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.audit-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.audit-tab-btn.active {
+  background: var(--color-primary);
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(77, 124, 254, 0.35);
+}
+
+[data-theme="light"] .audit-tab-btn.active {
+  background: #2563eb;
+  color: #ffffff !important;
+}
+
+.audit-card-alert {
+  transition: transform 0.1s ease;
+}
+.audit-card-alert:hover {
+  transform: translateY(-1px);
+}
+
+.paciente-audit-card {
+  transition: all 0.12s ease;
+}
+.paciente-audit-card:hover {
+  border-color: var(--color-primary) !important;
+  background-color: var(--bg-surface-hover, rgba(77, 124, 254, 0.04)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL DE AUDITORÍA DE MORBILIDAD  — Dark / Light
+   ═══════════════════════════════════════════════════════════ */
+
+/* Overlay */
+#morbilidadAuditModal {
+  z-index: 100000 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+#morbilidadAuditModal.hidden { display: none !important; }
+
+/* Contenedor principal */
+#morbilidadAuditModal .modal-container {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.04) !important;
+  color: var(--text-primary) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 95% !important;
+  max-width: 900px !important;
+  max-height: 88vh !important;
+  animation: auditModalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes auditModalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+/* Header */
+#morbilidadAuditModal .modal-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: #f1f5f9 !important;
+  padding: 1.1rem 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] #morbilidadAuditModal .modal-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+}
+
+#morbilidadAuditModal .modal-header h3 {
+  color: #f1f5f9 !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#morbilidadAuditModal .modal-header p {
+  color: #94a3b8 !important;
+  font-size: 0.78rem !important;
+  margin: 0.2rem 0 0 0 !important;
+}
+
+[data-theme="light"] #morbilidadAuditModal .modal-header p {
+  color: #bfdbfe !important;
+}
+
+/* Botón cerrar */
+#morbilidadAuditModal .btn-audit-close {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  color: #94a3b8 !important;
+  border-radius: 8px !important;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem; transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+#morbilidadAuditModal .btn-audit-close:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
+}
+
+/* Badges AT2 / Morbilidad en el header */
+.audit-badge-at2 {
+  background: rgba(59, 130, 246, 0.25) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(147, 197, 253, 0.4) !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.audit-badge-morb {
+  background: rgba(16, 185, 129, 0.25) !important;
+  color: #6ee7b7 !important;
+  border: 1px solid rgba(110, 231, 183, 0.4) !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* Banner de estado */
+#morbAuditBanner {
+  padding: 0.7rem 1.5rem !important;
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+#morbAuditBanner.banner-ok {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #34d399 !important;
+  border-bottom-color: rgba(16, 185, 129, 0.2) !important;
+}
+#morbAuditBanner.banner-warn {
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #fbbf24 !important;
+  border-bottom-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+[data-theme="light"] #morbAuditBanner.banner-ok {
+  background: rgba(5, 150, 105, 0.08) !important;
+  color: #065f46 !important;
+  border-bottom-color: rgba(5, 150, 105, 0.2) !important;
+}
+[data-theme="light"] #morbAuditBanner.banner-warn {
+  background: rgba(217, 119, 6, 0.08) !important;
+  color: #92400e !important;
+  border-bottom-color: rgba(217, 119, 6, 0.2) !important;
+}
+
+/* Barra de pestañas */
+#morbilidadAuditModal .audit-tabs-bar {
+  display: flex !important;
+  gap: 0.4rem !important;
+  padding: 0.6rem 1.25rem !important;
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  flex-shrink: 0;
+}
+
+/* Search bar del modal de auditoría */
+#morbilidadAuditModal .modal-search-bar {
+  background: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0.65rem 1.25rem !important;
+  flex-shrink: 0;
+}
+
+#morbilidadAuditModal .modal-search-input {
+  width: 100% !important;
+  padding: 0.5rem 1rem 0.5rem 2.5rem !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 10px !important;
+  color: var(--input-text) !important;
+  font-size: 0.84rem !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+}
+#morbilidadAuditModal .modal-search-input:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(77, 124, 254, 0.2) !important;
+  background: var(--bg-surface) !important;
+}
+
+/* Cuerpo scrollable */
+#morbilidadAuditModal .modal-scroll-body {
+  padding: 1.1rem 1.25rem !important;
+  background: var(--bg-body) !important;
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  max-height: 60vh;
+}
+
+/* Footer */
+#morbilidadAuditModal .audit-modal-footer {
+  padding: 0.75rem 1.5rem !important;
+  background: var(--bg-surface) !important;
+  border-top: 1px solid var(--border-color) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-shrink: 0;
+}
+#morbilidadAuditModal .audit-footer-note {
+  font-size: 0.75rem !important;
+  color: var(--text-muted) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* ── Tarjetas de Discrepancias ── */
+.audit-section-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.audit-section-title.dup  { color: #fbbf24; }
+.audit-section-title.huer { color: #f87171; }
+.audit-section-title.excl { color: #60a5fa; }
+[data-theme="light"] .audit-section-title.dup  { color: #b45309; }
+[data-theme="light"] .audit-section-title.huer { color: #b91c1c; }
+[data-theme="light"] .audit-section-title.excl { color: #1d4ed8; }
+
+/* Tarjeta base de discrepancia */
+.audit-disc-card {
+  border-radius: 10px !important;
+  padding: 0.9rem 1rem !important;
+  margin-bottom: 0.6rem !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  position: relative;
+}
+.audit-disc-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+/* Duplicado — amarillo */
+.audit-disc-card.dup {
+  background: rgba(245, 158, 11, 0.07) !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
+}
+[data-theme="light"] .audit-disc-card.dup {
+  background: rgba(245, 158, 11, 0.06) !important;
+  border-color: rgba(180, 83, 9, 0.3) !important;
+}
+
+/* Huérfano — rojo */
+.audit-disc-card.huer {
+  background: rgba(239, 68, 68, 0.07) !important;
+  border: 1px solid rgba(239, 68, 68, 0.28) !important;
+}
+[data-theme="light"] .audit-disc-card.huer {
+  background: rgba(239, 68, 68, 0.06) !important;
+  border-color: rgba(185, 28, 28, 0.3) !important;
+}
+
+/* Excluido — azul */
+.audit-disc-card.excl {
+  background: rgba(59, 130, 246, 0.07) !important;
+  border: 1px solid rgba(59, 130, 246, 0.28) !important;
+}
+[data-theme="light"] .audit-disc-card.excl {
+  background: rgba(59, 130, 246, 0.06) !important;
+  border-color: rgba(29, 78, 216, 0.25) !important;
+}
+
+/* Título de cada card */
+.disc-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.3;
+}
+.disc-card-title.dup  { color: #fef08a; }
+.disc-card-title.huer { color: #fca5a5; }
+.disc-card-title.excl { color: #93c5fd; }
+[data-theme="light"] .disc-card-title.dup  { color: #78350f; }
+[data-theme="light"] .disc-card-title.huer { color: #991b1b; }
+[data-theme="light"] .disc-card-title.excl { color: #1e40af; }
+
+/* Meta (fecha / médico) */
+.disc-card-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+  display: block;
+}
+
+/* Badge de conteo en la card */
+.disc-card-badge {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  padding: 0.2rem 0.6rem !important;
+  border-radius: 9999px !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Caja de explicación dentro de la card */
+.disc-card-reason {
+  font-size: 0.78rem;
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  margin-top: 0.45rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.disc-card-reason.dup {
+  background: rgba(0,0,0,0.18);
+  color: #e2e8f0;
+  border-left: 3px solid rgba(245, 158, 11, 0.5);
+}
+.disc-card-reason.huer {
+  background: rgba(0,0,0,0.18);
+  color: #e2e8f0;
+  border-left: 3px solid rgba(239, 68, 68, 0.5);
+}
+.disc-card-reason.excl {
+  background: rgba(0,0,0,0.18);
+  color: #e2e8f0;
+  border-left: 3px solid rgba(59, 130, 246, 0.5);
+}
+
+[data-theme="light"] .disc-card-reason.dup,
+[data-theme="light"] .disc-card-reason.huer,
+[data-theme="light"] .disc-card-reason.excl {
+  background: rgba(0,0,0,0.05) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Badge de diagnóstico (casilla) */
+.diag-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.73rem;
+  font-weight: 600;
+}
+[data-theme="light"] .diag-slot-badge {
+  background: rgba(0,0,0,0.05) !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+
+/* ── Tarjetas de Pacientes (tab 2) ── */
+.paciente-audit-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 0.9rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  transition: all 0.12s ease !important;
+  margin-bottom: 0.45rem !important;
+}
+.paciente-audit-card:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--bg-surface-hover, rgba(77, 124, 254, 0.04)) !important;
+  transform: translateX(2px);
+}
+
+.pac-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 24px;
+  text-align: right;
+}
+.pac-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  line-height: 1.2;
+}
+.pac-meta {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 0.1rem;
+}
+.pac-diags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+
+/* Estado vacío */
+.audit-empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+.audit-empty-state i {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.65rem;
+}
+.audit-empty-state strong {
+  font-size: 0.95rem;
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+.audit-empty-state span {
+  font-size: 0.8rem;
+}
+
+/* Scrollbar del modal */
+#morbilidadAuditModal .modal-scroll-body::-webkit-scrollbar { width: 5px; }
+#morbilidadAuditModal .modal-scroll-body::-webkit-scrollbar-track { background: transparent; }
+#morbilidadAuditModal .modal-scroll-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INFORME DE ATENCIONES POR MÉDICO — Dark & Light
+   ═══════════════════════════════════════════════════════════ */
+
+/* Ocultar footer global en vistas de informe para maximizar altura */
+.atenciones-page-wrapper .app-footer,
+body:has(.atenciones-page-wrapper) .app-footer {
+  display: none !important;
+}
+
+.atenciones-page-wrapper {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Tabla de Atenciones */
+#atencionesTable {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-size: 0.8rem !important;
+}
+
+#atencionesTable thead th {
+  background: var(--bg-surface) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  border-color: var(--border-color) !important;
+  padding: 3px 2px !important;
+  vertical-align: middle !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+}
+
+#atencionesTable thead th.sticky-col-first {
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 50 !important;
+  background: var(--bg-surface) !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+#atencionesTable tbody td.sticky-col-first {
+  left: 0 !important;
+  position: sticky !important;
+  z-index: 15 !important;
+  background: var(--bg-surface) !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+#atencionesTable tr.atenciones-total-row td.sticky-col-first {
+  left: 0 !important;
+  position: sticky !important;
+  z-index: 35 !important;
+  background: var(--bg-subtle) !important;
+  border-right: 2px solid var(--border-color) !important;
+}
+
+/* Encabezado vertical de días */
+.vertical-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+.vertical-text-wrapper .day-num {
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: block;
+}
+
+.vertical-text-wrapper .day-name {
+  font-size: 0.70rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.85;
+  display: block;
+}
+
+/* Fines de semana (Sábado y Domingo) */
+.cell-weekend {
+  background: rgba(16, 185, 129, 0.07) !important;
+  color: #10b981 !important;
+}
+
+.bg-weekend-header {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+}
+
+[data-theme="light"] .cell-weekend {
+  background: rgba(16, 185, 129, 0.06) !important;
+  color: #047857 !important;
+}
+
+[data-theme="light"] .bg-weekend-header {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #065f46 !important;
+}
+
+/* Columnas de Semanas (Subtotales SEM) */
+.bg-week-header {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border-left: 2px solid var(--border-color) !important;
+  border-right: 2px solid var(--border-color) !important;
+}
+
+[data-theme="light"] .bg-week-header {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #1d4ed8 !important;
+}
+
+.cell-week-subtotal {
+  background: rgba(59, 130, 246, 0.06) !important;
+  color: #93c5fd !important;
+  font-weight: 700 !important;
+  border-left: 2px solid var(--border-color) !important;
+  border-right: 2px solid var(--border-color) !important;
+}
+
+[data-theme="light"] .cell-week-subtotal {
+  background: rgba(37, 99, 235, 0.04) !important;
+  color: #1e40af !important;
+}
+
+/* Columna Mes Total */
+.col-mes-total {
+  background: rgba(77, 124, 254, 0.15) !important;
+  color: #93c5fd !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  border-left: 2px solid var(--border-color) !important;
+}
+
+[data-theme="light"] .col-mes-total {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #1d4ed8 !important;
+}
+
+/* Fila de Médico */
+.doctor-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.doctor-name-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Botón que lleva al AT2 de ese médico */
+.btn-doctor-at2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(77, 124, 254, 0.12);
+  color: var(--color-primary, #60a5fa) !important;
+  border: 1px solid rgba(77, 124, 254, 0.25);
+  font-size: 0.72rem;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  text-decoration: none !important;
+}
+
+.btn-doctor-at2:hover {
+  background: var(--color-primary, #3b82f6);
+  color: #ffffff !important;
+  border-color: var(--color-primary, #3b82f6);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(77, 124, 254, 0.4);
+}
+
+/* Fila de Total General (Sticky en pie de tabla) */
+.atenciones-total-row td,
+tfoot.atenciones-tfoot td {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 25 !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  border-top: 2px solid var(--color-primary, #3b82f6) !important;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .atenciones-total-row td,
+[data-theme="dark"] tfoot.atenciones-tfoot td {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .atenciones-total-row td.cell-week-subtotal,
+[data-theme="dark"] tfoot.atenciones-tfoot td.cell-week-subtotal {
+  background: #1e293b !important;
+  color: #93c5fd !important;
+}
+
+/* Modo claro - Limpio y armonioso */
+[data-theme="light"] .atenciones-total-row td,
+[data-theme="light"] tfoot.atenciones-tfoot td {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .atenciones-total-row td.cell-week-subtotal,
+[data-theme="light"] tfoot.atenciones-tfoot td.cell-week-subtotal {
+  background: #e2e8f0 !important;
+  color: #1e40af !important;
+}
+
+/* Esquina inferior izquierda (Sticky Bottom + Sticky Left) */
+.atenciones-total-row td.sticky-col-first,
+tfoot.atenciones-tfoot td.sticky-col-first {
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 45 !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px -2px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="dark"] .atenciones-total-row td.sticky-col-first,
+[data-theme="dark"] tfoot.atenciones-tfoot td.sticky-col-first {
+  background: #0f172a !important;
+  color: #60a5fa !important;
+}
+
+[data-theme="light"] .atenciones-total-row td.sticky-col-first,
+[data-theme="light"] tfoot.atenciones-tfoot td.sticky-col-first {
+  background: #f1f5f9 !important;
+  color: #1e40af !important;
+}
+
+/* Columna Mes Total en Fila de Totales */
+.atenciones-total-row .col-mes-total,
+tfoot.atenciones-tfoot .col-mes-total {
+  background: var(--color-primary, #3b82f6) !important;
+  color: #ffffff !important;
+  z-index: 26 !important;
+}
+
+/* Celdas con datos vs vacías */
+.cell-atencion-val {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cell-atencion-empty {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INFORME AT2 INDIVIDUAL POR MÉDICO — Dark & Light
+   ═══════════════════════════════════════════════════════════ */
+#at2Table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-size: 0.8rem !important;
+}
+
+#at2Table thead th {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  font-size: 0.75rem !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+}
+
+#at2Table thead th.sticky-col-first {
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 50 !important;
+  background: var(--bg-surface) !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+#at2Table tbody td.sticky-col-first {
+  left: 0 !important;
+  position: sticky !important;
+  z-index: 15 !important;
+  background: var(--bg-surface) !important;
+  border-right: 2px solid var(--border-color) !important;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+#at2Table tbody td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+#at2Table .manual-input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: var(--color-primary) !important;
+  font-weight: 700 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#at2Table .manual-input:focus {
+  background: var(--bg-subtle) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 0 2px var(--color-primary) !important;
+}
+

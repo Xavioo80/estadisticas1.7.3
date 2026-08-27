@@ -1,0 +1,242 @@
+@php
+  $openSubmenus = [];
+  if (isset($_COOKIE['sing_open_submenus'])) {
+      $decoded = json_decode(urldecode($_COOKIE['sing_open_submenus']), true);
+      if (is_array($decoded)) {
+          $openSubmenus = $decoded;
+      }
+  } else {
+      $openSubmenus = ['dashboard'];
+  }
+@endphp
+
+<!-- Sidebar Navigation with Auto-Expand on Hover and Multi-Level Support -->
+<aside class="app-sidebar" id="appSidebar">
+  <!-- Brand Header -->
+  <div class="sidebar-brand">
+    <a href="{{ route('dashboard') }}" class="sidebar-logo">
+      <div class="logo-icon">
+        <i class="bi bi-bar-chart-fill"></i>
+      </div>
+      <div class="logo-text">
+        Estadísticas <span>1.7</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Navigation Menu List -->
+  <ul class="sidebar-menu">
+    <!-- GRUPO 1: MENÚ PRINCIPAL -->
+    <li class="sidebar-heading">Menú Principal</li>
+    
+    <!-- Dashboard con sub-items -->
+    <li class="sidebar-item has-submenu {{ in_array('dashboard', $openSubmenus) ? 'open' : '' }}" data-submenu="dashboard" data-tooltip="Dashboard">
+      <a href="javascript:void(0)" class="sidebar-link">
+        <i class="bi bi-speedometer2 nav-icon"></i>
+        <span class="nav-label">Dashboard</span>
+        <i class="bi bi-chevron-right nav-arrow"></i>
+      </a>
+      <div class="sidebar-submenu-wrapper">
+        <ul class="sidebar-submenu">
+          <li class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('dashboard') }}" class="sidebar-link">
+              <i class="bi bi-grid-1x2"></i> General
+            </a>
+          </li>
+          <li class="{{ request()->routeIs('visits') ? 'active' : '' }}">
+            <a href="{{ route('visits') }}" class="sidebar-link">
+              <i class="bi bi-shield-check"></i> Dash. Vigilancia
+            </a>
+          </li>
+          <li class="{{ request()->routeIs('charts') ? 'active' : '' }}">
+            <a href="{{ route('charts') }}" class="sidebar-link">
+              <i class="bi bi-activity"></i> Dash. Diagnósticos
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('informes.notificacion_svs') ? 'active' : '' }}" data-tooltip="Notificación SVS">
+      <a href="{{ route('informes.notificacion_svs') }}" class="sidebar-link">
+        <i class="bi bi-file-earmark-medical-fill nav-icon"></i>
+        <span class="nav-label">Notificación SVS</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('calendario_epi') ? 'active' : '' }}" data-tooltip="Calendario Epi">
+      <a href="{{ route('calendario_epi') }}" class="sidebar-link">
+        <i class="bi bi-calendar3 nav-icon"></i>
+        <span class="nav-label">Calendario Epi</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ (request()->routeIs('ingresos.*') || request()->routeIs('ingresos') || request()->routeIs('forms')) ? 'active' : '' }}" data-tooltip="Ingresos AT-1">
+      <a href="{{ route('ingresos.index') }}" class="sidebar-link">
+        <i class="bi bi-pencil-square nav-icon"></i>
+        <span class="nav-label">Ingresos AT-1</span>
+      </a>
+    </li>
+
+    <!-- GRUPO 2: REPORTES Y SALIDA -->
+    <li class="sidebar-heading">Reportes y Salida</li>
+
+    <li class="sidebar-item {{ (request()->routeIs('registrosat1') || request()->routeIs('tables') || request()->routeIs('registros')) ? 'active' : '' }}" data-tooltip="Registros AT1">
+      <a href="{{ route('registrosat1') }}" class="sidebar-link">
+        <i class="bi bi-table nav-icon"></i>
+        <span class="nav-label">Registros AT1</span>
+        <span class="badge badge-soft-success nav-badge">AT1</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('informesat1') ? 'active' : '' }}" data-tooltip="Informes AT1">
+      <a href="{{ route('informesat1') }}" class="sidebar-link">
+        <i class="bi bi-file-earmark-bar-graph-fill nav-icon"></i>
+        <span class="nav-label">Informes AT1</span>
+        <span class="badge badge-soft-primary nav-badge">Diag</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ (request()->routeIs('documentacion.*') || request()->is('documentacion*')) ? 'active' : '' }}" data-tooltip="Documentación">
+      <a href="{{ route('documentacion.index') }}" class="sidebar-link">
+        <i class="bi bi-journal-text nav-icon"></i>
+        <span class="nav-label">Documentación</span>
+      </a>
+    </li>
+
+    <!-- Submenú de Informes Médicos y Epidemiológicos -->
+    <li class="sidebar-item has-submenu {{ (request()->routeIs('informes.*') || in_array('informes', $openSubmenus)) ? 'open' : '' }}" data-submenu="informes" data-tooltip="Informes">
+      <a href="javascript:void(0)" class="sidebar-link">
+        <i class="bi bi-file-earmark-bar-graph-fill nav-icon"></i>
+        <span class="nav-label">Informes</span>
+        <i class="bi bi-chevron-right nav-arrow"></i>
+      </a>
+      <div class="sidebar-submenu-wrapper">
+        <ul class="sidebar-submenu">
+          <li class="{{ request()->routeIs('informes.atenciones') ? 'active' : '' }}"><a href="{{ route('informes.atenciones') }}" class="sidebar-link"><i class="bi bi-person-check"></i> Atenciones</a></li>
+          <li class="{{ request()->routeIs('informes.at2') ? 'active' : '' }}"><a href="{{ route('informes.at2') }}" class="sidebar-link"><i class="bi bi-file-earmark-medical"></i> AT2 Individual</a></li>
+          <li class="{{ request()->routeIs('informes.tb9') ? 'active' : '' }}"><a href="{{ route('informes.tb9') }}" class="sidebar-link"><i class="bi bi-clipboard2-pulse"></i> TB9</a></li>
+          <li class="{{ request()->routeIs('informes.implantes') ? 'active' : '' }}"><a href="{{ route('informes.implantes') }}" class="sidebar-link"><i class="bi bi-bandaid"></i> Implantes</a></li>
+          <li class="{{ request()->routeIs('informes.at2r-n') ? 'active' : '' }}"><a href="{{ route('informes.at2r-n') }}" class="sidebar-link"><i class="bi bi-card-checklist"></i> AT2-r N</a></li>
+          <li class="{{ request()->routeIs('informes.morbilidad') ? 'active' : '' }}"><a href="{{ route('informes.morbilidad') }}" class="sidebar-link"><i class="bi bi-virus"></i> Morbilidad</a></li>
+          <li class="{{ request()->routeIs('informes.its') ? 'active' : '' }}"><a href="{{ route('informes.its') }}" class="sidebar-link"><i class="bi bi-shield-plus"></i> ITS</a></li>
+          <li class="{{ request()->routeIs('informes.alerta-semanal') ? 'active' : '' }}"><a href="{{ route('informes.alerta-semanal') }}" class="sidebar-link"><i class="bi bi-exclamation-triangle"></i> Alerta Semanal</a></li>
+          <li class="{{ request()->routeIs('informes.trans2') ? 'active' : '' }}"><a href="{{ route('informes.trans2') }}" class="sidebar-link"><i class="bi bi-activity"></i> TRANS-2</a></li>
+          <li class="{{ request()->routeIs('informes.sm107') ? 'active' : '' }}"><a href="{{ route('informes.sm107') }}" class="sidebar-link"><i class="bi bi-heart-pulse"></i> SM1-07</a></li>
+          <li class="{{ request()->routeIs('informes.sm2') ? 'active' : '' }}"><a href="{{ route('informes.sm2') }}" class="sidebar-link"><i class="bi bi-hospital"></i> SM2</a></li>
+          <li class="{{ request()->routeIs('informes.sm307') ? 'active' : '' }}"><a href="{{ route('informes.sm307') }}" class="sidebar-link"><i class="bi bi-file-medical"></i> SM3-07</a></li>
+          <li class="{{ request()->routeIs('informes.hora-medico*') ? 'active' : '' }}"><a href="{{ route('informes.hora-medico') }}" class="sidebar-link"><i class="bi bi-clock-history"></i> Hora Médico</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <!-- GRUPO 3: GESTIÓN OTRAS BASES -->
+    <li class="sidebar-heading">Gestión Otras Bases</li>
+
+    <li class="sidebar-item {{ request()->routeIs('pacientes.*') ? 'active' : '' }}" data-tooltip="Pacientes BD">
+      <a href="{{ route('pacientes.index') }}" class="sidebar-link">
+        <i class="bi bi-person-vcard-fill nav-icon"></i>
+        <span class="nav-label">Pacientes BD</span>
+      </a>
+    </li>
+
+    <!-- Adolescentes con Submenú -->
+    @php
+      $isAdolescentesActive = request()->routeIs('adolescentes.*');
+    @endphp
+    <li class="sidebar-item has-submenu {{ $isAdolescentesActive || in_array('adolescentes', $openSubmenus) ? 'open' : '' }}" data-submenu="adolescentes" data-tooltip="Adolescentes">
+      <a href="javascript:void(0)" class="sidebar-link">
+        <i class="bi bi-people-fill nav-icon"></i>
+        <span class="nav-label">Adolescentes</span>
+        <i class="bi bi-chevron-right nav-arrow"></i>
+      </a>
+      <div class="sidebar-submenu-wrapper">
+        <ul class="sidebar-submenu">
+          <li class="{{ request()->routeIs('adolescentes.index') || request()->routeIs('adolescentes.create') || request()->routeIs('adolescentes.edit') || request()->routeIs('adolescentes.historial') || request()->routeIs('adolescentes.depurados') ? 'active' : '' }}">
+            <a href="{{ route('adolescentes.index') }}" class="sidebar-link">
+              <i class="bi bi-person-lines-fill"></i> Base Adolescentes
+            </a>
+          </li>
+          <li class="{{ request()->routeIs('adolescentes.seguimientos') || request()->routeIs('adolescentes.seguimiento.*') ? 'active' : '' }}">
+            <a href="{{ route('adolescentes.seguimientos') }}" class="sidebar-link">
+              <i class="bi bi-clipboard-check"></i> Seguimientos
+            </a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('adulto-mayor.*') ? 'active' : '' }}" data-tooltip="Adulto Mayor">
+      <a href="{{ route('adulto-mayor.index') }}" class="sidebar-link">
+        <i class="bi bi-heart-fill nav-icon"></i>
+        <span class="nav-label">Adulto Mayor</span>
+      </a>
+    </li>
+
+    <!-- GRUPO 4: ADMINISTRACIÓN -->
+    <li class="sidebar-heading">Administración</li>
+
+    <li class="sidebar-item {{ request()->routeIs('medicos.*') ? 'active' : '' }}" data-tooltip="Médicos">
+      <a href="{{ route('medicos.index') }}" class="sidebar-link">
+        <i class="bi bi-person-badge-fill nav-icon"></i>
+        <span class="nav-label">Médicos</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('diagnosticos.*') ? 'active' : '' }}" data-tooltip="Diagnósticos">
+      <a href="{{ route('diagnosticos.index') }}" class="sidebar-link">
+        <i class="bi bi-clipboard-data-fill nav-icon"></i>
+        <span class="nav-label">Diagnósticos</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('colonias.*') ? 'active' : '' }}" data-tooltip="Colonias">
+      <a href="{{ route('colonias.index') }}" class="sidebar-link">
+        <i class="bi bi-geo-alt-fill nav-icon"></i>
+        <span class="nav-label">Colonias</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('referencias.*') ? 'active' : '' }}" data-tooltip="Referencias">
+      <a href="{{ route('referencias.index') }}" class="sidebar-link">
+        <i class="bi bi-arrow-left-right nav-icon"></i>
+        <span class="nav-label">Referencias</span>
+      </a>
+    </li>
+
+    <!-- GRUPO 5: MÓDULO ADMIN -->
+    <li class="sidebar-heading">Módulo Admin</li>
+
+    <li class="sidebar-item {{ request()->routeIs('typography') ? 'active' : '' }}" data-tooltip="Personalización">
+      <a href="{{ route('typography') }}" class="sidebar-link">
+        <i class="bi bi-palette-fill nav-icon"></i>
+        <span class="nav-label">Personalización</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('ui-elements') ? 'active' : '' }}" data-tooltip="Componentes UI">
+      <a href="{{ route('ui-elements') }}" class="sidebar-link">
+        <i class="bi bi-bounding-box-circles nav-icon"></i>
+        <span class="nav-label">Componentes UI</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item" data-tooltip="Alternar Modo">
+      <a href="javascript:void(0)" class="sidebar-link" onclick="SingTheme.toggle();">
+        <i class="bi bi-moon-stars-fill nav-icon"></i>
+        <span class="nav-label">Alternar Tema</span>
+      </a>
+    </li>
+  </ul>
+  <script>
+    (function() {
+      try {
+        var menu = document.querySelector('.sidebar-menu');
+        var savedScroll = sessionStorage.getItem('sing_sidebar_scroll');
+        if (menu && savedScroll !== null) {
+          menu.scrollTop = parseInt(savedScroll, 10);
+        }
+      } catch (e) {}
+    })();
+  </script>
+</aside>
