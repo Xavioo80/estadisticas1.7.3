@@ -29,7 +29,9 @@
         @include('informes.sm307_content')
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
         // Definir funciones globales fuera de $(document).ready() para disponibilidad inmediata
         window.updateReport = function() {
@@ -93,7 +95,4 @@
             });
         });
     </script>
-    @endpush
-
-
-@endsection
+@endpush

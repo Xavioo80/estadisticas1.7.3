@@ -29,7 +29,9 @@
         @include('informes.sm2_content')
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
         $(document).on('change', '.ajax-filter', function() {
             const container = $('#sm2-container');
@@ -63,7 +65,4 @@
             }
         }
     </script>
-    @endpush
-
-
-@endsection
+@endpush
