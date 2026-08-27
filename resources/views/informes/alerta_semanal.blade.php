@@ -17,22 +17,23 @@
         width: 100% !important;
         min-width: 0 !important;
         max-width: 100% !important;
+        align-items: center !important;
     }
     .cell-clickable:hover {
         background-color: var(--color-primary-light, rgba(99, 102, 241, 0.15)) !important;
     }
     @media print {
         .no-print { display: none !important; }
-        .informe-table-container { border: none !important; box-shadow: none !important; max-height: none !important; }
+        .informe-table-container { border: none !important; box-shadow: none !important; max-height: none !important; width: 100% !important; max-width: 100% !important; }
         .table-alerta th, .table-alerta td { border: 1px solid #000 !important; color: #000 !important; }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="informe-page-wrapper" style="flex: 1 1 0%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; width: 100%;">
+<div class="informe-page-wrapper" style="flex: 1 1 0%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; width: 100%; max-width: 980px; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
     <!-- Header -->
-    <div class="informe-header no-print" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); padding: 0.65rem 1rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-shrink: 0;">
+    <div class="informe-header no-print" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); padding: 0.65rem 1rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-shrink: 0; width: 100%;">
         <div>
             <h2 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
                 <i class="bi bi-exclamation-triangle text-primary"></i> Alerta Semanal
@@ -51,7 +52,7 @@
     <!-- Dynamic Content Area -->
     <div id="dynamic-content" style="flex: 1 1 0%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; width: 100%;">
         <!-- Loading Overlay -->
-        <div id="table-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-surface); opacity: 0.85; z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div id="table-loader" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-surface); opacity: 0.85; z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); border-radius: var(--radius-md, 10px);">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Cargando...</span>
             </div>

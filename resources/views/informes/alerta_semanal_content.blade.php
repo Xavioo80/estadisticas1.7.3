@@ -1,5 +1,5 @@
 <!-- Barra de Filtros y Acciones en Una Sola Fila Horizontal -->
-<div class="filter-container no-print mb-2" style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.5rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important;">
+<div class="filter-container no-print mb-2" style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.5rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important; width: 100% !important;">
     <form id="filter-form" action="{{ route('informes.alerta-semanal') }}" method="GET" style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; margin: 0 !important; flex: 1 1 auto !important; min-width: 0 !important;">
         <!-- Año -->
         <div style="width: 95px !important; min-width: 95px !important; flex-shrink: 0 !important;">
@@ -48,72 +48,80 @@
 </div>
 
 <!-- Tabla del Telegrama Semanal -->
-<div class="informe-table-container custom-scrollbar mb-4" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); overflow: auto; box-shadow: var(--shadow-sm);">
+<div class="informe-table-container custom-scrollbar mb-4" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); overflow: auto; box-shadow: var(--shadow-sm); width: 100%;">
     <table class="table table-bordered table-alerta mb-0" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+        <colgroup>
+            <col style="width: 45%;">
+            <col style="width: 11%;">
+            <col style="width: 11%;">
+            <col style="width: 11%;">
+            <col style="width: 11%;">
+            <col style="width: 11%;">
+        </colgroup>
         <thead>
             <tr style="background: var(--bg-subtle);">
-                <th rowspan="2" class="sticky-header text-left" style="width: 38%; padding: 8px 12px; font-size: 0.82rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color); vertical-align: middle;">
+                <th rowspan="2" class="sticky-header text-left" style="padding: 7px 10px; font-size: 0.80rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color); vertical-align: middle;">
                     ENFERMEDADES / EVENTOS
                 </th>
-                <th colspan="4" class="sticky-header text-center" style="padding: 6px 10px; font-size: 0.8rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color);">
+                <th colspan="4" class="sticky-header text-center" style="padding: 5px 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color);">
                     NÚMERO DE CASOS POR GRUPO DE EDAD
                 </th>
-                <th rowspan="2" class="sticky-header text-center" style="width: 10%; padding: 8px 12px; font-size: 0.82rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color); vertical-align: middle;">
+                <th rowspan="2" class="sticky-header text-center" style="padding: 7px 10px; font-size: 0.80rem; font-weight: 700; color: var(--text-primary); border-color: var(--border-color); vertical-align: middle;">
                     TOTAL
                 </th>
             </tr>
             <tr style="background: var(--bg-subtle);">
-                <th class="sticky-header text-center" style="width: 13%; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">&lt; 1 AÑO</th>
-                <th class="sticky-header text-center" style="width: 13%; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">1 - 4 AÑOS</th>
-                <th class="sticky-header text-center" style="width: 13%; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">5 - 14 AÑOS</th>
-                <th class="sticky-header text-center" style="width: 13%; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">15 Y + AÑOS</th>
+                <th class="sticky-header text-center" style="padding: 5px 6px; font-size: 0.73rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">&lt; 1 AÑO</th>
+                <th class="sticky-header text-center" style="padding: 5px 6px; font-size: 0.73rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">1 - 4 AÑOS</th>
+                <th class="sticky-header text-center" style="padding: 5px 6px; font-size: 0.73rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">5 - 14 AÑOS</th>
+                <th class="sticky-header text-center" style="padding: 5px 6px; font-size: 0.73rem; font-weight: 600; color: var(--text-muted); border-color: var(--border-color);">15 Y + AÑOS</th>
             </tr>
         </thead>
         <tbody>
             @foreach($rowsDef as $idx => $row)
                 <tr style="border-color: var(--border-color);">
-                    <td class="text-left font-weight-600" style="padding: 6px 12px; color: var(--text-primary); font-size: 0.82rem; border-color: var(--border-color);">
+                    <td class="text-left font-weight-600" style="padding: 4px 10px; color: var(--text-primary); font-size: 0.80rem; border-color: var(--border-color);">
                         {{ $row['label'] }}
                     </td>
 
                     @if($row['label'] === 'CADENA RED DE FRIO')
-                        <td colspan="4" class="text-center cursor-pointer font-weight-bold select-none p-1" id="coldChainCell" onclick="toggleColdChain()" style="background: #22c55e; color: #fff; font-size: 0.82rem; border-color: var(--border-color);">
+                        <td colspan="4" class="text-center cursor-pointer font-weight-bold select-none p-1" id="coldChainCell" onclick="toggleColdChain()" style="background: #22c55e; color: #fff; font-size: 0.80rem; border-color: var(--border-color);">
                             <span id="coldChainLabel">VERDE</span>
                         </td>
-                        <td class="text-center text-muted" style="padding: 6px 10px; border-color: var(--border-color);">-</td>
+                        <td class="text-center text-muted" style="padding: 4px 6px; border-color: var(--border-color);">-</td>
                     @else
                         <!-- < 1 AÑO -->
                         <td class="text-center cell-clickable {{ $results[$idx]['less_1'] > 0 ? 'font-weight-bold text-primary' : 'text-muted' }}" 
                             onclick="fetchDetails({{ $idx }}, 'less_1')"
-                            style="padding: 6px 10px; font-size: 0.88rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
+                            style="padding: 4px 6px; font-size: 0.85rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
                             {{ $results[$idx]['less_1'] ?: '0' }}
                         </td>
 
                         <!-- 1 - 4 AÑOS -->
                         <td class="text-center cell-clickable {{ $results[$idx]['1_4'] > 0 ? 'font-weight-bold text-primary' : 'text-muted' }}" 
                             onclick="fetchDetails({{ $idx }}, '1_4')"
-                            style="padding: 6px 10px; font-size: 0.88rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
+                            style="padding: 4px 6px; font-size: 0.85rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
                             {{ $results[$idx]['1_4'] ?: '0' }}
                         </td>
 
                         <!-- 5 - 14 AÑOS -->
                         <td class="text-center cell-clickable {{ $results[$idx]['5_14'] > 0 ? 'font-weight-bold text-primary' : 'text-muted' }}" 
                             onclick="fetchDetails({{ $idx }}, '5_14')"
-                            style="padding: 6px 10px; font-size: 0.88rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
+                            style="padding: 4px 6px; font-size: 0.85rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
                             {{ $results[$idx]['5_14'] ?: '0' }}
                         </td>
 
                         <!-- 15 Y + AÑOS -->
                         <td class="text-center cell-clickable {{ $results[$idx]['15_plus'] > 0 ? 'font-weight-bold text-primary' : 'text-muted' }}" 
                             onclick="fetchDetails({{ $idx }}, '15_plus')"
-                            style="padding: 6px 10px; font-size: 0.88rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
+                            style="padding: 4px 6px; font-size: 0.85rem; cursor: pointer; border-color: var(--border-color); transition: background 0.15s;">
                             {{ $results[$idx]['15_plus'] ?: '0' }}
                         </td>
 
                         <!-- TOTAL -->
                         <td class="text-center cell-clickable {{ $results[$idx]['total'] > 0 ? 'font-weight-bold' : 'text-muted' }}" 
                             onclick="fetchDetails({{ $idx }}, 'total')"
-                            style="padding: 6px 10px; font-size: 0.88rem; cursor: pointer; background: var(--bg-subtle); color: var(--text-primary); border-color: var(--border-color); transition: background 0.15s;">
+                            style="padding: 4px 6px; font-size: 0.85rem; cursor: pointer; background: var(--bg-subtle); color: var(--text-primary); border-color: var(--border-color); transition: background 0.15s;">
                             {{ $results[$idx]['total'] ?: '0' }}
                         </td>
                     @endif
@@ -123,14 +131,14 @@
     </table>
 
     <!-- Firmas para Impresión -->
-    <div class="mt-4 p-4 d-flex justify-content-between" style="border-top: 1px dashed var(--border-color);">
+    <div class="mt-3 p-3 d-flex justify-content-between" style="border-top: 1px dashed var(--border-color);">
         <div class="text-center" style="width: 40%;">
-            <div style="border-top: 1px solid var(--text-primary); padding-top: 4px; font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">
+            <div style="border-top: 1px solid var(--text-primary); padding-top: 4px; font-size: 0.78rem; font-weight: 700; color: var(--text-primary);">
                 FIRMA Y SELLO RESPONSABLE
             </div>
         </div>
         <div class="text-center" style="width: 40%;">
-            <div style="border-top: 1px solid var(--text-primary); padding-top: 4px; font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">
+            <div style="border-top: 1px solid var(--text-primary); padding-top: 4px; font-size: 0.78rem; font-weight: 700; color: var(--text-primary);">
                 FECHA DE ENTREGA: {{ now()->format('d/m/Y') }}
             </div>
         </div>
