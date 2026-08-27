@@ -87,56 +87,66 @@
         const ano = $('select[name="ano"]').val() || '{{ $anoDefault }}';
         const se = $('select[name="se"]').val() || '{{ $seDefault }}';
 
-        $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary mr-1"></div> Cargando registros...</td></tr>');
-        $('#modalAlertaDetalles').modal('show');
+        const modal = $('#modalAlertaDetalles');
+        const loader = $('#modalAlertaLoader');
+        const bodyContent = $('#modalAlertaBodyContent');
+
+        loader.show();
+        bodyContent.hide();
+        modal.modal('show');
 
         $.ajax({
             url: "{{ route('informes.alerta-semanal.details') }}",
             type: 'GET',
             data: { ano: ano, se: se, idx: idx, range: range },
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
             success: function(res) {
-                $('#modalAlertaTitle').text(res.title);
-                $('#modalAlertaRangeLabel').text(res.range_label);
+                const titleText = res.title || res.label || 'Detalle de Pacientes';
+                const rangeText = res.range_label || range || '';
+                const totalCount = res.total !== undefined ? res.total : (res.count !== undefined ? res.count : 0);
 
-                $('#modalSummaryTotal').text(res.total);
+                $('#modalAlertaTitle').text(titleText);
+                $('#modalAlertaSubtitle').text('Grupo: ' + rangeText);
+                $('#modalAlertaTotalBadge').text(totalCount + (totalCount === 1 ? ' Caso' : ' Casos'));
+                $('#modalSummaryTotal').text(totalCount);
 
                 let daysHtml = '';
-                if (res.summary_days) {
-                    for (const [day, count] of Object.entries(res.summary_days)) {
-                        daysHtml += `<span class="badge badge-subtle px-2 py-1 border" style="font-size: 0.75rem; border-color: var(--border-color); color: var(--text-primary);"><span class="text-muted font-weight-normal">${day}:</span> <strong>${count}</strong></span>`;
+                const daysObj = res.summary_days || res.summaryByDay;
+                if (daysObj && Object.keys(daysObj).length > 0) {
+                    for (const [day, count] of Object.entries(daysObj)) {
+                        daysHtml += `<span class="badge badge-subtle px-2 py-1 mr-1 mb-1" style="font-size: 0.75rem; border: 1px solid var(--border-color); color: var(--text-primary); background: var(--bg-surface);"><i class="bi bi-calendar-event text-primary mr-1"></i> ${day}: <strong>${count}</strong></span>`;
                     }
                 }
-                $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin datos</span>');
-
-                let rangesHtml = '';
-                if (res.summary_ranges) {
-                    for (const [r, count] of Object.entries(res.summary_ranges)) {
-                        rangesHtml += `<span class="badge badge-subtle px-2 py-1 border" style="font-size: 0.75rem; border-color: var(--border-color); color: var(--text-primary);"><span class="text-muted font-weight-normal">${r}:</span> <strong>${count}</strong></span>`;
-                    }
-                }
-                $('#modalSummaryRanges').html(rangesHtml || '<span class="text-muted small">Sin datos</span>');
+                $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin registros por fecha</span>');
 
                 let rows = '';
-                if (res.patients && res.patients.length > 0) {
-                    res.patients.forEach(p => {
+                const patientsList = res.patients || res.details || [];
+                if (patientsList.length > 0) {
+                    patientsList.forEach((p, i) => {
                         rows += `
                             <tr style="border-color: var(--border-color);">
+                                <td class="font-weight-bold text-muted">${i + 1}</td>
                                 <td class="font-weight-bold text-primary">${p.fecha}</td>
-                                <td class="font-weight-bold" style="color: var(--text-primary);">${p.expediente}</td>
-                                <td>${p.sexo}</td>
-                                <td>${p.edad}</td>
-                                <td style="color: var(--text-primary);">${p.diagnostico}</td>
-                                <td class="text-muted">${p.medico}</td>
+                                <td class="font-weight-bold" style="color: var(--text-primary);">${p.expediente || p.exp || '-'}</td>
+                                <td>${p.sexo || '-'}</td>
+                                <td>${p.edad || '-'}</td>
+                                <td style="color: var(--text-primary);">${p.diagnostico || '-'}</td>
+                                <td class="text-muted">${p.medico || '-'}</td>
                             </tr>
                         `;
                     });
                 } else {
-                    rows = '<tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron pacientes para este rango.</td></tr>';
+                    rows = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="bi bi-info-circle mr-1"></i> No se encontraron registros de pacientes para este rango.</td></tr>';
                 }
                 $('#modalAlertaTableBody').html(rows);
+
+                loader.hide();
+                bodyContent.show();
             },
             error: function() {
-                $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-danger font-weight-bold">Error al cargar los datos</td></tr>');
+                loader.hide();
+                bodyContent.show();
+                $('#modalAlertaTableBody').html('<tr><td colspan="7" class="text-center py-4 text-danger font-weight-bold"><i class="bi bi-exclamation-triangle mr-1"></i> Error al cargar los datos</td></tr>');
             }
         });
     }

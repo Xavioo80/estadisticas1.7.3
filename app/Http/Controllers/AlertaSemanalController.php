@@ -298,6 +298,7 @@ class AlertaSemanalController extends Controller
             return [
                 'fecha' => $r->fecha,
                 'exp' => $r->exp,
+                'expediente' => $r->exp,
                 'sexo' => $r->sexo,
                 'edad' => $r->edad . ' ' . $r->tipo,
                 'diagnostico' => $r->diagnostico,
@@ -317,13 +318,21 @@ class AlertaSemanalController extends Controller
             return $group->count();
         });
 
+        $rangeLabel = $this->getRangeLabel($range);
+        $totalCount = $details->count();
+
         return response()->json([
+            'title' => $row['label'],
             'label' => $row['label'],
-            'range_label' => $this->getRangeLabel($range),
-            'count' => $details->count(),
+            'range_label' => $rangeLabel,
+            'count' => $totalCount,
+            'total' => $totalCount,
             'details' => $details,
+            'patients' => $details,
             'summaryByDay' => $summaryByDay,
-            'summaryByRange' => $summaryByRange
+            'summary_days' => $summaryByDay,
+            'summaryByRange' => $summaryByRange,
+            'summary_ranges' => $summaryByRange
         ]);
     }
 
