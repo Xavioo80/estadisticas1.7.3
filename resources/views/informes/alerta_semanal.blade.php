@@ -22,6 +22,25 @@
     .cell-clickable:hover {
         background-color: var(--color-primary-light, rgba(99, 102, 241, 0.15)) !important;
     }
+    /* Estilos Modernos para la tabla del Modal de Pacientes */
+    .modal-patient-table {
+        border-collapse: collapse !important;
+    }
+    .modal-patient-table th,
+    .modal-patient-table td {
+        border: none !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        vertical-align: middle !important;
+    }
+    .modal-patient-table tbody tr {
+        transition: background 0.15s ease-in-out !important;
+    }
+    .modal-patient-table tbody tr:hover td {
+        background-color: var(--color-primary-light, rgba(99, 102, 241, 0.08)) !important;
+    }
+    .modal-patient-table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
     @media print {
         .no-print { display: none !important; }
         .informe-table-container { border: none !important; box-shadow: none !important; max-height: none !important; width: 100% !important; max-width: 100% !important; }
@@ -106,7 +125,7 @@
                 const totalCount = res.total !== undefined ? res.total : (res.count !== undefined ? res.count : 0);
 
                 $('#modalAlertaTitle').text(titleText);
-                $('#modalAlertaSubtitle').text('Grupo: ' + rangeText);
+                $('#modalAlertaSubtitleBadge').text('Grupo: ' + rangeText);
                 $('#modalAlertaTotalBadge').text(totalCount + (totalCount === 1 ? ' Caso' : ' Casos'));
                 $('#modalSummaryTotal').text(totalCount);
 
@@ -114,7 +133,12 @@
                 const daysObj = res.summary_days || res.summaryByDay;
                 if (daysObj && Object.keys(daysObj).length > 0) {
                     for (const [day, count] of Object.entries(daysObj)) {
-                        daysHtml += `<span class="badge badge-subtle px-2 py-1 mr-1 mb-1" style="font-size: 0.75rem; border: 1px solid var(--border-color); color: var(--text-primary); background: var(--bg-surface);"><i class="bi bi-calendar-event text-primary mr-1"></i> ${day}: <strong>${count}</strong></span>`;
+                        daysHtml += `
+                            <div class="d-inline-flex align-items-center px-2.5 py-1 rounded-pill mr-1 mb-1" style="background: var(--bg-surface); border: 1px solid var(--border-color); font-size: 0.75rem; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                                <span class="text-muted"><i class="bi bi-calendar3 mr-1 text-primary"></i> ${day}</span>
+                                <span class="badge badge-primary font-weight-bold" style="border-radius: 9999px; font-size: 0.70rem; padding: 2px 6px;">${count}</span>
+                            </div>
+                        `;
                     }
                 }
                 $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin registros por fecha</span>');
@@ -123,15 +147,31 @@
                 const patientsList = res.patients || res.details || [];
                 if (patientsList.length > 0) {
                     patientsList.forEach((p, i) => {
+                        const sexoUpper = (p.sexo || '').trim().toUpperCase();
+                        let sexoBadge = '-';
+                        if (sexoUpper === 'M' || sexoUpper === 'MASCULINO') {
+                            sexoBadge = `<span class="badge font-weight-bold" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6; font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">M</span>`;
+                        } else if (sexoUpper === 'F' || sexoUpper === 'FEMENINO') {
+                            sexoBadge = `<span class="badge font-weight-bold" style="background: rgba(236, 72, 153, 0.12); color: #ec4899; font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">F</span>`;
+                        } else if (p.sexo) {
+                            sexoBadge = `<span class="badge badge-subtle" style="font-size: 0.72rem; border-radius: 6px; padding: 2px 7px;">${p.sexo}</span>`;
+                        }
+
                         rows += `
-                            <tr style="border-color: var(--border-color);">
-                                <td class="font-weight-bold text-muted">${i + 1}</td>
-                                <td class="font-weight-bold text-primary">${p.fecha}</td>
-                                <td class="font-weight-bold" style="color: var(--text-primary);">${p.expediente || p.exp || '-'}</td>
-                                <td>${p.sexo || '-'}</td>
-                                <td>${p.edad || '-'}</td>
-                                <td style="color: var(--text-primary);">${p.diagnostico || '-'}</td>
-                                <td class="text-muted">${p.medico || '-'}</td>
+                            <tr>
+                                <td class="text-center font-weight-bold text-muted" style="padding: 9px 12px; font-size: 0.75rem;">${i + 1}</td>
+                                <td style="padding: 9px 12px; white-space: nowrap; font-weight: 700; color: var(--color-primary); font-size: 0.82rem;">${p.fecha}</td>
+                                <td style="padding: 9px 12px;">
+                                    <span class="badge" style="background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color); font-family: monospace; font-size: 0.78rem; font-weight: 700; border-radius: 6px; padding: 3px 8px;">
+                                        ${p.expediente || p.exp || '-'}
+                                    </span>
+                                </td>
+                                <td class="text-center" style="padding: 9px 12px;">${sexoBadge}</td>
+                                <td style="padding: 9px 12px; font-weight: 600; color: var(--text-primary); font-size: 0.80rem;">${p.edad || '-'}</td>
+                                <td style="padding: 9px 12px; font-weight: 700; color: var(--text-primary); font-size: 0.82rem;">${p.diagnostico || '-'}</td>
+                                <td style="padding: 9px 12px; color: var(--text-muted); font-size: 0.80rem; font-weight: 500;">
+                                    <i class="bi bi-person-fill text-primary mr-1" style="font-size: 0.75rem;"></i>${p.medico || '-'}
+                                </td>
                             </tr>
                         `;
                     });

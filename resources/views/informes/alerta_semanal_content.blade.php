@@ -173,97 +173,87 @@
     </div>
 </div>
 
-<!-- Modal de Detalles de Pacientes Alerta Semanal -->
-<div class="modal fade" id="modalAlertaDetalles" tabindex="-1" role="dialog" aria-labelledby="modalAlertaDetallesLabel"
-    aria-hidden="true">
+<!-- Modal de Detalles de Pacientes Alerta Semanal (Diseño Moderno) -->
+<div class="modal fade" id="modalAlertaDetalles" tabindex="-1" role="dialog" aria-labelledby="modalAlertaDetallesLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
-        <div class="modal-content"
-            style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-lg, 12px); box-shadow: var(--shadow-2xl);">
+        <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); overflow: hidden;">
             <!-- Modal Header -->
-            <div class="modal-header"
-                style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); padding: 1rem 1.25rem;">
+            <div class="modal-header" style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
                 <div class="d-flex align-items-center gap-3">
-                    <div
-                        style="width: 38px; height: 38px; border-radius: 50%; background: var(--color-primary-light, rgba(99, 102, 241, 0.15)); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
-                        <i class="bi bi-shield-exclamation"></i>
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
+                        <i class="bi bi-shield-check"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title font-weight-bold mb-0" id="modalAlertaTitle"
-                            style="color: var(--text-primary); font-size: 1.05rem;">
+                        <h5 class="modal-title font-weight-bold mb-0" id="modalAlertaTitle" style="color: var(--text-primary); font-size: 1.12rem; letter-spacing: -0.01em;">
                             Detalle de Pacientes
                         </h5>
-                        <p class="small mb-0 mt-0.5" id="modalAlertaSubtitle"
-                            style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">
-                            Desglose de atenciones epidemiológicas
-                        </p>
+                        <div class="d-flex align-items-center mt-1" style="gap: 8px;">
+                            <span class="badge" id="modalAlertaSubtitleBadge" style="background: var(--color-primary-light, rgba(99, 102, 241, 0.12)); color: var(--color-primary); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                                Grupo: -
+                            </span>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Desglose de atenciones del período</span>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge badge-primary px-3 py-1" id="modalAlertaTotalBadge"
-                        style="font-size: 0.8rem; font-weight: 700; border-radius: 9999px;">
+                <div class="d-flex align-items-center" style="gap: 12px;">
+                    <span class="badge badge-primary px-3 py-1.5" id="modalAlertaTotalBadge" style="font-size: 0.82rem; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
                         0 Casos
                     </span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                        style="color: var(--text-primary); opacity: 0.7; font-size: 1.5rem; outline: none; border: none; background: transparent;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: var(--text-primary); opacity: 0.6; font-size: 1.4rem; padding: 6px; margin: -6px; border: none; background: transparent; outline: none; transition: opacity 0.15s;">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             </div>
 
             <!-- Modal Body -->
-            <div class="modal-body p-3" style="background: var(--bg-surface); color: var(--text-primary);">
+            <div class="modal-body p-3.5" style="background: var(--bg-surface); color: var(--text-primary); overflow-y: auto;">
                 <!-- Loader -->
                 <div id="modalAlertaLoader" class="py-5 text-center" style="display: none;">
-                    <div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;">
+                    <div class="spinner-border text-primary" role="status" style="width: 2.4rem; height: 2.4rem;">
                         <span class="sr-only">Cargando...</span>
                     </div>
-                    <p class="small text-muted mt-2 font-weight-bold text-uppercase" style="letter-spacing: 0.05em;">
-                        Consultando registros...</p>
+                    <p class="small text-muted mt-2 font-weight-bold text-uppercase" style="letter-spacing: 0.06em; font-size: 0.75rem;">Consultando registros...</p>
                 </div>
 
                 <div id="modalAlertaBodyContent">
                     <!-- Resumen KPIs Cards -->
-                    <div class="row no-gutters mb-3" style="gap: 8px;">
-                        <div class="col-auto">
-                            <div class="p-2 px-3 text-center rounded border"
-                                style="background: var(--bg-subtle); border-color: var(--border-color) !important; min-width: 95px;">
-                                <span class="d-block text-muted text-uppercase"
-                                    style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em;">Total
-                                    Casos</span>
-                                <span class="font-weight-bold" style="font-size: 1.3rem; color: var(--color-primary);"
-                                    id="modalSummaryTotal">0</span>
+                    <div class="row no-gutters mb-3" style="display: flex; gap: 10px;">
+                        <!-- KPI Total -->
+                        <div style="flex: 0 0 auto; min-width: 120px;">
+                            <div class="p-2.5 px-3 rounded-lg border text-center h-100 d-flex flex-column justify-content-center" style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px;">
+                                <span class="d-block text-muted text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.06em;">TOTAL CASOS</span>
+                                <span class="font-weight-bold mt-0.5" style="font-size: 1.55rem; line-height: 1.1; color: var(--color-primary);" id="modalSummaryTotal">0</span>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="p-2 px-3 rounded border h-100 d-flex flex-column justify-content-center"
-                                style="background: var(--bg-subtle); border-color: var(--border-color) !important;">
-                                <span class="text-muted text-uppercase d-block mb-1"
-                                    style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em;">
-                                    <i class="bi bi-calendar-event mr-1 text-primary"></i> Casos por Fecha:
-                                </span>
-                                <div class="d-flex flex-wrap" id="modalSummaryDays"></div>
+
+                        <!-- KPI Fechas -->
+                        <div style="flex: 1 1 0%; min-width: 0;">
+                            <div class="p-2.5 px-3 rounded-lg border h-100 d-flex flex-column justify-content-center" style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px;">
+                                <div class="d-flex align-items-center mb-1.5" style="gap: 5px;">
+                                    <i class="bi bi-calendar-check text-primary" style="font-size: 0.8rem;"></i>
+                                    <span class="text-muted text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.06em;">DISTRIBUCIÓN POR FECHA</span>
+                                </div>
+                                <div class="d-flex flex-wrap" id="modalSummaryDays" style="gap: 6px;"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Pacientes -->
-                    <div class="table-responsive rounded border"
-                        style="max-height: 380px; overflow-y: auto; border-color: var(--border-color) !important; background: var(--bg-surface);">
-                        <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
-                            <thead
-                                style="background: var(--bg-subtle); color: var(--text-primary); position: sticky; top: 0; z-index: 5;">
-                                <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <th style="width: 35px; border-color: var(--border-color);">#</th>
-                                    <th style="width: 100px; border-color: var(--border-color);">Fecha</th>
-                                    <th style="width: 110px; border-color: var(--border-color);">Expediente</th>
-                                    <th style="width: 80px; border-color: var(--border-color);">Sexo</th>
-                                    <th style="width: 80px; border-color: var(--border-color);">Edad</th>
-                                    <th style="border-color: var(--border-color);">Diagnóstico</th>
-                                    <th style="border-color: var(--border-color);">Médico</th>
+                    <!-- Tabla de Pacientes Moderna (Sin bordes duros) -->
+                    <div class="table-responsive rounded-lg border" style="max-height: 360px; overflow-y: auto; border-color: var(--border-color) !important; border-radius: 12px; background: var(--bg-surface); box-shadow: var(--shadow-xs);">
+                        <table class="table mb-0 modal-patient-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                            <thead style="background: var(--bg-subtle); position: sticky; top: 0; z-index: 5;">
+                                <tr style="border-bottom: 2px solid var(--border-color);">
+                                    <th style="padding: 10px 12px; width: 45px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">#</th>
+                                    <th style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Fecha</th>
+                                    <th style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Expediente</th>
+                                    <th style="padding: 10px 12px; width: 75px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Sexo</th>
+                                    <th style="padding: 10px 12px; width: 85px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Edad</th>
+                                    <th style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Diagnóstico</th>
+                                    <th style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Médico Tratante</th>
                                 </tr>
                             </thead>
                             <tbody id="modalAlertaTableBody">
-                                <!-- Filas dinámicas -->
+                                <!-- Filas dinámicas generadas en JS -->
                             </tbody>
                         </table>
                     </div>
@@ -271,10 +261,11 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer"
-                style="background: var(--bg-subtle); border-top: 1px solid var(--border-color); padding: 0.75rem 1.25rem;">
-                <button type="button" class="btn btn-secondary btn-sm font-weight-bold px-3" data-dismiss="modal"
-                    style="border-radius: var(--radius-sm, 6px);">
+            <div class="modal-footer" style="background: var(--bg-subtle); border-top: 1px solid var(--border-color); padding: 0.75rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
+                <span class="text-muted small" style="font-size: 0.75rem;">
+                    <i class="bi bi-info-circle mr-1"></i> Haga clic en Cerrar para regresar al informe.
+                </span>
+                <button type="button" class="btn btn-subtle btn-sm font-weight-bold px-4" data-dismiss="modal" style="border-radius: 8px; height: 34px;">
                     Cerrar
                 </button>
             </div>
