@@ -30,16 +30,10 @@
         </div>
 
         <!-- Rango Epidemiológico Badge -->
-        <div class="d-inline-flex align-items-center px-3" style="background: linear-gradient(135deg, var(--bg-subtle), var(--bg-surface)); border: 1px solid var(--border-color); border-radius: 9999px; height: 34px; white-space: nowrap; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); gap: 6px;">
-            <div style="width: 20px; height: 20px; border-radius: 50%; background: var(--color-primary-light, rgba(99, 102, 241, 0.15)); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; flex-shrink: 0;">
-                <i class="bi bi-calendar3"></i>
-            </div>
-            <span style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);">Rango:</span>
-            <span class="font-weight-bold" style="font-size: 0.82rem; color: var(--color-primary); letter-spacing: 0.02em;">
-                {{ $fechaInfo['start'] }}
-                <i class="bi bi-arrow-right mx-1 text-muted" style="font-size: 0.70rem; opacity: 0.7;"></i>
-                {{ $fechaInfo['end'] }}
-            </span>
+        <div style="display: inline-flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; flex-wrap: nowrap !important; height: 34px !important; line-height: 34px !important; padding: 0 14px !important; background: var(--bg-subtle) !important; border: 1px solid var(--border-color) !important; border-radius: 9999px !important; white-space: nowrap !important; flex-shrink: 0 !important; font-size: 0.80rem !important; box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;">
+            <i class="bi bi-calendar3 text-primary mr-1.5" style="font-size: 0.82rem; line-height: 1; display: inline-block;"></i>
+            <span class="text-muted font-weight-bold mr-1" style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1; display: inline-block;">RANGO:</span>
+            <span class="font-weight-bold text-primary" style="font-size: 0.82rem; line-height: 1; display: inline-block;">{{ $fechaInfo['start'] }} al {{ $fechaInfo['end'] }}</span>
         </div>
     </form>
 
