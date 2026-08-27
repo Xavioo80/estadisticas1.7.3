@@ -216,27 +216,30 @@
                 </div>
 
                 <div id="modalAlertaBodyContent">
-                    <!-- Resumen KPIs Cards -->
-                    <div class="d-flex flex-wrap align-items-stretch mb-3" style="gap: 12px;">
-                        <!-- KPI Total Card -->
-                        <div class="d-flex align-items-center" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), var(--bg-subtle)); border: 1px solid rgba(79, 70, 229, 0.25); border-radius: 12px; padding: 10px 16px; min-width: 150px; gap: 12px; box-shadow: var(--shadow-xs);">
-                            <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);">
+                    <!-- Resumen KPIs en una sola barra moderna y unificada -->
+                    <div class="kpi-summary-bar mb-3 p-2.5 px-3 rounded-lg border" style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 12px;">
+                        <!-- Bloque Izquierdo: Total General -->
+                        <div class="d-flex align-items-center" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 14px; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); flex-shrink: 0;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <div>
-                                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; display: block; line-height: 1;">TOTAL CASOS</span>
-                                <span class="font-weight-bold" style="font-size: 1.55rem; color: var(--color-primary); line-height: 1.15;" id="modalSummaryTotal">0</span>
+                            <div style="display: flex; flex-direction: column;">
+                                <span style="font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; line-height: 1;">TOTAL CASOS</span>
+                                <span style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary); line-height: 1.15;" id="modalSummaryTotal">0</span>
                             </div>
                         </div>
 
-                        <!-- KPI Fechas Container (Pequeños cards horizontales) -->
-                        <div class="flex-grow-1" style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; min-width: 250px;">
-                            <div class="d-flex align-items-center mb-2" style="gap: 6px;">
-                                <i class="bi bi-calendar3-range text-primary" style="font-size: 0.8rem;"></i>
-                                <span class="text-muted text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.06em;">DISTRIBUCIÓN POR FECHA</span>
+                        <!-- Divisor vertical sutil -->
+                        <div style="width: 1px; height: 32px; background: var(--border-color); flex-shrink: 0;"></div>
+
+                        <!-- Bloque Derecho: Fechas (Flex row) -->
+                        <div class="d-flex align-items-center flex-wrap flex-grow-1" style="gap: 8px; min-width: 0;">
+                            <div class="d-flex align-items-center" style="gap: 5px; flex-shrink: 0;">
+                                <i class="bi bi-calendar3-range text-primary" style="font-size: 0.78rem;"></i>
+                                <span class="text-muted text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">DISTRIBUCIÓN:</span>
                             </div>
-                            <div class="d-flex flex-wrap align-items-center" id="modalSummaryDays" style="gap: 8px;">
-                                <!-- Renderizado de tarjetas pequeñas de fecha -->
+                            <div class="d-flex flex-wrap align-items-center flex-grow-1" id="modalSummaryDays" style="gap: 8px;">
+                                <!-- Date cards -->
                             </div>
                         </div>
                     </div>
