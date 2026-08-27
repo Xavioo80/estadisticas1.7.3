@@ -1,191 +1,468 @@
-<x-app-layout>
-    @section('title', 'Productividad Médica - Servicio Social')
+@extends('layouts.app')
 
-    {{-- ===== Page Header Bar (inside main slot) ===== --}}
-    <div class="flex flex-wrap items-center justify-between gap-2 py-1.5 px-2 mb-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm">
-        <div class="flex items-center space-x-3">
-            <div>
-                <h2 class="font-bold text-base text-gray-900 dark:text-white leading-none mb-0.5">Hora Médico - Servicio Social</h2>
-                <p class="text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] m-0">Informe de Médicos en Servicio Social (Todas las Jornadas)</p>
-            </div>
-            {{-- Navigation Tabs --}}
-            <div class="flex items-center bg-gray-200/70 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-300/80 dark:border-gray-700/80">
-                <a href="{{ route('informes.hora-medico') }}"
-                   class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ request()->routeIs('informes.hora-medico') && !request()->routeIs('informes.hora-medico.servicio-social') && !request()->routeIs('informes.hora-medico.consolidado') ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white shadow-xs' : 'bg-slate-600/90 dark:bg-slate-700/90 text-white dark:text-white border border-slate-500/50 dark:border-slate-600/50 hover:bg-slate-700 dark:hover:bg-slate-600' }}" style="text-decoration: none;">
-                    <i class="fas fa-user-md mr-1.5"></i> Generales y Especialistas
-                </a>
-                <a href="{{ route('informes.hora-medico.servicio-social') }}"
-                   class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white shadow-xs' : 'bg-slate-600/90 dark:bg-slate-700/90 text-white dark:text-white border border-slate-500/50 dark:border-slate-600/50 hover:bg-slate-700 dark:hover:bg-slate-600' }}" style="text-decoration: none;">
-                    <i class="fas fa-graduation-cap mr-1.5"></i> Servicio Social
-                </a>
-            </div>
-        </div>
-        <div class="flex items-center space-x-2">
-            <!-- Botón Observaciones -->
-            <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => 'SERVICIO SOCIAL']) }}" 
-               class="btn btn-sm btn-info text-white font-bold flex items-center gap-1.5 shadow-sm"
-               style="background: linear-gradient(135deg, #6366f1, #4f46e5); border: none; padding: 5px 12px; border-radius: 8px; text-decoration: none; font-size: 11px; white-space: nowrap;"
-               title="Ver Informe Oficial de Observaciones (Servicio Social)">
-                <i class="bi bi-journal-text text-sm"></i> Observaciones
-            </a>
+@section('title', 'Rendimiento Médico (Servicio Social) - Estadísticas 1.7')
 
-            <button
-                class="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white shadow-xs transition-all border-0 flex items-center justify-center"
-                data-toggle="modal" data-target="#addMedicoModal" title="Incluir Médico Social">
-                <i class="fas fa-user-plus text-xs"></i>
+@section('content')
+<style>
+    .header-actions-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+    }
+
+    #mainTable th.vertical-text,
+    #mainTable .vertical-text,
+    .vertical-text {
+        writing-mode: vertical-rl !important;
+        transform: rotate(180deg) !important;
+        white-space: normal !important;
+        word-break: normal !important;
+        font-size: 0.65rem !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        padding: 3px 2px !important;
+        letter-spacing: 0.2px !important;
+        line-height: 1.15 !important;
+    }
+
+    #mainTable thead tr.header-row th {
+        font-size: 0.74rem !important;
+        font-weight: 800 !important;
+        padding: 4px 4px !important;
+        vertical-align: middle !important;
+    }
+
+    #mainTable {
+        border: 1px solid #94a3b8 !important;
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+
+    html.dark #mainTable,
+    [data-theme="dark"] #mainTable {
+        border: 1px solid #475569 !important;
+    }
+
+    #mainTable thead th {
+        border: 1px solid #94a3b8 !important;
+        vertical-align: middle !important;
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        color: var(--text-primary, #0f172a) !important;
+    }
+
+    html.dark #mainTable thead th,
+    [data-theme="dark"] #mainTable thead th {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
+    }
+
+    #mainTable tbody td {
+        vertical-align: middle !important;
+        font-size: 0.88rem !important;
+        font-weight: 600 !important;
+        padding: 3px 4px !important;
+        border: 1px solid #94a3b8 !important;
+        color: var(--text-primary) !important;
+    }
+
+    html.dark #mainTable tbody td,
+    [data-theme="dark"] #mainTable tbody td {
+        border: 1px solid #475569 !important;
+    }
+
+    .btn-hsc-modal {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 26px !important;
+        height: 22px !important;
+        padding: 0 !important;
+        border-radius: 6px !important;
+        background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35) !important;
+        transition: all 0.18s ease-in-out !important;
+        cursor: pointer !important;
+    }
+
+    .btn-hsc-modal:hover {
+        background: linear-gradient(135deg, #3730a3, #4f46e5) !important;
+        transform: translateY(-1px) scale(1.08) !important;
+        box-shadow: 0 4px 8px rgba(79, 70, 229, 0.45) !important;
+        color: #ffffff !important;
+    }
+
+    /* ─── Columnas Fijas (Sticky Columns) ─── */
+    .sticky-col-1,
+    #mainTable th.sticky-col-1,
+    #mainTable td.sticky-col-1 {
+        position: sticky !important;
+        left: 0 !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+        background-color: var(--bg-surface, #ffffff) !important;
+        z-index: 30 !important;
+        text-align: center !important;
+        font-size: 0.80rem !important;
+        box-sizing: border-box !important;
+    }
+
+    .sticky-col-2,
+    #mainTable th.sticky-col-2,
+    #mainTable td.sticky-col-2,
+    #mainTable .sticky-col-2 {
+        position: sticky !important;
+        left: 36px !important;
+        width: 230px !important;
+        min-width: 230px !important;
+        max-width: 230px !important;
+        background-color: var(--bg-surface, #ffffff) !important;
+        z-index: 30 !important;
+        text-align: left !important;
+        padding-left: 10px !important;
+        padding-right: 6px !important;
+        font-size: 0.82rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        box-sizing: border-box !important;
+    }
+
+    html.dark .sticky-col-1,
+    html.dark #mainTable th.sticky-col-1,
+    html.dark #mainTable td.sticky-col-1,
+    [data-theme="dark"] .sticky-col-1,
+    [data-theme="dark"] #mainTable th.sticky-col-1,
+    [data-theme="dark"] #mainTable td.sticky-col-1,
+    html.dark .sticky-col-2,
+    html.dark #mainTable th.sticky-col-2,
+    html.dark #mainTable td.sticky-col-2,
+    [data-theme="dark"] .sticky-col-2,
+    [data-theme="dark"] #mainTable th.sticky-col-2,
+    [data-theme="dark"] #mainTable td.sticky-col-2 {
+        background-color: #0f172a !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* En thead, las celdas sticky de la esquina tienen z-index 100 */
+    #mainTable thead th.sticky-col-1 {
+        position: sticky !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 100 !important;
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+    }
+
+    #mainTable thead th.sticky-col-2 {
+        position: sticky !important;
+        top: 0 !important;
+        left: 36px !important;
+        z-index: 100 !important;
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+    }
+
+    /* ─── Encabezados Fijos de 3 Filas (Sticky Multi-row Thead) ─── */
+    #mainTable thead,
+    #mainTable thead.thead-premium {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 60 !important;
+    }
+
+    #mainTable thead th {
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        color: var(--text-primary, #0f172a) !important;
+        border: 1px solid #94a3b8 !important;
+        box-sizing: border-box !important;
+    }
+
+    #mainTable thead tr.header-row-main th {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 60 !important;
+    }
+
+    #mainTable thead tr.header-row-mid th {
+        position: sticky !important;
+        top: 28px !important;
+        z-index: 55 !important;
+    }
+
+    #mainTable thead tr.header-row-sub th {
+        position: sticky !important;
+        top: 54px !important;
+        z-index: 50 !important;
+    }
+
+    html.dark #mainTable thead th,
+    [data-theme="dark"] #mainTable thead th {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
+    }
+
+    html.dark #mainTable thead th.sticky-col-1,
+    html.dark #mainTable thead th.sticky-col-2,
+    [data-theme="dark"] #mainTable thead th.sticky-col-1,
+    [data-theme="dark"] #mainTable thead th.sticky-col-2 {
+        background-color: #1e293b !important;
+    }
+
+    /* Hover de filas: mantener opacidad sólida en celdas sticky */
+    #mainTable tbody tr:hover td.sticky-col-1,
+    #mainTable tbody tr:hover td.sticky-col-2 {
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+    }
+
+    html.dark #mainTable tbody tr:hover td.sticky-col-1,
+    html.dark #mainTable tbody tr:hover td.sticky-col-2,
+    [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-1,
+    [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-2 {
+        background-color: #1e293b !important;
+    }
+
+    #tableContainer {
+        flex: 1 1 0% !important;
+        min-height: 0 !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        overflow: auto !important;
+        position: relative !important;
+        scrollbar-width: thin;
+        scrollbar-color: #94a3b8 var(--bg-surface, #f8fafc);
+    }
+
+    /* ─── Fila de Totales Fija con Cuadrícula Completa (Sticky Tfoot) ─── */
+    #mainTable tfoot {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 45 !important;
+    }
+
+    #mainTable tfoot tr {
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+    }
+
+    #mainTable tfoot td {
+        position: sticky !important;
+        bottom: 0 !important;
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        color: var(--text-primary, #0f172a) !important;
+        font-weight: 800 !important;
+        font-size: 0.88rem !important;
+        border: 1px solid #94a3b8 !important;
+        vertical-align: middle !important;
+        padding: 4px 4px !important;
+        z-index: 45 !important;
+    }
+
+    html.dark #mainTable tfoot tr,
+    html.dark #mainTable tfoot td,
+    [data-theme="dark"] #mainTable tfoot tr,
+    [data-theme="dark"] #mainTable tfoot td {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #475569 !important;
+    }
+
+    #mainTable tfoot td.sticky-col-footer {
+        position: sticky !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 266px !important;
+        min-width: 266px !important;
+        max-width: 266px !important;
+        z-index: 80 !important;
+        background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        border: 1px solid #94a3b8 !important;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+        font-size: 0.82rem !important;
+        box-sizing: border-box !important;
+    }
+
+        .nav-tab-group {
+            display: inline-flex !important;
+            align-items: center !important;
+            background: var(--bg-surface-alt, #e2e8f0) !important;
+            padding: 3px !important;
+            border-radius: 10px !important;
+            border: 1px solid var(--border-color, #cbd5e1) !important;
+            gap: 3px !important;
+        }
+
+        html.dark .nav-tab-group,
+        [data-theme="dark"] .nav-tab-group {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        .nav-tab-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 5px 12px !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            border-radius: 7px !important;
+            text-decoration: none !important;
+            transition: all 0.18s ease-in-out !important;
+            white-space: nowrap !important;
+        }
+
+        .nav-tab-btn.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35) !important;
+            border: 1px solid #1d4ed8 !important;
+        }
+
+        .nav-tab-btn.active i {
+            color: #ffffff !important;
+        }
+
+        .nav-tab-btn:not(.active) {
+            background: var(--bg-surface, #ffffff) !important;
+            color: var(--text-primary, #334155) !important;
+            border: 1px solid var(--border-color, #cbd5e1) !important;
+        }
+
+        .nav-tab-btn:not(.active):hover {
+            background: var(--bg-surface-alt, #f1f5f9) !important;
+            color: var(--text-primary, #0f172a) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        html.dark .nav-tab-btn:not(.active),
+        [data-theme="dark"] .nav-tab-btn:not(.active) {
+            background: #334155 !important;
+            color: #f8fafc !important;
+            border-color: #475569 !important;
+        }
+
+        html.dark .nav-tab-btn:not(.active):hover,
+        [data-theme="dark"] .nav-tab-btn:not(.active):hover {
+            background: #475569 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-header-purple {
+            background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+            color: #ffffff !important;
+            border: none !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35) !important;
+            transition: all 0.18s ease-in-out !important;
+        }
+
+        .btn-header-purple:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+            color: #ffffff !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4) !important;
+        }
+
+        .btn-header-purple i {
+            color: #ffffff !important;
+        }
+    </style>
+
+    <div class="informe-page-wrapper" id="report-wrapper">
+        <!-- Header -->
+        <div class="informe-header no-print">
+            <div class="flex items-center gap-3 shrink-0">
+                <h2 style="margin: 0; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-primary);">
+                    <i class="bi bi-mortarboard text-primary"></i> Hora Médico - Servicio Social
+                </h2>
+                {{-- Navigation Tabs --}}
+                <div class="nav-tab-group">
+                    <a href="{{ route('informes.hora-medico', ['ano' => $ano, 'mes' => $mesNombre]) }}"
+                        class="nav-tab-btn {{ !request()->routeIs('informes.hora-medico.servicio-social') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill"></i> Generales y Especialistas
+                    </a>
+                    <a href="{{ route('informes.hora-medico.servicio-social', ['ano' => $ano, 'mes' => $mesNombre]) }}"
+                        class="nav-tab-btn {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'active' : '' }}">
+                        <i class="bi bi-mortarboard-fill"></i> Servicio Social
+                    </a>
+                </div>
+            </div>
+
+            <div class="header-actions-row">
+                <!-- Botón Observaciones -->
+                <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => 'SERVICIO SOCIAL']) }}"
+                    class="btn-header-purple"
+                    title="Ver Informe Oficial de Observaciones (Servicio Social)">
+                    <i class="bi bi-journal-text"></i> Observaciones
+                </a>
+
+            <!-- Botón Incluir Médico Social -->
+            <button type="button" class="btn btn-primary btn-sm flex items-center gap-1 shadow-sm"
+                style="white-space: nowrap;" data-toggle="modal" data-target="#addMedicoModal"
+                title="Incluir Médico Social">
+                <i class="bi bi-person-plus text-xs"></i> Incluir Médico
             </button>
-            <div class="h-4 w-[1px] bg-gray-300 dark:bg-gray-700 mx-1"></div>
-            <button type="button"
-                class="font-semibold flex items-center px-3 rounded-lg h-8 text-[10px] bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all uppercase shadow-xs"
-                onclick="window.location.reload()">
-                <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                Actualizar
+
+            <!-- Botón Exportar Excel -->
+            <button type="button" class="btn btn-success btn-sm flex items-center gap-1 shadow-sm"
+                style="white-space: nowrap;" data-toggle="modal" data-target="#exportExcelModal"
+                title="Exportar a Excel">
+                <i class="bi bi-file-earmark-excel"></i> Excel
+            </button>
+
+            <button type="button" onclick="imprimirReporte()" class="btn-action-print" title="Imprimir Reporte">
+                <i class="bi bi-printer"></i>
+            </button>
+
+            <button type="button" onclick="toggleFullScreen()" class="btn-action-fullscreen" title="Pantalla Completa">
+                <i class="bi bi-arrows-fullscreen" id="fullScreenIcon"></i>
+            </button>
+
+            <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm font-semibold"
+                onclick="updateFilters()">
+                <i class="bi bi-arrow-clockwise mr-1"></i> Actualizar
             </button>
         </div>
     </div>
 
-    {{-- CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da;
-            border-radius: .25rem;
-        }
-
-        .select2-container {
-            width: 100% !important;
-        }
-        #mainTable td {
-            padding: 2px 4px !important;
-            vertical-align: middle !important;
-            height: auto !important;
-        }
-        #mainTable th.sticky-col-2,
-        #mainTable td.sticky-col-2,
-        #mainTable .sticky-col-2 {
-            text-align: left !important;
-            padding-left: 8px !important;
-            padding-right: 4px !important;
-        }
-
-        .btn-hsc-modal {
-            padding: 0px 4px !important;
-            font-size: 0.7rem !important;
-            line-height: 1 !important;
-            height: 18px !important;
-            width: 22px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 2px !important;
-        }
-
-        .btn-hsc-modal i {
-            font-size: 0.65rem !important;
-        }
-
-        .obs-column {
-            white-space: normal !important;
-            word-wrap: break-word !important;
-            min-height: 20px !important;
-        }
-
-        .sticky-thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background-color: #f8fafc;
-            border-bottom: 2px solid #cbd5e1;
-        }
-
-        html.dark .sticky-thead th,
-        .dark .sticky-thead th {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border-bottom: 2px solid #334155 !important;
-        }
-
-        .modal:not(.show) {
-            display: none !important;
-        }
-
-        .modal-backdrop.show {
-            opacity: 0.5;
-            z-index: 1040;
-        }
-
-        .modal.show {
-            z-index: 1050;
-        }
-
-    </style>
-
-    <div class="report-container fade-in">
-        <!-- Header Oficial (Solo para Impresión) -->
-        <div class="official-header-print hidden print:block p-1 mb-1"
-            style="background-color: transparent; color: #000; border: none;">
-            <div class="row align-items-center no-gutters">
-                <div class="col-2 text-left px-3">
-                    <img src="{{ asset('img/logos/logo_izquierdo.png') }}" alt="Logo Izquierdo" id="img_logo_izquierdo_print"
-                         style="width: <?php echo $settings['logo_izquierdo_width'] ?? 'auto'; ?>; height: <?php echo $settings['logo_izquierdo_height'] ?? '70px'; ?>; object-fit: contain;">
-                </div>
-                <div class="col-8 text-center p-0">
-                    <h6 class="mb-0 font-weight-bold" style="font-size: 1rem; line-height: 1.1;">REGION SANITARIA METROPOLITANA DISTRITO CENTRAL</h6>
-                    <h6 class="mb-0 font-weight-bold" style="font-size: 1rem; line-height: 1.1;">AREA DE GESTION A LA INFORMACION</h6>
-                    <h6 class="mb-0 font-weight-bold" style="font-size: 1rem; line-height: 1.1;">INFORME DE CONSULTAS BRINDADAS POR MEDICO - SERVICIO SOCIAL</h6>
-                </div>
-                <div class="col-2 text-right px-3">
-                    <img src="{{ asset('img/logos/logo_derecho.png') }}" alt="Logo Derecho" id="img_logo_derecho_print"
-                         style="width: <?php echo $settings['logo_derecho_width'] ?? 'auto'; ?>; height: <?php echo $settings['logo_derecho_height'] ?? '70px'; ?>; object-fit: contain;">
-                </div>
+    <!-- Barra de Filtros -->
+    <div class="filter-container no-print">
+        <div class="flex flex-1 items-center gap-2 mb-0 flex-wrap">
+            <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Jornada:</span>
+                <span class="badge badge-info font-bold px-2.5 py-1 text-xs" style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); border-radius: 6px;">
+                    <i class="bi bi-mortarboard-fill mr-1"></i> TODAS LAS JORNADAS (SERVICIO SOCIAL)
+                </span>
             </div>
 
-            <div class="row align-items-end mt-1 px-2 no-gutters">
-                <div class="col-4">
-                    <div class="font-weight-bold" style="font-size: 0.85rem;">JORNADA: TODAS LAS JORNADAS (SERVICIO SOCIAL)</div>
-                    <div class="font-weight-bold" style="font-size: 0.85rem; line-height: 1;">CENTRO INTEGRAL DE SALUD SAN MIGUEL</div>
-                </div>
-                <div class="col-2 text-center">
-                    <span class="font-weight-bold" style="font-size: 0.85rem;">MES: {{ $mesNombre }}</span>
-                </div>
-                <div class="col-3 text-center">
-                    <span class="font-weight-bold" style="font-size: 0.85rem;">AÑO: {{ $ano }}</span>
-                </div>
-                <div class="col-3 text-right">
-                    <h6 class="font-weight-bold mb-0" style="font-size: 1.1rem;">Hora Medico - Servicio Social</h6>
-                </div>
-            </div>
-        </div>
-
-        <!-- Barra de Filtros (Solo para Pantalla) -->
-        <div class="filter-container flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-theme-xs mb-3 no-print">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-filter text-brand-500"></i>
-                <span class="text-xs font-bold uppercase text-gray-900 dark:text-white">Filtros</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">JORNADA:</span>
-                    <select name="jornada" class="filter-select h-8 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-2" disabled>
-                        <option value="TOTAL JORNADAS" selected>TODAS LAS JORNADAS (SERVICIO SOCIAL)</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">MES:</span>
-                    <select name="mes" class="filter-select h-8 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-2"
-                        onchange="updateFilters()">
+            <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Mes:</span>
+                <div style="width: 125px;">
+                    <select name="mes" class="filter-select w-full" onchange="updateFilters()">
                         @foreach($meses as $m)
                             <option value="{{ $m }}" {{ $mesNombre == $m ? 'selected' : '' }}>{{ $m }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">AÑO:</span>
-                    <select name="ano" class="filter-select h-8 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-2"
-                        onchange="updateFilters()">
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Año:</span>
+                <div style="width: 88px;">
+                    <select name="ano" class="filter-select w-full" onchange="updateFilters()">
                         @foreach($anos as $a)
                             <option value="{{ $a }}" {{ $ano == $a ? 'selected' : '' }}>{{ $a }}</option>
                         @endforeach
@@ -193,173 +470,348 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Tabla Principal -->
-        <div class="table-container-wrapper table-responsive rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-theme-xs p-2 overflow-x-auto">
-            <table class="table table-bordered text-xs text-center mb-0 w-full" id="mainTable">
-                <thead class="sticky-thead">
-                    <tr class="header-row" style="height: 25px;">
-                        <th rowspan="2" class="align-middle border-black sticky-header" style="width: 30px; top: 0; left: 0; z-index: 90;">N°</th>
-                        <th rowspan="2" class="align-middle border-black sticky-header text-center" style="width: 200px; top: 0; left: 30px; z-index: 90;">NOMBRE</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 30px; top: 0; z-index: 80;">ACUERDO</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 30px; top: 0; z-index: 80;">CONTRATO</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 30px; top: 0; z-index: 80;">M. GENERAL</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 30px; top: 0; z-index: 80;">M. ESPECIALISTA</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 35px; top: 0; z-index: 80;">HRS CONTRATADAS POR DIA</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 35px; top: 0; z-index: 80;">DIAS CONTRATADOS AL MES</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 35px; top: 0; z-index: 80;">DIAS CUMPLIDOS AL MES</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 35px; top: 0; z-index: 80;">HORAS CONTRATADAS EN EL MES</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 35px; top: 0; z-index: 80;">HORAS CUMPLIDAS EN EL MES</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 45px; top: 0; z-index: 80;">PACIENTES PROGRAMADOS</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 45px; top: 0; z-index: 80;">PACIENTES REPROGRAMADOS</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 45px; top: 0; z-index: 80;">PACIENTES ATENDIDOS</th>
-                        <th rowspan="2" class="vertical-text border-black sticky-header" style="width: 40px; top: 0; z-index: 80;">RENDIMIENTO MEDICO %</th>
-                        <th colspan="3" class="border-black sticky-header" style="top: 0; z-index: 80;">HORAS PERDIDAS POR CAUSA JUSTIFICADA</th>
-                        <th rowspan="2" class="align-middle border-black sticky-header" style="width: 250px; top: 0; z-index: 80;">OBSERVACIONES</th>
+    <!-- Dynamic Content Area -->
+    <div id="dynamic-content"
+        style="flex: 1 1 0%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+        <!-- Loading Overlay -->
+        <div id="table-loader"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-surface); opacity: 0.85; z-index: 1000; align-items: center; justify-content: center;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+        </div>
+
+        <div class="table-responsive" id="tableContainer">
+            <table class="table table-bordered table-sm text-center mb-0 w-full" id="mainTable"
+                style="min-width: 1350px;">
+                <thead class="thead-premium sticky-top">
+                    {{-- Fila 1: Grupos Principales y Super-Header HORAS SIN CONSULTA --}}
+                    <tr class="header-row-main">
+                        <th rowspan="3" class="align-middle sticky-col-1"
+                            style="width: 36px; min-width: 36px; z-index: 100;">#</th>
+                        <th rowspan="3" class="align-middle sticky-col-2 text-left"
+                            style="width: 230px; min-width: 230px; z-index: 100; padding-left: 10px !important;">NOMBRE
+                            COMPLETO DEL MEDICO</th>
+                        <th colspan="2" rowspan="2" class="align-middle">MODALIDAD</th>
+                        <th colspan="2" rowspan="2" class="align-middle">CATEGORIA</th>
+                        <th rowspan="3" class="vertical-text align-middle" style="width: 32px; min-width: 32px;">HORAS
+                            CONTRATADAS X DIA</th>
+                        <th colspan="2" rowspan="2" class="align-middle">DIAS MES</th>
+                        <th colspan="2" rowspan="2" class="align-middle">HORAS MES</th>
+                        <th colspan="3" rowspan="2" class="align-middle">ATENCIONES</th>
+                        <th rowspan="3" class="vertical-text align-middle font-bold"
+                            style="width: 36px; min-width: 36px;"><span class="text-danger">%</span> DE RENDIMIENTO</th>
+                        <th colspan="10" class="align-middle bg-primary-soft font-bold" style="letter-spacing: 0.5px;">
+                            HORAS SIN CONSULTA</th>
+                        <th rowspan="3" class="align-middle no-print" style="width: 40px; min-width: 40px;">ACCION</th>
                     </tr>
-                    <tr class="header-row" style="height: 25px;">
-                        <th class="vertical-text border-black sticky-header" style="width: 30px; top: 25px; z-index: 80;">OFICIALES</th>
-                        <th class="vertical-text border-black sticky-header" style="width: 30px; top: 25px; z-index: 80;">VACACIONES</th>
-                        <th class="vertical-text border-black sticky-header" style="width: 30px; top: 25px; z-index: 80;">PERSONALES</th>
+                    {{-- Fila 2: Sub-grupos bajo HORAS SIN CONSULTA --}}
+                    <tr class="header-row-mid">
+                        <th colspan="7" class="align-middle font-bold">TOTAL DE HORAS OFICIALES</th>
+                        <th colspan="2" class="align-middle font-bold th-hatched">VACACIONES</th>
+                        <th rowspan="2" class="vertical-text align-middle" style="width: 32px; min-width: 32px;">
+                            PERMISOS PERSONALES.</th>
+                    </tr>
+                    {{-- Fila 3: Subcolumnas Detalladas (Verticales y compactas) --}}
+                    <tr class="header-row-sub">
+                        {{-- Modalidad: Acuerdo rayado, Contrato activo --}}
+                        <th class="vertical-text align-middle th-hatched" style="width: 30px;">ACUERDO.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">CONTRATO.</th>
+                        {{-- Categoria: Medico General activo, Especialista rayado --}}
+                        <th class="vertical-text align-middle" style="width: 30px;">MÉDICO GENERAL.</th>
+                        <th class="vertical-text align-middle th-hatched" style="width: 30px;">MÉDICO ESPECIALISTA.</th>
+                        {{-- Días Mes --}}
+                        <th class="vertical-text align-middle" style="width: 30px;">CONTRATADOS.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">CUMPLIDOS.</th>
+                        {{-- Horas Mes --}}
+                        <th class="vertical-text align-middle" style="width: 32px;">CONTRATADAS.</th>
+                        <th class="vertical-text align-middle" style="width: 32px;">CUMPLIDAS.</th>
+                        {{-- Atenciones --}}
+                        <th class="vertical-text align-middle" style="width: 32px;">PROGRAMADAS.</th>
+                        <th class="vertical-text align-middle" style="width: 32px;">REPROGRAMADAS.</th>
+                        <th class="vertical-text align-middle font-bold" style="width: 34px;">ATENDIDAS.</th>
+                        {{-- Horas Sin Consulta: Oficiales (7) con ACTIVIDADES UNIVERSIDAD --}}
+                        <th class="vertical-text align-middle" style="width: 30px;">FERIADOS / COMPENSATORIOS</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">ESFAM.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES DE PROMOCION.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">CONGRESOS / TALLERES.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">INVESTIGACION DE CAMPO.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES UNIVERSIDAD.</th>
+                        <th class="vertical-text align-middle" style="width: 30px;">CITAS, INCAPACIDADES IHSS / PRIVADA.</th>
+                        {{-- Horas Sin Consulta: Vacaciones rayadas --}}
+                        <th class="vertical-text align-middle th-hatched" style="width: 30px;">ORDINARIAS.</th>
+                        <th class="vertical-text align-middle th-hatched" style="width: 30px;">PROFILACTICAS.</th>
                     </tr>
                 </thead>
-                <tbody id="tableContent">
-                    @include('informes.hora_medico_table')
-                </tbody>
+                @include('informes.hora_medico_table')
             </table>
         </div>
     </div>
+</div>
 
-    <!-- Modales -->
-    @include('informes.hora_medico_modales')
+<!-- Modales -->
+@include('informes.hora_medico_modales')
 
-    <!-- Sticky Action Footer Bar -->
-    <div class="report-footer-screen fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 shadow-lg py-2 px-4 no-print">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-                    <i class="fas fa-graduation-cap mr-1"></i> Servicio Social
-                </span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="imprimirReporte()" 
-                    class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-xs">
-                    <i class="fas fa-print mr-1.5"></i> Imprimir Informe Social
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function updateFilters() {
-            let ano = $('[name="ano"]').val();
-            let mes = $('[name="mes"]').val();
-            let jornada = 'TOTAL JORNADAS';
-
-            $('#tableContent').css('opacity', '0.5');
-
-            $.get("{{ route('informes.hora-medico.servicio-social') }}", {
-                ano: ano,
-                mes: mes,
-                jornada: jornada
-            }, function (html) {
-                $('#mainTable thead').nextAll().remove();
-                $('#mainTable').append(html);
-                $('#tableContent').css('opacity', '1');
-
-                const url = new URL(window.location);
-                url.searchParams.set('ano', ano);
-                url.searchParams.set('mes', mes);
-                window.history.pushState({}, '', url);
-            });
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function syncStickyHeaderOffsets() {
+        const row1 = document.querySelector('#mainTable thead tr.header-row-main');
+        const row2 = document.querySelector('#mainTable thead tr.header-row-mid');
+        const row3 = document.querySelector('#mainTable thead tr.header-row-sub');
+        if (!row1) return;
+        const h1 = row1.offsetHeight;
+        if (row2) {
+            const h2 = row2.offsetHeight;
+            row2.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1}px`, 'important'));
+            if (row3) {
+                row3.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1 + h2}px`, 'important'));
+            }
         }
+    }
 
-        function imprimirReporte() {
-            let ano = $('[name="ano"]').val();
-            let mes = $('[name="mes"]').val();
-            let jornada = 'TOTAL JORNADAS';
+    $(document).ready(function () {
+        syncStickyHeaderOffsets();
+        window.addEventListener('resize', syncStickyHeaderOffsets);
+    });
 
-            const url = new URL("{{ route('informes.hora-medico.imprimir') }}");
+    function updateFilters() {
+        let ano = $('[name="ano"]').val();
+        let mes = $('[name="mes"]').val();
+        let jornada = 'TOTAL JORNADAS';
+
+        $('#table-loader').css('display', 'flex').fadeIn(150);
+
+        $.get("{{ route('informes.hora-medico.servicio-social') }}", {
+            ano: ano,
+            mes: mes,
+            jornada: jornada
+        }, function (html) {
+            $('#mainTable > tbody, #mainTable > tfoot').remove();
+            $('#mainTable').append(html);
+            syncStickyHeaderOffsets();
+            $('#table-loader').fadeOut(150);
+
+            const url = new URL(window.location);
             url.searchParams.set('ano', ano);
             url.searchParams.set('mes', mes);
-            url.searchParams.set('jornada', jornada);
+            window.history.pushState({}, '', url);
+        }).fail(function () {
+            $('#table-loader').fadeOut(150);
+        });
+    }
 
-            window.open(url.toString(), '_blank');
-        }
+    function toggleFullScreen() {
+        const elem = document.getElementById('report-wrapper');
+        const icon = document.getElementById('fullScreenIcon');
 
-        $(document).ready(function () {
-            $(document).on('click', '.btn-hsc-modal', function () {
-                const d = $(this).data();
-                openHSCModal(d.id, d.name, d.atenciones, d.prog, d.pxh, d.diasmes, d.diascont, d.hrsdia, d.rend, d.observaciones);
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().catch(err => {
+                alert(`Error al intentar pantalla completa: ${err.message}`);
             });
+            if (icon) {
+                icon.classList.remove('bi-arrows-fullscreen');
+                icon.classList.add('bi-fullscreen-exit');
+            }
+        } else {
+            document.exitFullscreen();
+            if (icon) {
+                icon.classList.remove('bi-fullscreen-exit');
+                icon.classList.add('bi-arrows-fullscreen');
+            }
+        }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+        const icon = document.getElementById('fullScreenIcon');
+        if (!document.fullscreenElement && icon) {
+            icon.classList.remove('bi-fullscreen-exit');
+            icon.classList.add('bi-arrows-fullscreen');
+        }
+    });
+
+    function imprimirReporte() {
+        let ano = $('[name="ano"]').val();
+        let mes = $('[name="mes"]').val();
+        let jornada = 'TOTAL JORNADAS';
+
+        const url = new URL("{{ route('informes.hora-medico.imprimir') }}");
+        url.searchParams.set('ano', ano);
+        url.searchParams.set('mes', mes);
+        url.searchParams.set('jornada', jornada);
+
+        window.open(url.toString(), '_blank');
+    }
+
+    // Modal HSC / Observaciones Calculations
+    function openHscModal(el) {
+        let btn = $(el);
+        let medicoId = btn.data('medico-id') || btn.data('id');
+        let medName = btn.data('medico-nombre') || btn.data('name');
+        let atend = btn.data('atendidos') || btn.data('atenciones') || 0;
+        let diasMes = btn.data('total-dias') || btn.data('diasmes') || 0;
+        let hrsDia = btn.data('horas-dia') || btn.data('hrsdia') || 0;
+        let diasCont = btn.data('dias-cont') || btn.data('diascont') || 0;
+        let isSS = true; // Vista Servicio Social
+        let pxh = parseFloat(btn.data('pxh')) || 3;
+
+        $('#hsc_medico_id').val(medicoId).data('pxh', pxh);
+        $('#hsc_medico_name').text(medName);
+        $('#m_stat_atend').text(atend);
+        $('#m_stat_dias_mes').text(diasMes);
+        $('#m_stat_hrs_dia').text(hrsDia);
+        $('#m_input_dias_cont').val(diasCont);
+        $('#m_input_observaciones').val('');
+
+        let currentAno = $('[name="ano"]').val();
+        let currentMes = $('[name="mes"]').val();
+        $('#hscForm [name="ano"]').val(currentAno);
+        $('#hscForm [name="mes"]').val(currentMes);
+
+        $('.hsc-td-input').val(0);
+
+        $('#modal_th_asambleas').html('ACTIVIDADES<br>UNIVERSIDAD.');
+        $('#modal_th_vacaciones_group, #modal_th_vac_ord, #modal_th_vac_prof').addClass('th-hatched');
+        $('[name="vacaciones_ordinarias"], [name="descanso_profilactico"]').prop('disabled', true).addClass('td-hatched').val(0);
+
+        $.get("{{ route('informes.hora-medico.get-hsc') }}", {
+            medico_id: medicoId,
+            ano: currentAno,
+            mes: currentMes
+        }, function (data) {
+            if (data && data.id) {
+                Object.keys(data).forEach(key => {
+                    let val = data[key];
+                    if ($.isNumeric(val) && !['id', 'medico_id', 'ano', 'created_at', 'updated_at'].includes(key)) {
+                        val = parseFloat(val);
+                    }
+                    if (key === 'vacaciones_ordinarias' || key === 'descanso_profilactico') {
+                        $(`[name="${key}"]`).val(0);
+                    } else {
+                        $(`[name="${key}"]`).val(val);
+                    }
+                });
+                if (data.observaciones !== undefined) {
+                    $('#m_input_observaciones').val(data.observaciones || '');
+                }
+            }
+            recalcHSC();
         });
 
-        function openHSCModal(medicoId, name, atenciones, prog, pxh, diasMes, diasCont, hrsDia, rendActual, initialObs = '') {
-            let currentAno = $('[name="ano"]').val();
-            let currentMes = $('[name="mes"]').val();
+        $('#hscModal').modal('show');
+    }
 
-            $('#hsc_medico_id').val(medicoId);
-            $('#hscForm [name="ano"]').val(currentAno);
-            $('#hscForm [name="mes"]').val(currentMes);
-            $('#hsc_medico_name').text(name);
+    $(document).on('click', '.btn-hsc-modal', function (e) {
+        e.preventDefault();
+        openHscModal(this);
+    });
 
-            $('#m_stat_atend').text(atenciones);
-            $('#m_stat_dias_mes').text(diasMes);
-            $('#m_stat_hrs_dia').text(hrsDia);
-            $('#m_input_dias_cont').val(diasCont);
-            $('#m_stat_hrs_cont').text(Math.round(hrsDia * diasCont));
-            let initialRend = Math.round(rendActual) + '%';
-            $('#m_stat_rend_actual').text(initialRend);
-            $('#res_rendimiento_modal').text(initialRend);
+    $(document).on('input', '.hsc-td-input, #m_input_dias_cont', function () {
+        recalcHSC();
+    });
 
-            $('#hscForm .hsc-td-input').val(0);
-            $('#hscForm textarea').val('');
-            $('#m_input_observaciones').val(initialObs || '');
+    function recalcHSC() {
+        let comp = parseFloat($('[name="compensatorio"]').val()) || 0;
+        let esfam = parseFloat($('[name="esfam"]').val()) || 0;
+        let prom = parseFloat($('[name="promocion"]').val()) || 0;
+        let cong = parseFloat($('[name="congresos_medicos"]').val()) || 0;
+        let campo = parseFloat($('[name="trabajo_campo"]').val()) || 0;
+        let asam = parseFloat($('[name="convocatoria_general"]').val()) || 0;
+        let citas = parseFloat($('[name="incapacidad"]').val()) || 0;
 
-            $.get("{{ route('informes.hora-medico.get-hsc') }}", {
-                medico_id: medicoId,
-                ano: currentAno,
-                mes: currentMes
-            }, function (data) {
-                if (data.id) {
-                    Object.keys(data).forEach(key => {
-                        let val = data[key];
-                        if ($.isNumeric(val) && !['id', 'medico_id', 'ano', 'created_at', 'updated_at'].includes(key)) {
-                            val = parseFloat(val);
-                        }
-                        $(`[name="${key}"]`).val(val);
+        let vacOrd = parseFloat($('[name="vacaciones_ordinarias"]').val()) || 0;
+        let vacProf = parseFloat($('[name="descanso_profilactico"]').val()) || 0;
+        let pers = parseFloat($('[name="permiso_personal"]').val()) || 0;
+
+        let totalOfic = comp + esfam + prom + cong + campo + asam + citas;
+        let totalVac = vacOrd + vacProf;
+        let totalPers = pers;
+        let totalHsc = totalOfic + totalVac + totalPers;
+
+        $('#res_oficiales').text(totalOfic);
+        $('#res_vacaciones').text(totalVac);
+        $('#res_personales').text(totalPers);
+        $('#res_total_general').text(totalHsc);
+
+        let diasCont = parseFloat($('#m_input_dias_cont').val()) || 0;
+        let hrsDia = parseFloat($('#m_stat_hrs_dia').text()) || 0;
+        let atend = parseFloat($('#m_stat_atend').text()) || 0;
+
+        let hrsCont = diasCont * hrsDia;
+        let hrsDescontadas = totalOfic + totalVac;
+        let hrsCump = hrsCont - hrsDescontadas;
+        let diasCump = hrsDia > 0 ? (hrsCump / hrsDia) : 0;
+
+        $('#m_stat_hrs_cont').text(Math.round(hrsCont));
+        $('#m_stat_dias_cump').text(Math.round(diasCump));
+        $('#m_stat_hrs_cump').text(Math.round(hrsCump));
+
+        let pxh = parseFloat($('#hsc_medico_id').data('pxh')) || 3;
+        let prog = diasCont * (hrsDia * pxh);
+        let repr = prog - (hrsDescontadas * pxh);
+        let rend = 0;
+        if (repr <= 0) {
+            rend = (hrsCont > 0 && hrsDescontadas >= hrsCont) ? 100 : 0;
+        } else {
+            rend = (atend / repr) * 100;
+        }
+        $('#m_stat_rend_actual').text(Math.round(rend) + '%');
+        $('#res_rendimiento_modal').text(Math.round(rend) + '%');
+    }
+
+    function saveHSC() {
+        let formData = $('#hscForm').serialize();
+        Swal.fire({ title: 'Guardando...', didOpen: () => { Swal.showLoading(); } });
+
+        $.post("{{ route('informes.hora-medico.save-hsc') }}", formData + "&_token={{ csrf_token() }}", function (res) {
+            Swal.close();
+            if (res.success) {
+                Swal.fire({ icon: 'success', title: 'Guardado correctamente', timer: 1000, showConfirmButton: false })
+                    .then(() => {
+                        $('#hscModal').modal('hide');
+                        updateFilters();
                     });
-                    if (data.observaciones !== undefined) {
-                        $('#m_input_observaciones').val(data.observaciones || '');
-                    }
-                }
-                $('.hsc-td-input').first().trigger('input');
-            });
-            $('#hscModal').modal('show');
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error al guardar', text: res.error });
+            }
+        }).fail(function (xhr) {
+            Swal.close();
+            let errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Ocurrió un error inesperado';
+            Swal.fire({ icon: 'error', title: 'Error', text: errorMsg });
+        });
+    }
+
+    function agregarMedicoTable() {
+        let medicoId = $('#select_add_medico').val();
+        let currentAno = $('[name="ano"]').val();
+        let currentMes = $('[name="mes"]').val();
+
+        if (!medicoId) {
+            Swal.fire({ icon: 'warning', title: 'Atención', text: 'Debe seleccionar un médico' });
+            return;
         }
 
-        function saveHSC() {
-            let formData = $('#hscForm').serialize();
-            Swal.fire({ title: 'Guardando...', didOpen: () => { Swal.showLoading(); } });
+        Swal.fire({ title: 'Procesando...', didOpen: () => { Swal.showLoading(); } });
 
-            $.post("{{ route('informes.hora-medico.save-hsc') }}", formData + "&_token={{ csrf_token() }}", function (res) {
-                Swal.close();
-                if (res.success) {
-                    Swal.fire({ icon: 'success', title: 'Guardado', timer: 1000, showConfirmButton: false })
-                        .then(() => {
-                            $('#hscModal').modal('hide');
-                            updateFilters();
-                        });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error al guardar', text: res.error });
-                }
-            }).fail(function (xhr) {
-                Swal.close();
-                let errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Ocurrió un error inesperado';
-                Swal.fire({ icon: 'error', title: 'Error 500', text: errorMsg });
-            });
-        }
-    </script>
-</x-app-layout>
+        $.post("{{ route('informes.hora-medico.add-medico-hsc') }}", {
+            _token: "{{ csrf_token() }}",
+            medico_id: medicoId,
+            ano: currentAno,
+            mes: currentMes
+        }, function (res) {
+            Swal.close();
+            if (res.success) {
+                Swal.fire({ icon: 'success', title: 'Médico Agregado', timer: 1200, showConfirmButton: false })
+                    .then(() => {
+                        $('#addMedicoModal').modal('hide');
+                        updateFilters();
+                    });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: res.error });
+            }
+        });
+    }
+</script>
+@endsection

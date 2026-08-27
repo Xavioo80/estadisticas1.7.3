@@ -463,7 +463,7 @@
                                 <i class="fas fa-user-md text-blue-600 dark:text-blue-400"></i>
                                 <span>Seleccionar Médico:</span>
                             </label>
-                            <select id="select_add_medico" class="form-control select2 w-100">
+                            <select id="select_add_medico" class="form-control custom-select font-medium text-xs rounded-lg h-9 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 w-100">
                                 <option value="">Seleccione médico a incluir...</option>
                                 @foreach($todosLosMedicos as $m)
                                     <option value="{{ $m->id }}" data-jornada="{{ $m->JORNADA }}">{{ $m->NOM_MED }} ({{ $m->JORNADA }})</option>
@@ -485,6 +485,54 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const allMedicosList = [
+            @if(isset($todosLosMedicos))
+                @foreach($todosLosMedicos as $m)
+                    { id: "{{ $m->id }}", nombre: "{{ addslashes($m->NOM_MED) }}", jornada: "{{ addslashes($m->JORNADA) }}" },
+                @endforeach
+            @endif
+        ];
+
+        function populateMedicosDropdown(selectedJornada) {
+            let select = $('#select_add_medico');
+            select.empty();
+            select.append('<option value="">Seleccione médico a incluir...</option>');
+
+            let filterJor = (selectedJornada || 'TODAS').toUpperCase().trim();
+
+            allMedicosList.forEach(function(m) {
+                let mJor = (m.jornada || '').toUpperCase().trim();
+                let matches = (filterJor === 'TODAS' || filterJor === 'TODAS LAS JORNADAS' || mJor === filterJor || mJor.includes(filterJor) || filterJor.includes(mJor));
+                if (matches) {
+                    select.append($('<option>', {
+                        value: m.id,
+                        text: m.nombre + (m.jornada ? ' (' + m.jornada + ')' : '')
+                    }));
+                }
+            });
+        }
+
+        $('#addMedicoModal').on('show.bs.modal', function() {
+            let activeJor = $('[name="jornada"]').val() || 'TODAS';
+            if (activeJor === 'SERVICIO SOCIAL' || activeJor === 'TOTAL JORNADAS') {
+                activeJor = 'TODAS';
+            }
+            if ($('#filter_add_jornada option[value="' + activeJor + '"]').length > 0) {
+                $('#filter_add_jornada').val(activeJor);
+            } else {
+                $('#filter_add_jornada').val('TODAS');
+            }
+            populateMedicosDropdown($('#filter_add_jornada').val());
+        });
+
+        $(document).on('change', '#filter_add_jornada', function() {
+            populateMedicosDropdown($(this).val());
+        });
+    });
+</script>
 
 <!-- Modal Exportar Excel -->
 <div class="modal fade" id="exportExcelModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -643,7 +691,7 @@
                                 {{-- Fila 1: Grupos Principales --}}
                                 <tr class="hsc-header-row-main">
                                     <th colspan="7" class="bg-oficial-main text-center align-middle font-extrabold uppercase">TOTAL DE HORAS OFICIALES</th>
-                                    <th colspan="2" class="bg-vacaciones-main text-center align-middle font-extrabold uppercase">VACACIONES</th>
+                                    <th colspan="2" id="modal_th_vacaciones_group" class="bg-vacaciones-main text-center align-middle font-extrabold uppercase">VACACIONES</th>
                                     <th rowspan="2" class="bg-personal-main align-middle font-extrabold uppercase" style="width: 46px;">
                                         <span class="hsc-v-header text-white">PERMISOS PERSONALES.</span>
                                     </th>
@@ -655,10 +703,10 @@
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">ACTIVIDADES DE<br>PROMOCION</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">CONGRESOS /<br>TALLERES.</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">INVESTIGACION<br>DE CAMPO.</span></th>
-                                    <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">ASAMBLEAS<br>COLEGIO MEDICO.</span></th>
+                                    <th class="bg-oficial-sub" style="width: 44px;"><span id="modal_th_asambleas" class="hsc-v-header">ASAMBLEAS<br>COLEGIO MEDICO.</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">CITAS, INCAPACIDADES<br>IHSS / PRIVADA.</span></th>
-                                    <th class="bg-vacaciones-sub" style="width: 44px;"><span class="hsc-v-header">ORDINARIAS.</span></th>
-                                    <th class="bg-vacaciones-sub" style="width: 44px;"><span class="hsc-v-header">PROFILACTICAS.</span></th>
+                                    <th id="modal_th_vac_ord" class="bg-vacaciones-sub" style="width: 44px;"><span class="hsc-v-header">ORDINARIAS.</span></th>
+                                    <th id="modal_th_vac_prof" class="bg-vacaciones-sub" style="width: 44px;"><span class="hsc-v-header">PROFILACTICAS.</span></th>
                                 </tr>
                             </thead>
                             <tbody>

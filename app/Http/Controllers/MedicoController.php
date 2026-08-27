@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Medico;
+use App\Models\HoraMedicoPosicion;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -40,6 +41,7 @@ class MedicoController extends Controller
         if ($esDirector) {
             // Desactivar el rol de director de los demás médicos
             Medico::where('id', '!=', $medico->id)->update(['es_director' => false]);
+            HoraMedicoPosicion::truncate();
         }
         $medico->es_director = $esDirector;
         $medico->save();
@@ -167,6 +169,7 @@ class MedicoController extends Controller
             $validated['es_director'] = $request->has('es_director');
             if ($validated['es_director']) {
                 Medico::where('id', '>', 0)->update(['es_director' => false]);
+                HoraMedicoPosicion::truncate();
             }
 
             // Use DB transaction to ensure atomicity
@@ -266,23 +269,29 @@ class MedicoController extends Controller
     public function update(Request $request, Medico $medico)
     {
         $validated = $request->validate([
-            'COD_MED' => 'required|unique:medicos,COD_MED,' . $medico->id,
-            'NOM_MED' => 'required',
-            'JORNADA' => 'required',
-            'NOMINA' => 'required',
-            'ESPECIALIDAD' => 'required',
-            'MODALIDAD' => 'required',
-            'FECHA_INGRESO' => 'required|date',
-            'CORREO' => 'nullable|email',
-            'TELEFONO' => 'nullable',
+            'COD_MED'           => 'required|unique:medicos,COD_MED,' . $medico->id,
+            'NOM_MED'           => 'required',
+            'JORNADA'           => 'required',
+            'NOMINA'            => 'nullable',
+            'ESPECIALIDAD'      => 'nullable',
+            'MODALIDAD'         => 'nullable',
+            'FECHA_INGRESO'     => 'nullable|date',
+            'CORREO'            => 'nullable|email',
+            'TELEFONO'          => 'nullable',
             'HORAS_CONTRATADAS' => 'nullable|numeric',
-            'CONSULTAS' => 'nullable',
-            'consultas_por_hora' => 'nullable|numeric',
-            'consultas_dia' => 'nullable|numeric',
-            'estado' => 'required|in:activo,inactivo',
-            'observaciones' => 'nullable',
-            'es_director' => 'nullable|boolean'
+            'CONSULTAS'         => 'nullable',
+            'consultas_por_hora'=> 'nullable|numeric',
+            'consultas_dia'     => 'nullable|numeric',
+            'estado'            => 'required|in:activo,inactivo',
+            'observaciones'     => 'nullable',
+            'es_director'       => 'nullable|boolean'
         ]);
+
+        // Keep existing values for fields not submitted (modal edit may omit some)
+        if (empty($validated['NOMINA']))      $validated['NOMINA']      = $medico->NOMINA;
+        if (empty($validated['ESPECIALIDAD'])) $validated['ESPECIALIDAD'] = $medico->ESPECIALIDAD;
+        if (empty($validated['MODALIDAD']))   $validated['MODALIDAD']   = $medico->MODALIDAD;
+        if (empty($validated['FECHA_INGRESO'])) $validated['FECHA_INGRESO'] = $medico->FECHA_INGRESO;
 
         if (str_starts_with(strtoupper(trim($validated['NOM_MED'])), 'MSS.')) {
             $validated['MODALIDAD'] = 'SERVICIO SOCIAL';
@@ -293,6 +302,7 @@ class MedicoController extends Controller
         $validated['es_director'] = $request->has('es_director');
         if ($validated['es_director']) {
             Medico::where('id', '!=', $medico->id)->update(['es_director' => false]);
+            HoraMedicoPosicion::truncate();
         }
 
         $medico->update($validated);

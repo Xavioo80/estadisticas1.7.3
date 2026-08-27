@@ -36,10 +36,16 @@
         </div>
 
         <!-- Rango Epidemiológico Badge -->
-        <div style="display: inline-flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; flex-wrap: nowrap !important; height: 34px !important; padding: 0 14px !important; background: var(--bg-subtle) !important; border: 1px solid var(--border-color) !important; border-radius: 9999px !important; white-space: nowrap !important; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-            <i class="bi bi-calendar3 text-primary" style="font-size: 0.85rem; margin-right: 7px; display: inline-flex; align-items: center;"></i>
-            <span class="text-muted font-weight-bold" style="font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 6px; display: inline-flex; align-items: center;">RANGO:</span>
-            <span class="font-weight-bold text-primary" style="font-size: 0.82rem; display: inline-flex; align-items: center;">{{ $fechaInfo['start'] }} <span class="text-muted font-weight-normal" style="margin: 0 4px; font-size: 0.75rem;">al</span> {{ $fechaInfo['end'] }}</span>
+        <div
+            style="display: inline-flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; flex-wrap: nowrap !important; height: 34px !important; padding: 0 14px !important; background: var(--bg-subtle) !important; border: 1px solid var(--border-color) !important; border-radius: 9999px !important; white-space: nowrap !important; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+            <i class="bi bi-calendar3 text-primary"
+                style="font-size: 0.85rem; margin-right: 7px; display: inline-flex; align-items: center;"></i>
+            <span class="text-muted font-weight-bold"
+                style="font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 6px; display: inline-flex; align-items: center;">RANGO:</span>
+            <span class="font-weight-bold text-primary"
+                style="font-size: 0.82rem; display: inline-flex; align-items: center;">{{ $fechaInfo['start'] }} <span
+                    class="text-muted font-weight-normal" style="margin: 0 4px; font-size: 0.75rem;">al</span>
+                {{ $fechaInfo['end'] }}</span>
         </div>
     </form>
 
@@ -174,59 +180,77 @@
 </div>
 
 <!-- Modal de Detalles de Pacientes Alerta Semanal (Diseño Moderno) -->
-<div class="modal fade" id="modalAlertaDetalles" tabindex="-1" role="dialog" aria-labelledby="modalAlertaDetallesLabel" aria-hidden="true">
+<div class="modal fade" id="modalAlertaDetalles" tabindex="-1" role="dialog" aria-labelledby="modalAlertaDetallesLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
-        <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); overflow: hidden;">
+        <div class="modal-content"
+            style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); overflow: hidden;">
             <!-- Modal Header -->
-            <div class="modal-header" style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
+            <div class="modal-header"
+                style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
                 <div class="d-flex align-items-center gap-3">
-                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
+                    <div
+                        style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);">
                         <i class="bi bi-shield-check"></i>
                     </div>
                     <div>
-                        <h5 class="modal-title font-weight-bold mb-0" id="modalAlertaTitle" style="color: var(--text-primary); font-size: 1.12rem; letter-spacing: -0.01em;">
+                        <h5 class="modal-title font-weight-bold mb-0" id="modalAlertaTitle"
+                            style="color: var(--text-primary); font-size: 1.12rem; letter-spacing: -0.01em;">
                             Detalle de Pacientes
                         </h5>
                         <div class="d-flex align-items-center mt-1" style="gap: 8px;">
-                            <span class="badge" id="modalAlertaSubtitleBadge" style="background: var(--color-primary-light, rgba(99, 102, 241, 0.12)); color: var(--color-primary); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                            <span class="badge" id="modalAlertaSubtitleBadge"
+                                style="background: var(--color-primary-light, rgba(99, 102, 241, 0.12)); color: var(--color-primary); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);">
                                 Grupo: -
                             </span>
-                            <span class="text-muted small" style="font-size: 0.76rem;">Desglose de atenciones del período</span>
+                            <span class="text-muted small" style="font-size: 0.76rem;">Desglose de atenciones del
+                                período</span>
                         </div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center" style="gap: 12px;">
-                    <span class="badge badge-primary px-3 py-1.5" id="modalAlertaTotalBadge" style="font-size: 0.82rem; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
+                    <span class="badge badge-primary px-3 py-1.5" id="modalAlertaTotalBadge"
+                        style="font-size: 0.82rem; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);">
                         0 Casos
                     </span>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: var(--text-primary); opacity: 0.6; font-size: 1.4rem; padding: 6px; margin: -6px; border: none; background: transparent; outline: none; transition: opacity 0.15s;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        style="color: var(--text-primary); opacity: 0.6; font-size: 1.4rem; padding: 6px; margin: -6px; border: none; background: transparent; outline: none; transition: opacity 0.15s;">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
             </div>
 
             <!-- Modal Body -->
-            <div class="modal-body p-3.5" style="background: var(--bg-surface); color: var(--text-primary); overflow-y: auto;">
+            <div class="modal-body p-3.5"
+                style="background: var(--bg-surface); color: var(--text-primary); overflow-y: auto;">
                 <!-- Loader -->
                 <div id="modalAlertaLoader" class="py-5 text-center" style="display: none;">
                     <div class="spinner-border text-primary" role="status" style="width: 2.4rem; height: 2.4rem;">
                         <span class="sr-only">Cargando...</span>
                     </div>
-                    <p class="small text-muted mt-2 font-weight-bold text-uppercase" style="letter-spacing: 0.06em; font-size: 0.75rem;">Consultando registros...</p>
+                    <p class="small text-muted mt-2 font-weight-bold text-uppercase"
+                        style="letter-spacing: 0.06em; font-size: 0.75rem;">Consultando registros...</p>
                 </div>
 
                 <div id="modalAlertaBodyContent">
                     <!-- Resumen KPIs en una sola barra moderna y unificada -->
-                    <div class="kpi-summary-bar mb-3 p-2.5 px-3 rounded-lg border" style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 12px;">
+                    <div class="kpi-summary-bar mb-3 p-2.5 px-3 rounded-lg border"
+                        style="background: var(--bg-subtle); border-color: var(--border-color) !important; border-radius: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 12px;">
                         <!-- Bloque Izquierdo: Total General -->
-                        <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: 10px !important; padding: 6px 14px !important; min-width: 110px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important; flex-shrink: 0 !important;">
-                            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 8px !important; line-height: 1 !important; margin-bottom: 3px !important;">
-                                <div style="width: 26px !important; height: 26px !important; border-radius: 7px !important; background: linear-gradient(135deg, #4f46e5, #6366f1) !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0.85rem !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25) !important;">
+                        <div
+                            style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: 10px !important; padding: 6px 14px !important; min-width: 110px !important; box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important; flex-shrink: 0 !important;">
+                            <div
+                                style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 8px !important; line-height: 1 !important; margin-bottom: 3px !important;">
+                                <div
+                                    style="width: 26px !important; height: 26px !important; border-radius: 7px !important; background: linear-gradient(135deg, #4f46e5, #6366f1) !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0.85rem !important; flex-shrink: 0 !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25) !important;">
                                     <i class="bi bi-people-fill"></i>
                                 </div>
-                                <span id="modalSummaryTotal" style="font-size: 1.30rem !important; font-weight: 800 !important; color: var(--color-primary) !important; line-height: 1 !important; display: inline-block !important;">0</span>
+                                <span id="modalSummaryTotal"
+                                    style="font-size: 1.30rem !important; font-weight: 800 !important; color: var(--color-primary) !important; line-height: 1 !important; display: inline-block !important;">0</span>
                             </div>
-                            <span style="font-size: 0.60rem !important; color: var(--text-muted) !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 0.06em !important; line-height: 1 !important; display: block !important;">TOTAL CASOS</span>
+                            <span
+                                style="font-size: 0.60rem !important; color: var(--text-muted) !important; text-transform: uppercase !important; font-weight: 700 !important; letter-spacing: 0.06em !important; line-height: 1 !important; display: block !important;">TOTAL
+                                CASOS</span>
                         </div>
 
                         <!-- Divisor vertical sutil -->
@@ -235,27 +259,44 @@
                         <!-- Bloque Derecho: Fechas (Flex row) -->
                         <div class="d-flex align-items-center flex-wrap flex-grow-1" style="gap: 8px; min-width: 0;">
                             <div class="d-flex align-items-center" style="gap: 5px; flex-shrink: 0;">
-                                <i class="bi bi-calendar3-range text-primary" style="font-size: 0.78rem;"></i>
-                                <span class="text-muted text-uppercase font-weight-bold" style="font-size: 0.65rem; letter-spacing: 0.05em;">DISTRIBUCIÓN:</span>
+
+
                             </div>
-                            <div class="d-flex flex-wrap align-items-center flex-grow-1" id="modalSummaryDays" style="gap: 8px;">
+                            <div class="d-flex flex-wrap align-items-center flex-grow-1" id="modalSummaryDays"
+                                style="gap: 8px;">
                                 <!-- Date cards -->
                             </div>
                         </div>
                     </div>
 
                     <!-- Tabla de Pacientes Moderna (Sin bordes duros) -->
-                    <div class="table-responsive rounded-lg border" style="max-height: 360px; overflow-y: auto; border-color: var(--border-color) !important; border-radius: 12px; background: var(--bg-surface); box-shadow: var(--shadow-xs);">
-                        <table class="table mb-0 modal-patient-table" style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                    <div class="table-responsive rounded-lg border"
+                        style="max-height: 360px; overflow-y: auto; border-color: var(--border-color) !important; border-radius: 12px; background: var(--bg-surface); box-shadow: var(--shadow-xs);">
+                        <table class="table mb-0 modal-patient-table"
+                            style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
                             <thead style="background: var(--bg-subtle); position: sticky; top: 0; z-index: 5;">
                                 <tr style="border-bottom: 2px solid var(--border-color);">
-                                    <th style="padding: 10px 12px; width: 45px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">#</th>
-                                    <th style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Fecha</th>
-                                    <th style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Expediente</th>
-                                    <th style="padding: 10px 12px; width: 75px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Sexo</th>
-                                    <th style="padding: 10px 12px; width: 85px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Edad</th>
-                                    <th style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Diagnóstico</th>
-                                    <th style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">Médico Tratante</th>
+                                    <th
+                                        style="padding: 10px 12px; width: 45px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        #</th>
+                                    <th
+                                        style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Fecha</th>
+                                    <th
+                                        style="padding: 10px 12px; width: 110px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Expediente</th>
+                                    <th
+                                        style="padding: 10px 12px; width: 75px; text-align: center; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Sexo</th>
+                                    <th
+                                        style="padding: 10px 12px; width: 85px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Edad</th>
+                                    <th
+                                        style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Diagnóstico</th>
+                                    <th
+                                        style="padding: 10px 12px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border: none;">
+                                        Médico Tratante</th>
                                 </tr>
                             </thead>
                             <tbody id="modalAlertaTableBody">
@@ -267,11 +308,13 @@
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer" style="background: var(--bg-subtle); border-top: 1px solid var(--border-color); padding: 0.75rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
+            <div class="modal-footer"
+                style="background: var(--bg-subtle); border-top: 1px solid var(--border-color); padding: 0.75rem 1.4rem; display: flex; align-items: center; justify-content: space-between;">
                 <span class="text-muted small" style="font-size: 0.75rem;">
                     <i class="bi bi-info-circle mr-1"></i> Haga clic en Cerrar para regresar al informe.
                 </span>
-                <button type="button" class="btn btn-subtle btn-sm font-weight-bold px-4" data-dismiss="modal" style="border-radius: 8px; height: 34px;">
+                <button type="button" class="btn btn-subtle btn-sm font-weight-bold px-4" data-dismiss="modal"
+                    style="border-radius: 8px; height: 34px;">
                     Cerrar
                 </button>
             </div>

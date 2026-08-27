@@ -4,29 +4,40 @@
     <div class="text-center font-bold uppercase text-slate-900 dark:text-white space-y-1 mb-4">
         <h4 class="font-extrabold text-base tracking-wide m-0">SECRETARIA DE SALUD</h4>
         <h5 class="font-bold text-sm tracking-wide m-0">REGIÓN SANITARIA METROPOLITANA DEL DISTRITO CENTRAL</h5>
-        <h6 class="font-semibold text-xs tracking-wider m-0">UNIDAD DE PLANEAMIENTO / ÁREA DE GESTIÓN DE LA INFORMACIÓN</h6>
+        <h6 class="font-semibold text-xs tracking-wider m-0">UNIDAD DE PLANEAMIENTO / ÁREA DE GESTIÓN DE LA INFORMACIÓN
+        </h6>
         <div class="inline-block border-b-2 border-slate-900 dark:border-white pb-0.5 px-4 mt-1">
-            <h5 class="font-black text-sm tracking-widest m-0">RENDIMIENTO MEDICO</h5>
+            <h5 class="font-black text-sm tracking-widest m-0">RENDIMIENTO MEDICO - INFORME OFICIAL DE OBSERVACIONES
+            </h5>
         </div>
     </div>
 
-    <!-- Fila 2: Datos de Establecimiento, Jornada, Mes, Año, Firma -->
-    <div class="flex items-center justify-between text-xs font-bold uppercase text-slate-800 dark:text-slate-200 border-b border-gray-300 dark:border-gray-700 pb-2 mb-3">
+    <!-- Fila 2: Datos de Establecimiento, Jornada/Servicio Social, Mes, Año, Firma -->
+    <div
+        class="flex items-center justify-between text-xs font-bold uppercase text-slate-800 dark:text-slate-200 border-b border-gray-300 dark:border-gray-700 pb-2 mb-3">
         <div>
             <span>ESTABLECIMIENTO DE SALUD:</span>
-            <span class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $settings['nombre_establecimiento'] ?? 'CENTRO DE SALUD' }}</span>
+            <span
+                class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $settings['nombre_establecimiento'] ?? 'CENTRO INTEGRAL DE SALUD SAN MIGUEL' }}</span>
         </div>
         <div>
-            <span>JORNADA:</span>
-            <span class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $jornada }}</span>
+            @if($jornada === 'SERVICIO SOCIAL')
+                <span class="font-black text-sm px-2 text-blue-700 dark:text-blue-400">MEDICOS EN SERVICIO SOCIAL</span>
+            @else
+                <span>JORNADA:</span>
+                <span
+                    class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $jornada }}</span>
+            @endif
         </div>
         <div>
             <span>MES:</span>
-            <span class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $mes }}</span>
+            <span
+                class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $mes }}</span>
         </div>
         <div>
             <span>AÑO:</span>
-            <span class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $ano }}</span>
+            <span
+                class="border-b border-black dark:border-white px-2 font-extrabold text-blue-700 dark:text-blue-400">{{ $ano }}</span>
         </div>
         <div class="text-right">
             <span class="text-[10px] text-gray-500 uppercase">FIRMA Y SELLO _______________________</span>
@@ -35,79 +46,69 @@
 </div>
 
 {{-- Tabla Oficial de Observaciones --}}
-<div class="table-responsive w-full">
-    <table class="table table-bordered text-xs text-left mb-0 w-full border-collapse border border-slate-300 dark:border-slate-700" style="width: 100%;">
-        <thead>
-            <tr class="bg-slate-800 dark:bg-slate-800 text-white font-bold uppercase text-center">
-                <th class="border border-slate-700 dark:border-slate-700 p-2 text-center" style="width: 45px;">N°</th>
-                <th class="border border-slate-700 dark:border-slate-700 p-2 text-left" style="width: 340px;">NOMBRE COMPLETO DEL MEDICO</th>
-                <th class="border border-slate-700 dark:border-slate-700 p-2 text-left">OBSERVACIONES</th>
-            </tr>
-        </thead>
-        <tbody>
+<table class="table table-bordered table-sm mb-0 w-full" id="consolidadoTable">
+    <thead>
+        <tr class="header-row-main">
+            <th class="sticky-col-1" style="width: 44px; min-width: 44px; text-align: center;">N°</th>
+            <th class="sticky-col-2 col-medico-name" style="width: 320px; min-width: 320px; text-align: left !important; padding-left: 14px !important;">NOMBRE COMPLETO DEL MEDICO</th>
+            <th style="text-align: left !important; padding-left: 14px !important;">OBSERVACIONES</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php
+            $rowsCount = count($data);
+            $minRows = max(25, $rowsCount);
+        @endphp
+        @foreach($data as $index => $row)
             @php
-                $rowsCount = count($data);
-                $minRows = max(25, $rowsCount);
+                $medico = $row['medico'];
+                $hsc = $row['hsc'];
+                $obsEstatica = trim($medico->observaciones ?? '');
+                $obsDinamica = $hsc ? trim($hsc->observaciones ?? '') : '';
+
+                // Texto combinado que se muestra
+                if ($obsEstatica && $obsDinamica) {
+                    $obsTexto = $obsEstatica . ' | ' . $obsDinamica;
+                } elseif ($obsEstatica) {
+                    $obsTexto = $obsEstatica;
+                } else {
+                    $obsTexto = $obsDinamica;
+                }
             @endphp
-            @foreach($data as $index => $row)
-                @php
-                    $medico = $row['medico'];
-                    $hsc = $row['hsc'];
-                    $obsEstatica = trim($medico->observaciones ?? '');
-                    $obsDinamica = $hsc ? trim($hsc->observaciones ?? '') : '';
-                    // Texto combinado que se muestra en el input
-                    if ($obsEstatica && $obsDinamica) {
-                        $obsTexto = $obsEstatica . ' | ' . $obsDinamica;
-                    } elseif ($obsEstatica) {
-                        $obsTexto = $obsEstatica;
-                    } else {
-                        $obsTexto = $obsDinamica;
-                    }
-                @endphp
-                <tr class="hover:bg-blue-50/50 dark:hover:bg-slate-800/60 transition-all border-b border-slate-200 dark:border-slate-800">
-                    <td class="border border-slate-300 dark:border-slate-700 p-2 text-center font-bold text-slate-700 dark:text-slate-300">{{ $index + 1 }}</td>
-                    <td class="border border-slate-300 dark:border-slate-700 p-2 text-left font-bold uppercase text-slate-900 dark:text-white">
-                        {{ $medico->NOM_MED }}
-                    </td>
-                    <td class="border border-slate-300 dark:border-slate-700 p-1 text-left">
-                        {{-- Input editable y botón de modal detallado --}}
-                        <div class="flex items-center gap-1.5 no-print">
-                            <input type="text"
-                                   id="obs_input_{{ $medico->id }}"
-                                   class="w-full bg-transparent border-0 focus:ring-1 focus:ring-blue-400 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400"
-                                   value="{{ $obsTexto }}"
-                                   placeholder="Escriba observaciones para este médico..."
-                                   data-static="{{ $obsEstatica }}"
-                                   onchange="guardarObservacionConsolidado({{ $medico->id }}, this.value, this.dataset.static, this)">
-                            <button type="button" 
-                                    class="p-1 px-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-blue-600 transition-colors shrink-0" 
-                                    onclick="abrirModalObservacion({{ $medico->id }}, '{{ addslashes($medico->NOM_MED) }}', '{{ addslashes($obsEstatica) }}', '{{ addslashes($obsDinamica) }}')" 
-                                    title="Editar detalle de observación">
-                                <i class="fas fa-edit text-[11px]"></i>
-                            </button>
-                        </div>
-                        <span class="hidden print:inline font-medium text-slate-800">{{ $obsTexto }}</span>
-                    </td>
-                </tr>
-            @endforeach
+            <tr class="medico-obs-row" data-name="{{ strtoupper($medico->NOM_MED) }}"
+                ondblclick="abrirModalObservacion({{ $medico->id }}, '{{ addslashes($medico->NOM_MED) }}', '{{ addslashes($obsEstatica) }}', '{{ addslashes($obsDinamica) }}')">
+                <td class="sticky-col-1 text-center font-bold" style="width: 44px; color: var(--text-muted); font-size: 0.82rem;">
+                    {{ $index + 1 }}</td>
+                <td class="sticky-col-2 col-medico-name font-bold"
+                    style="text-align: left !important; padding-left: 14px !important; color: var(--text-primary); font-size: 0.84rem; text-transform: uppercase;">
+                    {{ $medico->NOM_MED }}
+                </td>
+                <td class="text-left" style="text-align: left !important; padding: 2px 8px !important;">
+                    {{-- Input de texto plano editable y botón de modal detallado --}}
+                    <div class="flex items-center gap-1.5 no-print">
+                        <input type="text" id="obs_input_{{ $medico->id }}" class="obs-plain-input" value="{{ $obsTexto }}"
+                            placeholder="Escriba observaciones para este médico..." data-static="{{ $obsEstatica }}"
+                            title="Haga clic para escribir texto de la observación (guardado automático)"
+                            onchange="guardarObservacionConsolidado({{ $medico->id }}, this.value, this.dataset.static, this)">
+                        <button type="button" class="btn-obs-edit"
+                            onclick="abrirModalObservacion({{ $medico->id }}, '{{ addslashes($medico->NOM_MED) }}', '{{ addslashes($obsEstatica) }}', '{{ addslashes($obsDinamica) }}')"
+                            title="Editar en ventana emergente / sugerencias rápidas">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </div>
+                    <span class="hidden print:inline font-bold text-black"
+                        style="font-size: 0.84rem; text-transform: uppercase;">{{ $obsTexto }}</span>
+                </td>
+            </tr>
+        @endforeach
 
-            @for($i = $rowsCount + 1; $i <= $minRows; $i++)
-                <tr class="border-b border-slate-200 dark:border-slate-800">
-                    <td class="border border-slate-300 dark:border-slate-700 p-2 text-center font-bold text-slate-400 dark:text-slate-600">{{ $i }}</td>
-                    <td class="border border-slate-300 dark:border-slate-700 p-2 text-left">&nbsp;</td>
-                    <td class="border border-slate-300 dark:border-slate-700 p-2 text-left">&nbsp;</td>
-                </tr>
-            @endfor
-        </tbody>
-    </table>
-</div>
-
-{{-- Pie de Página Oficial (Notas Explicativas del Formato) --}}
-<div class="mt-4 pt-2 text-[10px] leading-relaxed font-bold text-slate-800 dark:text-slate-300 border-t border-slate-300 dark:border-slate-700 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-    <div>*** ESTE INFORME DEBE COINCIDIR CON EL TOTAL DE ATENCIONES DEL AT2R.</div>
-    <div>*** COLOCAR EL PERSONAL QUE ESTE DE VACACIONES O INCAPACITADO (DE LO CONTRARIO SE REPORTARA COMO FALTANTE).</div>
-    <div>*** EL ORDEN DE LOS MEDICOS DEBE SER IGUAL AL DE LOS MESES ANTERIORES.</div>
-    <div>*** COLOCAR FECHA DE INICIO Y DE FINAL DE CADA MEDICO EN SERVICIO SOCIAL.</div>
-    <div>*** EN LA PRIMERA CASILLA COLOCAR SIEMPRE EL NOMBRE COMPLETO DEL DIRECTOR DEL ESTABLECIMIENTO DE SALUD.</div>
-    <div>*** LLENAR UNA HOJA POR JORNADA (MATUTINA, VESPERTINA, FIN DE SEMANA Y SERVICIO SOCIAL).</div>
-</div>
+        @for($i = $rowsCount + 1; $i <= $minRows; $i++)
+            <tr class="empty-row">
+                <td class="sticky-col-1 text-center font-bold" style="color: var(--text-muted); opacity: 0.6; font-size: 0.82rem;">
+                    {{ $i }}</td>
+                <td class="sticky-col-2 col-medico-name" style="text-align: left !important;">&nbsp;</td>
+                <td style="text-align: left !important;">&nbsp;</td>
+            </tr>
+        @endfor
+    </tbody>
+</table>

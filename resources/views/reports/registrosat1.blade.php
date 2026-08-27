@@ -807,7 +807,7 @@
           <!-- Columna Indicadora de Fila (Excel Row Index) -->
           <th class="th-row-num"></th>
 
-          <!-- Columnas Principales idénticas a la imagen -->
+          <!-- Columnas en el orden exacto solicitado -->
           <th data-col="1" data-title="Nº" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">Nº</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
@@ -829,32 +829,32 @@
           <th data-col="7" data-title="EXP" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">EXP</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="8" data-title="SEXO" data-type="text">
-            <div class="excel-th-content"><span class="excel-th-title">SEXO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
-          </th>
-          <th data-col="9" data-title="EDAD" data-type="text">
-            <div class="excel-th-content"><span class="excel-th-title">EDAD</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
-          </th>
-          <th data-col="10" data-title="RANGO" data-type="text">
-            <div class="excel-th-content"><span class="excel-th-title">RANGO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
-          </th>
-          <th data-col="11" data-title="PACIENTE" data-type="text" class="col-paciente">
+          <th data-col="8" data-title="PACIENTE" data-type="text" class="col-paciente">
             <div class="excel-th-content"><span class="excel-th-title">PACIENTE</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="12" data-title="IDENTIDAD" data-type="text">
+          <th data-col="9" data-title="IDENTIDAD" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">IDENTIDAD</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="13" data-title="TELÉFONO" data-type="text">
+          <th data-col="10" data-title="TELÉFONO" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">TELÉFONO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="14" data-title="F. NACIMIENTO" data-type="text">
+          <th data-col="11" data-title="F. NACIMIENTO" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">F. NACIMIENTO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="15" data-title="ETNIA" data-type="text">
+          <th data-col="12" data-title="ETNIA" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">ETNIA</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="16" data-title="TIPO" data-type="text">
+          <th data-col="13" data-title="SEXO" data-type="text">
+            <div class="excel-th-content"><span class="excel-th-title">SEXO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
+          </th>
+          <th data-col="14" data-title="EDAD" data-type="text">
+            <div class="excel-th-content"><span class="excel-th-title">EDAD</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
+          </th>
+          <th data-col="15" data-title="TIPO" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">TIPO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
+          </th>
+          <th data-col="16" data-title="RANGO" data-type="text">
+            <div class="excel-th-content"><span class="excel-th-title">RANGO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
           <th data-col="17" data-title="CONDICIÓN" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">CONDICIÓN</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
@@ -874,62 +874,62 @@
           <th data-col="22" data-title="COND 1" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 1</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="23" data-title="COD 2" data-type="text" class="col-cod">
+          <th data-col="23" data-title="DG" data-type="text">
+            <div class="excel-th-content"><span class="excel-th-title">DG</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
+          </th>
+          <th data-col="24" data-title="COD 2" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 2</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="24" data-title="DIAGNÓSTICO 2" data-type="text" class="col-diag">
+          <th data-col="25" data-title="DIAGNÓSTICO 2" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 2</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="25" data-title="COND 2" data-type="text" class="col-cond">
+          <th data-col="26" data-title="COND 2" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 2</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="26" data-title="COD 3" data-type="text" class="col-cod">
+          <th data-col="27" data-title="COD 3" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 3</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="27" data-title="DIAGNÓSTICO 3" data-type="text" class="col-diag">
+          <th data-col="28" data-title="DIAGNÓSTICO 3" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 3</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="28" data-title="COND 3" data-type="text" class="col-cond">
+          <th data-col="29" data-title="COND 3" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 3</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="29" data-title="COD 4" data-type="text" class="col-cod">
+          <th data-col="30" data-title="COD 4" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 4</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="30" data-title="DIAGNÓSTICO 4" data-type="text" class="col-diag">
+          <th data-col="31" data-title="DIAGNÓSTICO 4" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 4</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="31" data-title="COND 4" data-type="text" class="col-cond">
+          <th data-col="32" data-title="COND 4" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 4</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="32" data-title="COD 5" data-type="text" class="col-cod">
+          <th data-col="33" data-title="COD 5" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 5</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="33" data-title="DIAGNÓSTICO 5" data-type="text" class="col-diag">
+          <th data-col="34" data-title="DIAGNÓSTICO 5" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 5</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="34" data-title="COND 5" data-type="text" class="col-cond">
+          <th data-col="35" data-title="COND 5" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 5</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="35" data-title="COD 6" data-type="text" class="col-cod">
+          <th data-col="36" data-title="COD 6" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 6</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="36" data-title="DIAGNÓSTICO 6" data-type="text" class="col-diag">
+          <th data-col="37" data-title="DIAGNÓSTICO 6" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 6</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="37" data-title="COND 6" data-type="text" class="col-cond">
+          <th data-col="38" data-title="COND 6" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 6</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="38" data-title="COD 7" data-type="text" class="col-cod">
+          <th data-col="39" data-title="COD 7" data-type="text" class="col-cod">
             <div class="excel-th-content"><span class="excel-th-title">COD 7</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="39" data-title="DIAGNÓSTICO 7" data-type="text" class="col-diag">
+          <th data-col="40" data-title="DIAGNÓSTICO 7" data-type="text" class="col-diag">
             <div class="excel-th-content"><span class="excel-th-title">DIAGNÓSTICO 7</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="40" data-title="COND 7" data-type="text" class="col-cond">
+          <th data-col="41" data-title="COND 7" data-type="text" class="col-cond">
             <div class="excel-th-content"><span class="excel-th-title">COND 7</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
-          </th>
-          <th data-col="41" data-title="SG" data-type="text">
-            <div class="excel-th-content"><span class="excel-th-title">SG</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
           <th data-col="42" data-title="REFERIDO A" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">REFERIDO A</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
@@ -946,16 +946,13 @@
           <th data-col="46" data-title="SM" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">SM</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="47" data-title="SG2" data-type="text">
-            <div class="excel-th-content"><span class="excel-th-title">SG2</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
-          </th>
-          <th data-col="48" data-title="AÑO" data-type="text">
+          <th data-col="47" data-title="AÑO" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">AÑO</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="49" data-title="MES" data-type="text">
+          <th data-col="48" data-title="MES" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">MES</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
-          <th data-col="50" data-title="ID" data-type="text">
+          <th data-col="49" data-title="ID" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">ID</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
         </tr>
@@ -1132,56 +1129,55 @@
           const sexo = r.sexo ? (r.sexo.charAt(0).toUpperCase() || r.sexo) : '';
           const cells = [
             String(index + 1), // 0: Índice
-            String(r.numero ?? ''),
-            String(r.cm ?? ''),
-            String(r.medico ?? ''),
-            String(r.prof ?? ''),
-            String(r.fecha ?? ''),
-            String(r.se ?? ''),
-            String(r.exp ?? ''),
-            String(sexo ?? ''),
-            String(r.edad ?? ''),
-            String(r.rango ?? ''),
-            String(r.nombre_paciente ?? ''),
-            String(r.identidad ?? ''),
-            String(r.telefono ?? ''),
-            String(r.fecha_nacimiento ?? ''),
-            String(r.etnia ?? ''),
-            String(r.tipo ?? ''),
-            String(r.cond ?? ''),
-            String(r.cod_col ?? ''),
-            String(r.colonia ?? ''),
-            String(r.cod_1 ?? ''),
-            String(r.diagnostico_1 ?? ''),
-            String(r.cond_1 ?? ''),
-            String(r.cod_2 ?? ''),
-            String(r.diagnostico_2 ?? ''),
-            String(r.cond_2 ?? ''),
-            String(r.cod_3 ?? ''),
-            String(r.diagnostico_3 ?? ''),
-            String(r.cond_3 ?? ''),
-            String(r.cod_4 ?? ''),
-            String(r.diagnostico_4 ?? ''),
-            String(r.cond_4 ?? ''),
-            String(r.cod_5 ?? ''),
-            String(r.diagnostico_5 ?? ''),
-            String(r.cond_5 ?? ''),
-            String(r.cod_6 ?? ''),
-            String(r.diagnostico_6 ?? ''),
-            String(r.cond_6 ?? ''),
-            String(r.cod_7 ?? ''),
-            String(r.diagnostico_7 ?? ''),
-            String(r.cond_7 ?? ''),
-            String(r.sg ?? ''),
-            String(r.referido_a ?? ''),
-            String(r.referido_de ?? ''),
-            String(r.pg_emb ?? ''),
-            String(r.jornada ?? ''),
-            String(r.sm ?? ''),
-            String(r.sg2 ?? ''),
-            String(r.ano ?? ''),
-            String(r.mes ?? ''),
-            String(r.id ?? '')
+            String(r.numero ?? ''), // 1: Nº
+            String(r.cm ?? ''), // 2: CM
+            String(r.medico ?? ''), // 3: MEDICO
+            String(r.prof ?? ''), // 4: PROF
+            String(r.fecha ?? ''), // 5: FECHA
+            String(r.se ?? ''), // 6: SE
+            String(r.exp ?? ''), // 7: EXP
+            String(r.nombre_paciente ?? ''), // 8: PACIENTE
+            String(r.identidad ?? ''), // 9: IDENTIDAD
+            String(r.telefono ?? ''), // 10: TELÉFONO
+            String(r.fecha_nacimiento ?? ''), // 11: F. NACIMIENTO
+            String(r.etnia ?? ''), // 12: ETNIA
+            String(sexo ?? ''), // 13: SEXO
+            String(r.edad ?? ''), // 14: EDAD
+            String(r.tipo ?? ''), // 15: TIPO
+            String(r.rango ?? ''), // 16: RANGO
+            String(r.cond ?? ''), // 17: CONDICIÓN
+            String(r.cod_col ?? ''), // 18: COD. COL
+            String(r.colonia ?? ''), // 19: COLONIA
+            String(r.cod_1 ?? r.cod ?? ''), // 20: COD 1
+            String(r.diagnostico_1 ?? r.diagnostico ?? ''), // 21: DIAGNÓSTICO 1
+            String(r.cond_1 ?? ''), // 22: COND 1
+            String(r.sg ?? r.dg ?? ''), // 23: DG
+            String(r.cod_2 ?? ''), // 24: COD 2
+            String(r.diagnostico_2 ?? ''), // 25: DIAGNÓSTICO 2
+            String(r.cond_2 ?? ''), // 26: COND 2
+            String(r.cod_3 ?? ''), // 27: COD 3
+            String(r.diagnostico_3 ?? ''), // 28: DIAGNÓSTICO 3
+            String(r.cond_3 ?? ''), // 29: COND 3
+            String(r.cod_4 ?? ''), // 30: COD 4
+            String(r.diagnostico_4 ?? ''), // 31: DIAGNÓSTICO 4
+            String(r.cond_4 ?? ''), // 32: COND 4
+            String(r.cod_5 ?? ''), // 33: COD 5
+            String(r.diagnostico_5 ?? ''), // 34: DIAGNÓSTICO 5
+            String(r.cond_5 ?? ''), // 35: COND 5
+            String(r.cod_6 ?? ''), // 36: COD 6
+            String(r.diagnostico_6 ?? ''), // 37: DIAGNÓSTICO 6
+            String(r.cond_6 ?? ''), // 38: COND 6
+            String(r.cod_7 ?? ''), // 39: COD 7
+            String(r.diagnostico_7 ?? ''), // 40: DIAGNÓSTICO 7
+            String(r.cond_7 ?? ''), // 41: COND 7
+            String(r.referido_a ?? ''), // 42: REFERIDO A
+            String(r.referido_de ?? ''), // 43: REFERIDO DE
+            String(r.pg_emb ?? ''), // 44: PG / EMB
+            String(r.jornada ?? ''), // 45: JORNADA
+            String(r.sm ?? ''), // 46: SM
+            String(r.ano ?? ''), // 47: AÑO
+            String(r.mes ?? ''), // 48: MES
+            String(r.id ?? '') // 49: ID
           ];
 
           return {
@@ -1235,40 +1231,40 @@
           `<td>${escHtml(c[5])}</td>` +
           `<td>${escHtml(c[6])}</td>` +
           `<td>${escHtml(c[7])}</td>` +
-          `<td>${escHtml(c[8])}</td>` +
+          `<td class="col-paciente" title="${escHtml(c[8])}">${escHtml(c[8])}</td>` +
           `<td>${escHtml(c[9])}</td>` +
           `<td>${escHtml(c[10])}</td>` +
-          `<td class="col-paciente" title="${escHtml(c[11])}">${escHtml(c[11])}</td>` +
+          `<td>${escHtml(c[11])}</td>` +
           `<td>${escHtml(c[12])}</td>` +
           `<td>${escHtml(c[13])}</td>` +
           `<td>${escHtml(c[14])}</td>` +
           `<td>${escHtml(c[15])}</td>` +
           `<td>${escHtml(c[16])}</td>` +
-          `<td>${escHtml(c[17])}</td>` +
+          `<td class="col-cond">${escHtml(c[17])}</td>` +
           `<td>${escHtml(c[18])}</td>` +
           `<td>${escHtml(c[19])}</td>` +
           `<td class="col-cod">${escHtml(c[20])}</td>` +
           `<td class="col-diag" title="${escHtml(c[21])}">${escHtml(c[21])}</td>` +
           `<td class="col-cond">${escHtml(c[22])}</td>` +
-          `<td class="col-cod">${escHtml(c[23])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[24])}">${escHtml(c[24])}</td>` +
-          `<td class="col-cond">${escHtml(c[25])}</td>` +
-          `<td class="col-cod">${escHtml(c[26])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[27])}">${escHtml(c[27])}</td>` +
-          `<td class="col-cond">${escHtml(c[28])}</td>` +
-          `<td class="col-cod">${escHtml(c[29])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[30])}">${escHtml(c[30])}</td>` +
-          `<td class="col-cond">${escHtml(c[31])}</td>` +
-          `<td class="col-cod">${escHtml(c[32])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[33])}">${escHtml(c[33])}</td>` +
-          `<td class="col-cond">${escHtml(c[34])}</td>` +
-          `<td class="col-cod">${escHtml(c[35])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[36])}">${escHtml(c[36])}</td>` +
-          `<td class="col-cond">${escHtml(c[37])}</td>` +
-          `<td class="col-cod">${escHtml(c[38])}</td>` +
-          `<td class="col-diag" title="${escHtml(c[39])}">${escHtml(c[39])}</td>` +
-          `<td class="col-cond">${escHtml(c[40])}</td>` +
-          `<td>${escHtml(c[41])}</td>` +
+          `<td>${escHtml(c[23])}</td>` +
+          `<td class="col-cod">${escHtml(c[24])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[25])}">${escHtml(c[25])}</td>` +
+          `<td class="col-cond">${escHtml(c[26])}</td>` +
+          `<td class="col-cod">${escHtml(c[27])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[28])}">${escHtml(c[28])}</td>` +
+          `<td class="col-cond">${escHtml(c[29])}</td>` +
+          `<td class="col-cod">${escHtml(c[30])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[31])}">${escHtml(c[31])}</td>` +
+          `<td class="col-cond">${escHtml(c[32])}</td>` +
+          `<td class="col-cod">${escHtml(c[33])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[34])}">${escHtml(c[34])}</td>` +
+          `<td class="col-cond">${escHtml(c[35])}</td>` +
+          `<td class="col-cod">${escHtml(c[36])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[37])}">${escHtml(c[37])}</td>` +
+          `<td class="col-cond">${escHtml(c[38])}</td>` +
+          `<td class="col-cod">${escHtml(c[39])}</td>` +
+          `<td class="col-diag" title="${escHtml(c[40])}">${escHtml(c[40])}</td>` +
+          `<td class="col-cond">${escHtml(c[41])}</td>` +
           `<td>${escHtml(c[42])}</td>` +
           `<td>${escHtml(c[43])}</td>` +
           `<td>${escHtml(c[44])}</td>` +
@@ -1277,7 +1273,6 @@
           `<td>${escHtml(c[47])}</td>` +
           `<td>${escHtml(c[48])}</td>` +
           `<td>${escHtml(c[49])}</td>` +
-          `<td>${escHtml(c[50])}</td>` +
         `</tr>`;
       }
 
@@ -1835,7 +1830,7 @@
         if (this.filteredRecords.length === 0) {
           this.tbody.innerHTML = `
             <tr class="excel-no-records-row">
-              <td colspan="51" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+              <td colspan="50" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
                 <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 0.45rem; opacity: 0.6;"></i>
                 <strong>No se encontraron registros que coincidan con los filtros</strong>
                 <div style="font-size: 0.78rem; margin-top: 0.25rem;">Prueba ajustando los filtros de columna o limpiando la búsqueda.</div>

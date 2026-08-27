@@ -230,7 +230,8 @@ class HoraMedicoController extends Controller
             $monthlyDirectorId = Setting::where('key', 'director_medico_id')->value('value');
         }
 
-        if (($monthlyDirectorId && (int)$medico->id === (int)$monthlyDirectorId) || !empty($medico->es_director)) {
+        // 1. Director siempre primero
+        if (!empty($medico->es_director) || ($monthlyDirectorId && (int)$medico->id === (int)$monthlyDirectorId)) {
             return 1;
         }
 
@@ -240,10 +241,12 @@ class HoraMedicoController extends Controller
         $nombre       = strtoupper($medico->NOM_MED ?? '');
         $obs          = strtoupper($medico->observaciones ?? '');
 
+        // 4. Temporales y ONGs (UNITEC, Médicos Sin Fronteras, etc.) siempre al final
         $isONG = (!empty($medico->es_ong)
             || str_contains($modalidad, 'ONG')
             || str_contains($nomina, 'ONG')
             || str_contains($modalidad, 'TEMPORAL')
+            || str_contains($nomina, 'TEMPORAL')
             || str_contains($nombre, 'MEDICOS SIN FRONTERAS')
             || str_contains($nombre, 'UNITEC')
             || str_contains($nombre, 'TEMPORAL')
@@ -256,36 +259,27 @@ class HoraMedicoController extends Controller
             return 99;
         }
 
-        $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL'));
+        $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL') || str_starts_with($nombre, 'MSS.'));
         if ($isSS) {
             return 10;
         }
 
-        $isEspecialista = ($especialidad !== '' && $especialidad !== 'MEDICO GENERAL' && $especialidad !== 'MÉDICO GENERAL');
+        // 2. Especialistas van después del director
+        $isEspecialista = ($nomina === 'ESPECIALISTA' || ($especialidad !== '' && $especialidad !== 'MEDICO GENERAL' && $especialidad !== 'MÉDICO GENERAL'));
         if ($isEspecialista) {
             return 2;
         }
 
-        $isAcuerdo = (str_contains($nomina, 'ACUERDO') || str_contains($modalidad, 'ACUERDO') || str_contains($nomina, 'PERMANENTE') || str_contains($modalidad, 'PERMANENTE'));
-        if ($isAcuerdo) {
-            return 3;
-        }
-
-        $isContrato = (str_contains($nomina, 'CONTRATO') || str_contains($modalidad, 'CONTRATO'));
-        if ($isContrato) {
-            return 4;
-        }
-
-        return 5;
+        // 3. Médicos Generales
+        return 3;
     }
 
     private function getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS = false)
     {
         $mesVariants = array_unique(array_filter([
             strtoupper($mesNombre),
-            strtolower($mesNombre),
             ucfirst(strtolower($mesNombre)),
-            $mesNombre
+            strtolower($mesNombre)
         ]));
 
         // 🚀 Optimización de Rendimiento Extrema: Uso del índice compuesto (ano, mes) de MySQL
@@ -294,25 +288,45 @@ class HoraMedicoController extends Controller
             ->get()
             ->keyBy('medico_id');
 
-        $atencionesCounts = RegistroGlobal::where('ano', $ano)
+        // Base RG query for this month (and jornada if applicable)
+        $rgBaseQuery = RegistroGlobal::where('ano', $ano)
             ->whereIn('mes', $mesVariants)
-            ->selectRaw('TRIM(medico) as m_name, COUNT(*) as total')
-            ->groupBy(DB::raw('TRIM(medico)'))
-            ->pluck('total', 'm_name')
+            ->whereNotNull('medico')
+            ->where('medico', '!=', '');
+
+        // For specific jornada (not totals), also filter RG by jornada
+        $rgJornadaQuery = (clone $rgBaseQuery);
+        if ($jornada !== 'TOTAL JORNADAS' && $jornada !== 'TODAS LAS JORNADAS' && $jornada !== 'TODAS' && $jornada !== 'SERVICIO SOCIAL' && !$onlySS) {
+            $rgJornadaQuery->where('jornada', $jornada);
+        }
+
+        // Get atenciones counts (by medico name) for this jornada
+        $atencionesCounts = (clone $rgJornadaQuery)
+            ->select('medico', DB::raw('count(*) as total'))
+            ->groupBy('medico')
+            ->pluck('total', 'medico')
             ->toArray();
 
-        $medicosConRegistros = array_keys($atencionesCounts);
-        $medicosConHSC = $allHSC->keys()->toArray();
+        // Get atenciones counts by cm (código médico) for this jornada
+        $atencionesByCm = (clone $rgJornadaQuery)
+            ->whereNotNull('cm')
+            ->where('cm', '!=', '')
+            ->select('cm', DB::raw('count(*) as total'))
+            ->groupBy('cm')
+            ->pluck('total', 'cm')
+            ->toArray();
 
+        $medicosConRegistrosNombres = array_keys($atencionesCounts);
+        $medicosConRegistrosCm     = array_keys($atencionesByCm);
+        $medicosConHSC             = $allHSC->keys()->toArray();
+
+        // Build the main medico query: include anyone who has records in RG (by name OR by cm code) OR is in HSC
         $query = Medico::where('estado', 'activo')
-            ->where(function ($q) use ($medicosConRegistros, $medicosConHSC) {
+            ->where(function ($q) use ($medicosConRegistrosNombres, $medicosConRegistrosCm, $medicosConHSC) {
                 $q->whereIn('id', $medicosConHSC)
-                  ->orWhereIn('NOM_MED', $medicosConRegistros);
+                  ->orWhereIn('COD_MED', $medicosConRegistrosCm)
+                  ->orWhereIn('NOM_MED', $medicosConRegistrosNombres);
             });
-
-        if ($jornada !== 'TOTAL JORNADAS' && $jornada !== 'TODAS LAS JORNADAS' && $jornada !== 'TODAS') {
-            $query->where('JORNADA', $jornada);
-        }
 
         if ($onlySS) {
             $query->where(function($q) {
@@ -343,12 +357,18 @@ class HoraMedicoController extends Controller
 
         $medicos = $query->get();
 
+
         $data = [];
 
         foreach ($medicos as $medico) {
             $hsc = $allHSC->get($medico->id);
             $trimmedName = trim($medico->NOM_MED);
-            $atenciones = $atencionesCounts[$trimmedName] ?? ($atencionesCounts[$medico->NOM_MED] ?? 0);
+            // Lookup atenciones: first by cm code, then by name (with/without trim)
+            $atenciones = $atencionesByCm[$medico->COD_MED]
+                ?? $atencionesByCm[(string)$medico->id]
+                ?? $atencionesCounts[$trimmedName]
+                ?? $atencionesCounts[$medico->NOM_MED]
+                ?? 0;
 
             // Detectar si es ONG
             $nomina    = strtoupper($medico->NOMINA ?? '');
@@ -358,9 +378,15 @@ class HoraMedicoController extends Controller
             $isONG = (!empty($medico->es_ong)
                 || str_contains($modalidad, 'ONG')
                 || str_contains($nomina, 'ONG')
+                || str_contains($modalidad, 'TEMPORAL')
+                || str_contains($nomina, 'TEMPORAL')
                 || str_contains($nombre, 'MEDICOS SIN FRONTERAS')
+                || str_contains($nombre, 'UNITEC')
+                || str_contains($nombre, 'TEMPORAL')
                 || str_contains($nombre, 'ONG')
-                || str_contains($obs, 'MEDICOS SIN FRONTERAS'));
+                || str_contains($obs, 'MEDICOS SIN FRONTERAS')
+                || str_contains($obs, 'UNITEC')
+                || str_contains($obs, 'TEMPORAL'));
 
             // 1. Horas por Día (Manejo de Jornada Semanal vs Diaria)
             $rawHrs = $medico->HORAS_CONTRATADAS ?: 0;
@@ -440,71 +466,33 @@ class HoraMedicoController extends Controller
             ->pluck('posicion', 'medico_id')
             ->toArray();
 
-        if (empty($posicionesExistentes)) {
-            usort($data, function ($a, $b) use ($ano, $mesNombre) {
-                $pA = $this->getDoctorPriority($a['medico'], $ano, $mesNombre);
-                $pB = $this->getDoctorPriority($b['medico'], $ano, $mesNombre);
+        usort($data, function ($a, $b) use ($ano, $mesNombre, $posicionesExistentes) {
+            $pA = $this->getDoctorPriority($a['medico'], $ano, $mesNombre);
+            $pB = $this->getDoctorPriority($b['medico'], $ano, $mesNombre);
 
-                if ($pA === $pB) {
-                    return strcmp($a['medico']->NOM_MED, $b['medico']->NOM_MED);
-                }
+            if ($pA !== $pB) {
                 return $pA <=> $pB;
-            });
-
-            // Guardar el snapshot histórico inicial en la BD en lote
-            $pos = 1;
-            $bulkPos = [];
-            $now = Carbon::now();
-            foreach ($data as &$item) {
-                $item['posicion'] = $pos;
-                $bulkPos[] = [
-                    'ano' => $ano,
-                    'mes' => $mesNombre,
-                    'jornada' => $jornada,
-                    'medico_id' => $item['medico']->id,
-                    'posicion' => $pos,
-                    'created_at' => $now,
-                    'updated_at' => $now
-                ];
-                $pos++;
-            }
-            unset($item);
-            if (!empty($bulkPos)) {
-                HoraMedicoPosicion::insert($bulkPos);
-            }
-        } else {
-            // Ya existe un snapshot histórico guardado para este mes/jornada:
-            $maxPos = !empty($posicionesExistentes) ? max($posicionesExistentes) : 0;
-            $bulkNew = [];
-            $now = Carbon::now();
-
-            foreach ($data as &$item) {
-                $mId = $item['medico']->id;
-                if (isset($posicionesExistentes[$mId])) {
-                    $item['posicion'] = (int)$posicionesExistentes[$mId];
-                } else {
-                    $maxPos++;
-                    $item['posicion'] = $maxPos;
-                    $bulkNew[] = [
-                        'ano' => $ano,
-                        'mes' => $mesNombre,
-                        'jornada' => $jornada,
-                        'medico_id' => $mId,
-                        'posicion' => $maxPos,
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ];
-                }
-            }
-            unset($item);
-            if (!empty($bulkNew)) {
-                HoraMedicoPosicion::insert($bulkNew);
             }
 
-            usort($data, function ($a, $b) {
-                return $a['posicion'] <=> $b['posicion'];
-            });
+            // Dentro del mismo grupo de prioridad, si hay posiciones históricas guardadas, respetarlas
+            $posA = $posicionesExistentes[$a['medico']->id] ?? null;
+            $posB = $posicionesExistentes[$b['medico']->id] ?? null;
+
+            if ($posA !== null && $posB !== null && $posA !== $posB) {
+                return $posA <=> $posB;
+            }
+            if ($posA !== null && $posB === null) return -1;
+            if ($posA === null && $posB !== null) return 1;
+
+            return strcmp($a['medico']->NOM_MED, $b['medico']->NOM_MED);
+        });
+
+        // Actualizar la secuencia de posiciones numeradas
+        $pos = 1;
+        foreach ($data as &$item) {
+            $item['posicion'] = $pos++;
         }
+        unset($item);
 
         return $data;
     }
@@ -568,8 +556,41 @@ class HoraMedicoController extends Controller
     public function agregarMedicoHSC(Request $request)
     {
         try {
-            $hsc = HoraSinConsulta::firstOrCreate(['medico_id' => $request->medico_id, 'ano' => $request->ano, 'mes' => $request->mes], ['total_horas' => 0]);
-            return response()->json(['success' => true]);
+            $request->validate([
+                'medico_id' => 'required',
+                'ano' => 'required',
+                'mes' => 'required'
+            ]);
+
+            $medicoId = $request->input('medico_id');
+            $ano = $request->input('ano');
+            $mes = strtoupper($request->input('mes'));
+
+            $medico = Medico::find($medicoId);
+            if (!$medico) {
+                return response()->json(['success' => false, 'error' => 'Médico no encontrado'], 404);
+            }
+
+            $hsc = HoraSinConsulta::firstOrCreate(
+                [
+                    'medico_id' => $medicoId,
+                    'ano' => $ano,
+                    'mes' => $mes
+                ],
+                [
+                    'dias_contratados' => 0,
+                    'total_horas_oficiales' => 0,
+                    'total_vacaciones' => 0,
+                    'total_horas_personales' => 0,
+                    'total_horas' => 0
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Médico incluido exitosamente en el reporte',
+                'hsc' => $hsc
+            ]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
@@ -711,7 +732,8 @@ class HoraMedicoController extends Controller
         }
 
         $onlySS = ($jornada === 'SERVICIO SOCIAL' || request()->routeIs('informes.hora-medico.servicio-social'));
-        $data = $this->getJornadaData($ano, $mes, $jornada, null, $diasLaborables, $diasFinSemana, $onlySS);
+        $nombreBusqueda = $request->input('nombre', $request->input('search', null));
+        $data = $this->getJornadaData($ano, $mes, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mes}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
 
@@ -743,7 +765,8 @@ class HoraMedicoController extends Controller
         }
 
         $onlySS = ($jornada === 'SERVICIO SOCIAL' || request()->routeIs('informes.hora-medico.servicio-social'));
-        $data = $this->getJornadaData($ano, $mes, $jornada, null, $diasLaborables, $diasFinSemana, $onlySS);
+        $nombreBusqueda = $request->input('nombre', $request->input('search', null));
+        $data = $this->getJornadaData($ano, $mes, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
 
         $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano')->toArray();
         if (empty($anos)) {
@@ -752,7 +775,18 @@ class HoraMedicoController extends Controller
         $meses = array_keys($this->mesMap);
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mes}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
-        $todosLosMedicos = $this->applyExclusionMedicos(Medico::where('estado', 'activo'))->orderBy('NOM_MED')->get();
+        if ($onlySS) {
+            $todosLosMedicos = $this->applyExclusionMedicos(
+                Medico::where('estado', 'activo')->where(function($q) {
+                    $q->where('NOMINA', 'LIKE', '%SOCIAL%')
+                      ->orWhere('MODALIDAD', 'LIKE', '%SOCIAL%')
+                      ->orWhere('ESPECIALIDAD', 'LIKE', '%SOCIAL%')
+                      ->orWhere('NOM_MED', 'LIKE', 'MSS.%');
+                })
+            )->orderBy('NOM_MED')->get();
+        } else {
+            $todosLosMedicos = $this->applyExclusionMedicos(Medico::where('estado', 'activo'))->orderBy('NOM_MED')->get();
+        }
         $mesNombre = $mes;
 
         return view($request->ajax() ? 'informes.hora_medico_consolidado_table' : 'informes.hora_medico_consolidado', compact('data', 'ano', 'mes', 'mesNombre', 'jornada', 'meses', 'anos', 'settings', 'currentDirectorId', 'todosLosMedicos'));

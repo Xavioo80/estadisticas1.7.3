@@ -81,168 +81,126 @@
         }
     @endphp
 
-    <div class="py-2">
-        <div class="max-w-full mx-auto sm:px-2 lg:px-4">
-            <div ng-app="TablaDetalles" ng-cloak ng-controller="TablaDetallesCtrl" id="ingresosApp">
-                <div class="page-fade-in">
-                    <div class="content-header p-0 mb-2 pt-2">
-                    <div class="container-fluid">
-                        <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
-                            <h1 class="mr-3 text-dark mb-0" style="font-size: 1.4rem; font-weight: 700;">
-                                Detalles: {{ \Carbon\Carbon::parse($fecha)->format('d-m-Y') }}
-                            </h1>
-                            <div class="compact-stat-card">
-                                <div class="d-flex align-items-center">
-                                    <div class="stat-icon"><i class="fas fa-list-ol"></i></div>
-                                    <div class="stat-details ml-2">
-                                        <span class="stat-label">Total Registros</span>
-                                        <span class="stat-value">@{{lista.length}}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="compact-stat-card" style="border-left-color: #17a2b8;">
-                                <div class="d-flex align-items-center">
-                                    <div class="stat-icon" style="color: #17a2b8;"><i class="fas fa-user-md"></i></div>
-                                    <div class="stat-details ml-2">
-                                        <span class="stat-label">Médicos</span>
-                                        <span class="stat-value">{{ $estadisticas['total_medicos'] ?? 0 }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="detalles-page-wrapper">
+        <div ng-app="TablaDetalles" ng-cloak ng-controller="TablaDetallesCtrl" id="ingresosApp" class="h-100 d-flex flex-column">
+            <!-- Header Compacto y Estático -->
+            <div class="detalles-top-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                    <h2 class="mb-0 font-weight-bold" style="font-size: 1.05rem; color: var(--text-primary);">
+                        Detalles: {{ \Carbon\Carbon::parse($fecha)->format('d-m-Y') }}
+                    </h2>
+                    <span class="badge badge-subtle-primary font-weight-bold px-2 py-1" style="font-size: 0.72rem;">
+                        <i class="fas fa-list-ol mr-1"></i> @{{lista.length}} Registros
+                    </span>
+                    <span class="badge badge-subtle-info font-weight-bold px-2 py-1" style="font-size: 0.72rem;">
+                        <i class="fas fa-user-md mr-1"></i> {{ $estadisticas['total_medicos'] ?? 0 }} Médicos
+                    </span>
+                </div>
+                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
+                    <a href="{{ route('ingresos.index') }}" class="btn btn-secondary btn-sm py-1 px-3" style="font-size: 0.75rem; font-weight: 600;">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
+                    <button type="button" class="btn btn-sm py-1 px-3 font-weight-bold"
+                        ng-class="{'btn-primary': !tablaGuardada, 'btn-success': tablaGuardada}"
+                        ng-click="guardarCambios()" style="font-size: 0.75rem;">
+                        <i class="fas" ng-class="{'fa-save': !tablaGuardada, 'fa-check': tablaGuardada}"></i>
+                        @{{ tablaGuardada ? 'Guardado' : 'Guardar Cambios' }}
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2"
+                        ng-click="abrirBuscadorMedicos()" title="Buscar Médico (Alt+M)" style="font-size: 0.75rem;">
+                        <i class="fas fa-user-md mr-1"></i> Médicos
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2"
+                        ng-click="abrirBuscadorDiagnosticos()" title="Buscar Diagnóstico (Alt+D)" style="font-size: 0.75rem;">
+                        <i class="fas fa-stethoscope mr-1"></i> Diagnósticos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Contenedor de la Tabla -->
+            <div class="detalles-card card shadow-sm flex-grow-1 d-flex flex-column mb-0">
+                <div class="card-body p-0 flex-grow-1 position-relative" style="min-height: 0; overflow: hidden;">
+                    <div class="table-responsive h-100 w-100" style="overflow: auto;">
+                        <table class="table table-bordered table-sm mb-0 table-detalles">
+                            <thead>
+                                <tr>
+                                    <th class="text-center sticky-col">#</th>
+                                    @foreach($columns as $col)
+                                        @php
+                                            $width = '75px';
+                                            switch ($col) {
+                                                case 'numero': $width = '40px'; break;
+                                                case 'ano': $width = '36px'; break;
+                                                case 'mes': $width = '55px'; break;
+                                                case 'cm': $width = '36px'; break;
+                                                case 'medico': $width = '175px'; break;
+                                                case 'prof': $width = '95px'; break;
+                                                case 'fecha': $width = '70px'; break;
+                                                case 'se': $width = '30px'; break;
+                                                case 'exp': $width = '58px'; break;
+                                                case 'sexo': $width = '32px'; break;
+                                                case 'edad': $width = '32px'; break;
+                                                case 'tipo': $width = '32px'; break;
+                                                case 'rango':
+                                                case 'rango_2':
+                                                case 'rango_3':
+                                                case 'rango_4':
+                                                case 'rango_5': $width = '68px'; break;
+                                                case 'cond': $width = '38px'; break;
+                                                case 'cod_col': $width = '45px'; break;
+                                                case 'colonia': $width = '125px'; break;
+                                                case 'sg': $width = '32px'; break;
+                                                case 'referido_a':
+                                                case 'referido_de': $width = '68px'; break;
+                                                case 'pg_emb': $width = '62px'; break;
+                                                case 'jornada': $width = '62px'; break;
+                                                case 'sm': $width = '32px'; break;
+                                                default:
+                                                    if (strpos($col, 'cod_') === 0 && $col !== 'cod_col') $width = '38px';
+                                                    else if (strpos($col, 'diagnostico_') === 0) $width = '150px';
+                                                    else if (strpos($col, 'cond_') === 0) $width = '32px';
+                                            }
+                                        @endphp
+                                        <th class="text-uppercase text-truncate"
+                                            style="width: {{ $width }}; min-width: {{ $width }}; max-width: {{ $width }};"
+                                            title="{{ str_replace('_', ' ', $col) }}">
+                                            {{ str_replace('_', ' ', $col) }}
+                                        </th>
+                                    @endforeach
+                                    <th class="text-center" style="width: 36px; min-width: 36px;">Acc.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in lista">
+                                    <td class="text-center font-weight-bold sticky-col"
+                                        ng-class="{'active-row': $index === filaSeleccionada}">
+                                        @{{item.numero || ($index + 1)}}
+                                    </td>
+                                    @foreach($columns as $col)
+                                        <td editable-td row="@{{$index}}" field="{{ $col }}"></td>
+                                    @endforeach
+                                    <td class="text-center align-middle p-0">
+                                        <button type="button" class="btn btn-sm btn-outline-danger p-0 d-inline-flex align-items-center justify-content-center" style="width: 18px; height: 17px;" ng-click="eliminarRegistro($index, item.id)" title="Eliminar fila">
+                                            <i class="fas fa-trash-alt" style="font-size: 0.60rem;"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <div class="container-fluid">
-                    <div class="card shadow"
-                        style="height: calc(100vh - 140px); display: flex; flex-direction: column;">
-                        <div class="card-body p-0" style="flex: 1; overflow: hidden; position: relative;">
-                            <div class="table-responsive"
-                                style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: auto; max-height: none;">
-                                <table class="table table-bordered table-hover table-sm mb-0"
-                                    style="table-layout: fixed;">
-                                    <thead class="thead-dark-custom shadow-sm"
-                                        style="position: sticky; top: 0; z-index: 10;">
-                                        <tr>
-                                            <th class="text-center sticky-col text-white"
-                                                style="width: 40px; min-width: 40px;">#</th>
-                                            @foreach($columns as $col)
-                                                @php
-                                                    $width = '100px';
-                                                    switch ($col) {
-                                                        case 'numero':
-                                                            $width = '60px';
-                                                            break;
-                                                        case 'ano':
-                                                            $width = '50px';
-                                                            break;
-                                                        case 'mes':
-                                                            $width = '80px';
-                                                            break;
-                                                        case 'cm':
-                                                            $width = '50px';
-                                                            break;
-                                                        case 'medico':
-                                                            $width = '250px';
-                                                            break;
-                                                        case 'prof':
-                                                            $width = '120px';
-                                                            break;
-                                                        case 'fecha':
-                                                            $width = '90px';
-                                                            break;
-                                                        case 'se':
-                                                            $width = '40px';
-                                                            break;
-                                                        case 'exp':
-                                                            $width = '80px';
-                                                            break;
-                                                        case 'sexo':
-                                                            $width = '40px';
-                                                            break;
-                                                        case 'edad':
-                                                            $width = '40px';
-                                                            break;
-                                                        case 'tipo':
-                                                            $width = '40px';
-                                                            break;
-                                                        case 'cond':
-                                                            $width = '60px';
-                                                            break;
-                                                        case 'cod_col':
-                                                            $width = '60px';
-                                                            break;
-                                                        case 'colonia':
-                                                            $width = '200px';
-                                                            break;
-                                                        case 'sg':
-                                                            $width = '40px';
-                                                            break;
-                                                        default:
-                                                            if (strpos($col, 'cod_') === 0 && $col !== 'cod_col')
-                                                                $width = '50px';
-                                                            else if (strpos($col, 'diagnostico_') === 0)
-                                                                $width = '250px';
-                                                            else if (strpos($col, 'cond_') === 0)
-                                                                $width = '40px';
-                                                    }
-                                                @endphp
-                                                <th class="text-uppercase text-xs text-truncate text-white"
-                                                    style="width: {{ $width }}; min-width: {{ $width }}; max-width: {{ $width }}; border-bottom: 2px solid #495057;"
-                                                    title="{{ str_replace('_', ' ', $col) }}">
-                                                    {{ str_replace('_', ' ', $col) }}
-                                                </th>
-                                            @endforeach
-                                            <th class="text-center text-white" style="width: 50px; min-width: 50px; border-bottom: 2px solid #495057;">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="item in lista">
-                                            <td class="text-center font-weight-bold bg-light text-xs sticky-col"
-                                                ng-class="{'active-row': $index === filaSeleccionada}">
-                                                @{{item.numero || ($index + 1)}}
-                                            </td>
-                                            @foreach($columns as $col)
-                                                <td editable-td row="@{{$index}}" field="{{ $col }}" class="text-xs"></td>
-                                            @endforeach
-                                            <td class="text-center align-middle">
-                                                <button type="button" class="btn btn-sm btn-outline-danger px-2 py-0" ng-click="eliminarRegistro($index, item.id)" title="Eliminar fila">
-                                                    <i class="fas fa-trash-alt text-xs"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white border-top">
-                            <div class="btn-group">
-                                <a href="{{ route('ingresos.index') }}" class="btn btn-secondary px-4">
-                                    <i class="fas fa-arrow-left mr-1"></i> Volver
-                                </a>
-                                <button type="button" class="btn px-4"
-                                    ng-class="{'btn-primary': !tablaGuardada, 'btn-success': tablaGuardada}"
-                                    ng-click="guardarCambios()"
-                                    title="@{{ tablaGuardada ? 'Los datos actuales ya están guardados' : 'Guardar cambios' }}">
-                                    <i class="fas"
-                                        ng-class="{'fa-save': !tablaGuardada, 'fa-check': tablaGuardada}"></i>
-                                    @{{ tablaGuardada ? 'Cambios Guardados' : 'Guardar Cambios' }}
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary"
-                                    ng-click="abrirBuscadorMedicos()" title="Buscar Médico (Alt+M)">
-                                    <i class="fas fa-user-md mr-1"></i> Médicos
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary"
-                                    ng-click="abrirBuscadorDiagnosticos()" title="Buscar Diagnóstico (Alt+D)">
-                                    <i class="fas fa-stethoscope mr-1"></i> Diagnósticos
-                                </button>
-                            </div> <!-- Fin btn-group -->
-                        </div> <!-- Fin card-footer -->
-                    </div> <!-- Fin card shadow -->
-                </div> <!-- Fin container-fluid -->
-                </div> <!-- Fin page-fade-in -->
-                @include('partials.modales-buscadores')
+                <div class="card-footer py-1 px-3 d-flex align-items-center justify-content-between" style="height: 32px; background-color: var(--bg-surface); border-top: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center" style="gap: 8px;">
+                        <span class="text-muted" style="font-size: 0.70rem; font-weight: 500;">
+                            <i class="fas fa-keyboard mr-1"></i> Use Tab/Enter para navegar celdas | Alt+M (Médicos) | Alt+D (Diagnósticos)
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center" style="gap: 8px;">
+                        <span class="text-muted" style="font-size: 0.70rem;">Filas: <strong>@{{lista.length}}</strong></span>
+                    </div>
+                </div>
             </div>
+            @include('partials.modales-buscadores')
         </div>
     </div>
 
@@ -258,294 +216,188 @@
             display: none !important;
         }
 
-        .table {
+        /* Pantalla Estática - Sin Scroll en la Ventana */
+        .detalles-page-wrapper {
+            height: 100% !important;
+            max-height: 100% !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            padding: 2px 6px;
+            background-color: var(--bg-body, #f8f9fa);
+        }
+
+        #ingresosApp {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .detalles-top-bar {
+            flex-shrink: 0;
+            padding: 2px 0 4px 0;
+        }
+
+        .detalles-card {
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: var(--radius-md, 6px);
+            background-color: var(--bg-surface, #ffffff);
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+        }
+
+        .detalles-card .card-body {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .detalles-card .table-responsive {
+            display: block !important;
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            width: 100% !important;
+            overflow: auto !important;
+            position: relative !important;
+        }
+
+        /* Tabla compacta con texto reducido */
+        .table-detalles {
             border-collapse: separate !important;
             border-spacing: 0 !important;
-            border: 1px solid #c0c0c0 !important;
+            table-layout: fixed !important;
+            width: max-content;
+            min-width: 100%;
+            font-size: 0.68rem !important;
+            margin-bottom: 0 !important;
         }
 
-        .table th,
-        .table td {
-            padding: 0 5px !important;
-            vertical-align: middle;
-            white-space: nowrap;
-            height: 24px;
-            border: 1px solid #c0c0c0 !important;
+        .table-detalles thead th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 20 !important;
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            font-size: 0.62rem !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            padding: 2px 3px !important;
+            height: 22px !important;
+            white-space: nowrap !important;
+            border: 1px solid #334155 !important;
+            line-height: 18px !important;
         }
 
-        .sticky-col {
-            position: sticky;
-            left: 0;
-            z-index: 2 !important;
-            background-color: #f8f9fa !important;
-            border-left: 1px solid #c0c0c0 !important;
-            border-right: 2px solid #a0a0a0 !important;
+        html[data-theme="dark"] .table-detalles thead th,
+        body.dark .table-detalles thead th {
+            background-color: #0f172a !important;
+            border-color: #1e293b !important;
+            color: #94a3b8 !important;
         }
 
-        .sticky-col.active-row {
-            background-color: #007bff !important;
-            color: #ffffff !important;
-            border-right: 2px solid #0056b3 !important;
-            z-index: 3 !important;
+        .table-detalles tbody td {
+            font-size: 0.68rem !important;
+            padding: 0 3px !important;
+            height: 20px !important;
+            max-height: 20px !important;
+            line-height: 19px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            border: 1px solid var(--border-color, #e2e8f0) !important;
+            color: var(--text-primary, #0f172a);
+            background-color: var(--bg-surface, #ffffff);
         }
 
-        thead th.sticky-col {
-            z-index: 11 !important;
-            top: 0;
-            left: 0;
-            border-top: 1px solid #454d55 !important;
-            background-color: #343a40 !important;
-            color: #ffffff !important;
+        .table-detalles tbody tr:hover td {
+            background-color: rgba(59, 130, 246, 0.08) !important;
         }
 
-        .text-xs {
-            font-size: 0.75rem !important;
+        /* Columna 1 fija (#) */
+        .table-detalles thead th.sticky-col {
+            position: sticky !important;
+            left: 0 !important;
+            top: 0 !important;
+            z-index: 30 !important;
+            background-color: #0f172a !important;
+            border-right: 2px solid #3b82f6 !important;
+            width: 45px !important;
+            min-width: 45px !important;
+            max-width: 45px !important;
         }
 
-        table tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.08) !important;
-        }
-
-        td[contenteditable="true"] {
-            outline: none;
-            min-height: 20px;
-            padding: 0 5px !important;
-            border: 1px solid #c0c0c0;
-            transition: background 0.2s;
-            cursor: cell;
-        }
-
-        td[contenteditable="true"]:focus {
-            background-color: #ffffff;
-            box-shadow: inset 0 0 0 2px #007bff;
-            border: 1px solid #007bff !important;
-            z-index: 5;
-            position: relative;
-        }
-
-        td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left !important;
-            padding: 0 8px !important;
-            height: 20px;
-            line-height: 20px;
-        }
-
-        td:focus,
-        td.nav-mode {
-            overflow: visible !important;
-            white-space: normal !important;
-            min-width: max-content;
-            z-index: 100 !important;
-            background-color: white !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .thead-dark-custom th {
-            border: 1px solid #454d55 !important;
-            position: sticky;
-            top: 0;
-            background-color: #343a40 !important;
-            color: #ffffff !important;
-            font-size: 0.7rem !important;
-        }
-
-        .compact-stat-card {
-            background: #d1dce7;
-            border: 1px solid #b8c5d3;
-            border-radius: 8px;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid #28a745;
-            min-width: auto;
-        }
-
-        .stat-icon {
-            width: 32px;
-            height: 32px;
-            background: #ffffff !important;
-            color: #28a745;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .stat-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.65rem;
-            color: #6c757d;
+        .table-detalles tbody td.sticky-col {
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 15 !important;
+            background-color: var(--bg-subtle, #f1f5f9) !important;
+            border-right: 2px solid var(--border-color, #cbd5e1) !important;
             font-weight: 700;
-            text-transform: uppercase;
+            width: 45px !important;
+            min-width: 45px !important;
+            max-width: 45px !important;
         }
 
-        .stat-value {
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: #2d3436;
+        .table-detalles tbody td.sticky-col.active-row {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+            border-right: 2px solid #1d4ed8 !important;
         }
 
+        /* Celdas editables */
+        .table-detalles td[contenteditable="true"] {
+            outline: none;
+            cursor: cell;
+            transition: background 0.15s;
+        }
+
+        .table-detalles td[contenteditable="true"]:focus {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: inset 0 0 0 2px #3b82f6 !important;
+            z-index: 25 !important;
+            position: relative;
+            overflow: visible !important;
+            white-space: nowrap !important;
+        }
+
+        html[data-theme="dark"] .table-detalles td[contenteditable="true"]:focus {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            box-shadow: inset 0 0 0 2px #60a5fa !important;
+        }
+
+        /* Scrollbars siempre visibles */
         .table-responsive::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 10px !important;
+            height: 10px !important;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: var(--bg-subtle, #f1f5f9) !important;
         }
 
         .table-responsive::-webkit-scrollbar-thumb {
-            background: #aaa;
-            border-radius: 5px;
+            background: #94a3b8 !important;
+            border-radius: 5px !important;
+            border: 2px solid var(--bg-subtle, #f1f5f9) !important;
+        }
+
+        .app-footer {
+            display: none !important;
         }
     </style>
-
-    <script>
-        // --- INYECCIÓN MANUAL DEL SIDEBAR DERECHO ---
-        document.addEventListener('DOMContentLoaded', function () {
-            var sidebarHtml = `
-            <div class="p-3">
-                <h5 class="mb-2">Configuración de Tabla</h5>
-                <hr class="mb-3">
-                <div class="mb-3">
-                    <label class="mb-1">Tamaño de Fuente</label>
-                    <select id="configFontSize" class="form-control form-control-sm">
-                        <option value="10px">Extra Pequeña (10px)</option>
-                        <option value="12px" selected>Pequeña (12px)</option>
-                        <option value="14px">Normal (14px)</option>
-                        <option value="16px">Grande (16px)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="mb-1">Altura de Filas (Padding V)</label>
-                    <input type="range" class="custom-range" id="configRowHeight" min="0" max="16" step="1" value="0">
-                    <small class="text-muted d-block text-right"><span id="lblRowHeight">0</span>px</small>
-                </div>
-                <div class="mb-3">
-                    <label class="mb-1">Espacio Lateral (Padding H)</label>
-                    <input type="range" class="custom-range" id="configCellPadding" min="0" max="30" step="1" value="5">
-                    <small class="text-muted d-block text-right"><span id="lblCellPadding">5</span>px</small>
-                </div>
-                <hr>
-                <button class="btn btn-sm btn-outline-secondary btn-block" onclick="resetConfigTabla()">
-                    Restaurar Valores
-                </button>
-            </div>`;
-
-            // Intentar inyectar en el contenido
-            var $target = $('.control-sidebar-content');
-            if ($target.length === 0) $target = $('.control-sidebar');
-
-            if ($target.length > 0) {
-                // Limpiar cualquier contenido previo (como temas de AdminLTE) si queremos exclusividad
-                // O mejor, inyectarlo.
-                $target.html(sidebarHtml);
-
-                // --- FIX VISUAL: Forzar altura completa ---
-                $target.css({
-                    'height': '100vh',
-                    'min-height': '100%',
-                    'overflow-y': 'auto',
-                    'padding-bottom': '50px'
-                });
-                $('.control-sidebar').css({
-                    'bottom': '0',
-                    'top': '57px',
-                    'height': 'calc(100vh - 57px)',
-                    'position': 'fixed'
-                });
-
-                setTimeout(function () {
-                    if ($target.html().trim() === '' || $target.html().indexOf('Configuración de Tabla') === -1) {
-                        $target.html(sidebarHtml);
-                        initTableConfig();
-                    }
-                    $target.css('height', '100vh');
-                    $('.control-sidebar').css('height', 'calc(100vh - 57px)');
-                }, 800);
-            }
-
-            // Inicializar controles después de inyectar
-            setTimeout(initTableConfig, 100);
-        });
-
-        function initTableConfig() {
-            var confFontSize = document.getElementById('configFontSize');
-            if (!confFontSize) return;
-
-            var confRowHeight = document.getElementById('configRowHeight');
-            var confCellPadding = document.getElementById('configCellPadding');
-            var lblRowHeight = document.getElementById('lblRowHeight');
-            var lblCellPadding = document.getElementById('lblCellPadding');
-
-            var styleTag = document.getElementById('dynamic-table-styles');
-            if (!styleTag) {
-                styleTag = document.createElement('style');
-                styleTag.id = 'dynamic-table-styles';
-                document.head.appendChild(styleTag);
-            }
-
-            function updateTableStyles() {
-                var fs = confFontSize.value;
-                var pv = confRowHeight.value + 'px';
-                var ph = confCellPadding.value + 'px';
-
-                if (lblRowHeight) lblRowHeight.textContent = confRowHeight.value;
-                if (lblCellPadding) lblCellPadding.textContent = confCellPadding.value;
-
-                var css = `
-                    /* 1. Fuente solo para contenido */
-                    .table td, .table td input, .table td select, .text-xs, .form-control-sm { font-size: ${fs} !important; }
-                    
-                    /* 2. Padding */
-                    .table th, .table td { padding-top: ${pv} !important; padding-bottom: ${pv} !important; padding-left: ${ph} !important; padding-right: ${ph} !important; }
-                    .table input.form-control-sm { height: auto !important; padding: ${pv} ${ph} !important; }
-
-                    /* 3. Auto widths */
-                    .table { table-layout: auto !important; }
-                    .table th, .table td { white-space: nowrap; max-width: none !important; width: auto !important; min-width: 40px; }
-                `;
-                styleTag.innerHTML = css;
-
-                var config = { fontSize: fs, rowHeight: confRowHeight.value, cellPadding: confCellPadding.value };
-                localStorage.setItem('tablaConfig', JSON.stringify(config));
-            }
-
-            var saved = localStorage.getItem('tablaConfig');
-            if (saved) {
-                try {
-                    var c = JSON.parse(saved);
-                    if (c.fontSize && confFontSize) confFontSize.value = c.fontSize;
-                    if (c.rowHeight && confRowHeight) confRowHeight.value = c.rowHeight;
-                    if (c.cellPadding && confCellPadding) confCellPadding.value = c.cellPadding;
-                } catch (e) { }
-            }
-
-            if (confFontSize) {
-                confFontSize.removeEventListener('change', updateTableStyles);
-                confRowHeight.removeEventListener('input', updateTableStyles);
-                confCellPadding.removeEventListener('input', updateTableStyles);
-
-                confFontSize.addEventListener('change', updateTableStyles);
-                confRowHeight.addEventListener('input', updateTableStyles);
-                confCellPadding.addEventListener('input', updateTableStyles);
-                updateTableStyles();
-            }
-
-            window.resetConfigTabla = function () {
-                confFontSize.value = '12px';
-                confRowHeight.value = '0';
-                confCellPadding.value = '5';
-                updateTableStyles();
-            };
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

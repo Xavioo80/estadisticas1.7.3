@@ -122,29 +122,134 @@
 
         .btn-hsc-modal i {
             font-size: 0.72rem !important;
-            color: #ffffff !important;
-        }
-
-        .sticky-col-1 {
-            position: sticky;
-            left: 0;
-            background: var(--bg-surface, #fff);
-            z-index: 25;
+        /* ─── Columnas Fijas (Sticky Columns) ─── */
+        .sticky-col-1,
+        #mainTable th.sticky-col-1,
+        #mainTable td.sticky-col-1 {
+            position: sticky !important;
+            left: 0 !important;
+            width: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
+            background-color: var(--bg-surface, #ffffff) !important;
+            z-index: 30 !important;
             text-align: center !important;
             font-size: 0.80rem !important;
+            box-sizing: border-box !important;
         }
 
+        .sticky-col-2,
         #mainTable th.sticky-col-2,
         #mainTable td.sticky-col-2,
-        #mainTable .sticky-col-2,
-        .sticky-col-2 {
-            position: sticky;
-            left: 28px;
-            background: var(--bg-surface, #fff);
-            z-index: 25;
+        #mainTable .sticky-col-2 {
+            position: sticky !important;
+            left: 36px !important;
+            width: 230px !important;
+            min-width: 230px !important;
+            max-width: 230px !important;
+            background-color: var(--bg-surface, #ffffff) !important;
+            z-index: 30 !important;
             text-align: left !important;
-            padding-left: 8px !important;
-            padding-right: 4px !important;
+            padding-left: 10px !important;
+            padding-right: 6px !important;
+            font-size: 0.82rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            box-sizing: border-box !important;
+        }
+
+        html.dark .sticky-col-1,
+        html.dark #mainTable th.sticky-col-1,
+        html.dark #mainTable td.sticky-col-1,
+        [data-theme="dark"] .sticky-col-1,
+        [data-theme="dark"] #mainTable th.sticky-col-1,
+        [data-theme="dark"] #mainTable td.sticky-col-1,
+        html.dark .sticky-col-2,
+        html.dark #mainTable th.sticky-col-2,
+        html.dark #mainTable td.sticky-col-2,
+        [data-theme="dark"] .sticky-col-2,
+        [data-theme="dark"] #mainTable th.sticky-col-2,
+        [data-theme="dark"] #mainTable td.sticky-col-2 {
+            background-color: #0f172a !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* En thead, las celdas sticky de la esquina tienen z-index 100 */
+        #mainTable thead th.sticky-col-1 {
+            position: sticky !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 100 !important;
+            background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        }
+
+        #mainTable thead th.sticky-col-2 {
+            position: sticky !important;
+            top: 0 !important;
+            left: 36px !important;
+            z-index: 100 !important;
+            background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        }
+
+        /* ─── Encabezados Fijos de 3 Filas (Sticky Multi-row Thead) ─── */
+        #mainTable thead,
+        #mainTable thead.thead-premium {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 60 !important;
+        }
+
+        #mainTable thead th {
+            background-color: var(--bg-surface-alt, #e2e8f0) !important;
+            color: var(--text-primary, #0f172a) !important;
+            border: 1px solid #94a3b8 !important;
+            box-sizing: border-box !important;
+        }
+
+        #mainTable thead tr.header-row-main th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 60 !important;
+        }
+
+        #mainTable thead tr.header-row-mid th {
+            position: sticky !important;
+            top: 28px !important;
+            z-index: 55 !important;
+        }
+
+        #mainTable thead tr.header-row-sub th {
+            position: sticky !important;
+            top: 54px !important;
+            z-index: 50 !important;
+        }
+
+        html.dark #mainTable thead th,
+        [data-theme="dark"] #mainTable thead th {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border: 1px solid #475569 !important;
+        }
+
+        html.dark #mainTable thead th.sticky-col-1,
+        html.dark #mainTable thead th.sticky-col-2,
+        [data-theme="dark"] #mainTable thead th.sticky-col-1,
+        [data-theme="dark"] #mainTable thead th.sticky-col-2 {
+            background-color: #1e293b !important;
+        }
+
+        /* Hover de filas: mantener opacidad sólida en celdas sticky */
+        #mainTable tbody tr:hover td.sticky-col-1,
+        #mainTable tbody tr:hover td.sticky-col-2 {
+            background-color: var(--bg-surface-alt, #e2e8f0) !important;
+        }
+
+        html.dark #mainTable tbody tr:hover td.sticky-col-1,
+        html.dark #mainTable tbody tr:hover td.sticky-col-2,
+        [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-1,
+        [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-2 {
+            background-color: #1e293b !important;
         }
 
         #tableContainer {
@@ -180,7 +285,7 @@
         #mainTable tfoot {
             position: sticky !important;
             bottom: 0 !important;
-            z-index: 35 !important;
+            z-index: 45 !important;
         }
 
         #mainTable tfoot tr {
@@ -193,10 +298,11 @@
             background-color: var(--bg-surface-alt, #e2e8f0) !important;
             color: var(--text-primary, #0f172a) !important;
             font-weight: 800 !important;
-            font-size: 0.90rem !important;
+            font-size: 0.88rem !important;
             border: 1px solid #94a3b8 !important;
             vertical-align: middle !important;
             padding: 4px 4px !important;
+            z-index: 45 !important;
         }
 
         html.dark #mainTable tfoot tr,
@@ -208,47 +314,108 @@
             border: 1px solid #475569 !important;
         }
 
-        #mainTable tfoot td.sticky-col-footer,
-        #mainTable tfoot td.sticky-col {
+        #mainTable tfoot td.sticky-col-footer {
             position: sticky !important;
             left: 0 !important;
             bottom: 0 !important;
-            z-index: 40 !important;
+            width: 266px !important;
+            min-width: 266px !important;
+            max-width: 266px !important;
+            z-index: 80 !important;
             background-color: var(--bg-surface-alt, #e2e8f0) !important;
             border: 1px solid #94a3b8 !important;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
             font-size: 0.82rem !important;
+            box-sizing: border-box !important;
         }
 
         html.dark #mainTable tfoot td.sticky-col-footer,
-        html.dark #mainTable tfoot td.sticky-col,
-        [data-theme="dark"] #mainTable tfoot td.sticky-col-footer,
-        [data-theme="dark"] #mainTable tfoot td.sticky-col {
+        [data-theme="dark"] #mainTable tfoot td.sticky-col-footer {
             background-color: #1e293b !important;
             color: #f8fafc !important;
             border: 1px solid #475569 !important;
+        }
+        .nav-tab-group {
+            display: inline-flex !important;
+            align-items: center !important;
+            background: var(--bg-surface-alt, #e2e8f0) !important;
+            padding: 3px !important;
+            border-radius: 10px !important;
+            border: 1px solid var(--border-color, #cbd5e1) !important;
+            gap: 3px !important;
+        }
+
+        html.dark .nav-tab-group,
+        [data-theme="dark"] .nav-tab-group {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        .nav-tab-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 5px 12px !important;
+            font-size: 0.75rem !important;
+            font-weight: 700 !important;
+            border-radius: 7px !important;
+            text-decoration: none !important;
+            transition: all 0.18s ease-in-out !important;
+            white-space: nowrap !important;
+        }
+
+        .nav-tab-btn.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35) !important;
+            border: 1px solid #1d4ed8 !important;
+        }
+
+        .nav-tab-btn.active i {
+            color: #ffffff !important;
+        }
+
+        .nav-tab-btn:not(.active) {
+            background: var(--bg-surface, #ffffff) !important;
+            color: var(--text-primary, #334155) !important;
+            border: 1px solid var(--border-color, #cbd5e1) !important;
+        }
+
+        .nav-tab-btn:not(.active):hover {
+            background: var(--bg-surface-alt, #f1f5f9) !important;
+            color: var(--text-primary, #0f172a) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        html.dark .nav-tab-btn:not(.active),
+        [data-theme="dark"] .nav-tab-btn:not(.active) {
+            background: #334155 !important;
+            color: #f8fafc !important;
+            border-color: #475569 !important;
+        }
+
+        html.dark .nav-tab-btn:not(.active):hover,
+        [data-theme="dark"] .nav-tab-btn:not(.active):hover {
+            background: #475569 !important;
+            color: #ffffff !important;
         }
     </style>
     <div class="informe-page-wrapper" id="report-wrapper">
         <!-- Header -->
         <div class="informe-header no-print">
-            <div class="flex items-center gap-3">
-                <div>
-                    <h2><i class="bi bi-clock-history text-primary mr-1"></i> Rendimiento Médico (Hora Médico)</h2>
-                    <p>Rendimiento y Productividad por Hora Médica</p>
-                </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <h2 style="margin: 0; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-primary);">
+                    <i class="bi bi-clock-history text-primary"></i> Rendimiento Médico (Hora Médico)
+                </h2>
                 {{-- Navigation Tabs --}}
-                <div
-                    class="flex items-center bg-gray-200/70 dark:bg-gray-800/90 p-1 rounded-xl border border-gray-300/80 dark:border-gray-700/80">
+                <div class="nav-tab-group">
                     <a href="{{ route('informes.hora-medico', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => $jornada]) }}"
-                        class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ request()->routeIs('informes.hora-medico') && !request()->routeIs('informes.hora-medico.servicio-social') && !request()->routeIs('informes.hora-medico.consolidado') ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white shadow-xs' : 'bg-slate-600/90 dark:bg-slate-700/90 text-white dark:text-white border border-slate-500/50 dark:border-slate-600/50 hover:bg-slate-700 dark:hover:bg-slate-600' }}"
-                        style="text-decoration: none;">
-                        <i class="fas fa-user-md mr-1.5"></i> Generales y Especialistas
+                        class="nav-tab-btn {{ request()->routeIs('informes.hora-medico') && !request()->routeIs('informes.hora-medico.servicio-social') && !request()->routeIs('informes.hora-medico.consolidado') ? 'active' : '' }}">
+                        <i class="bi bi-people-fill"></i> Generales y Especialistas
                     </a>
                     <a href="{{ route('informes.hora-medico.servicio-social', ['ano' => $ano, 'mes' => $mesNombre]) }}"
-                        class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white shadow-xs' : 'bg-slate-600/90 dark:bg-slate-700/90 text-white dark:text-white border border-slate-500/50 dark:border-slate-600/50 hover:bg-slate-700 dark:hover:bg-slate-600' }}"
-                        style="text-decoration: none;">
-                        <i class="fas fa-graduation-cap mr-1.5"></i> Servicio Social
+                        class="nav-tab-btn {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'active' : '' }}">
+                        <i class="bi bi-mortarboard-fill"></i> Servicio Social
                     </a>
                 </div>
             </div>
@@ -256,10 +423,9 @@
             <div class="header-actions-row">
                 <!-- Botón Observaciones (Acceso a Horas Sin Consulta / Observaciones) -->
                 <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => $jornada]) }}"
-                    class="btn btn-sm btn-info text-white font-bold flex items-center gap-1.5 shadow-sm"
-                    style="background: linear-gradient(135deg, #6366f1, #4f46e5); border: none; padding: 6px 12px; border-radius: 8px; text-decoration: none; white-space: nowrap;"
+                    class="btn-header-purple"
                     title="Ver Informe Oficial de Observaciones">
-                    <i class="bi bi-journal-text text-sm"></i> Observaciones
+                    <i class="bi bi-journal-text"></i> Observaciones
                 </a>
 
                 <!-- Botón Incluir Médico -->
@@ -435,6 +601,26 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        function syncStickyHeaderOffsets() {
+            const row1 = document.querySelector('#mainTable thead tr.header-row-main');
+            const row2 = document.querySelector('#mainTable thead tr.header-row-mid');
+            const row3 = document.querySelector('#mainTable thead tr.header-row-sub');
+            if (!row1) return;
+            const h1 = row1.offsetHeight;
+            if (row2) {
+                const h2 = row2.offsetHeight;
+                row2.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1}px`, 'important'));
+                if (row3) {
+                    row3.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1 + h2}px`, 'important'));
+                }
+            }
+        }
+
+        $(document).ready(function () {
+            syncStickyHeaderOffsets();
+            window.addEventListener('resize', syncStickyHeaderOffsets);
+        });
+
         function updateFilters() {
             let ano = $('[name="ano"]').val();
             let mes = $('[name="mes"]').val();
@@ -451,6 +637,7 @@
             }, function (html) {
                 $('#mainTable > tbody, #mainTable > tfoot').remove();
                 $('#mainTable').append(html);
+                syncStickyHeaderOffsets();
                 $('#table-loader').fadeOut(150);
 
                 // Actualizar URL sin recargar
@@ -508,25 +695,24 @@
             window.open(url.toString(), '_blank');
         }
 
-        // Modal HSC / Observaciones Calculations
-        $(document).on('click', '.btn-hsc-modal', function () {
-            let medicoId = $(this).data('id');
-            let medName = $(this).data('name');
-            let atend = $(this).data('atenciones') || 0;
-            let diasMes = $(this).data('diasmes') || 0;
-            let hrsDia = $(this).data('hrsdia') || 0;
-            let diasCont = $(this).data('diascont') || 0;
-            let prog = $(this).data('prog') || 0;
-            let pxh = $(this).data('pxh') || 6;
-            let obs = $(this).data('observaciones') || '';
+        function openHscModal(el) {
+            let btn = $(el);
+            let medicoId = btn.data('medico-id') || btn.data('id');
+            let medName = btn.data('medico-nombre') || btn.data('name');
+            let atend = btn.data('atendidos') || btn.data('atenciones') || 0;
+            let diasMes = btn.data('total-dias') || btn.data('diasmes') || 0;
+            let hrsDia = btn.data('horas-dia') || btn.data('hrsdia') || 0;
+            let diasCont = btn.data('dias-cont') || btn.data('diascont') || 0;
+            let isSS = parseInt(btn.data('is-ss')) === 1;
+            let pxh = parseFloat(btn.data('pxh')) || (isSS ? 3 : 6);
 
-            $('#hsc_medico_id').val(medicoId);
+            $('#hsc_medico_id').val(medicoId).data('pxh', pxh);
             $('#hsc_medico_name').text(medName);
             $('#m_stat_atend').text(atend);
             $('#m_stat_dias_mes').text(diasMes);
             $('#m_stat_hrs_dia').text(hrsDia);
             $('#m_input_dias_cont').val(diasCont);
-            $('#m_input_observaciones').val(obs);
+            $('#m_input_observaciones').val('');
 
             let currentAno = $('[name="ano"]').val();
             let currentMes = $('[name="mes"]').val();
@@ -535,6 +721,16 @@
 
             // Reset inputs
             $('.hsc-td-input').val(0);
+
+            if (isSS) {
+                $('#modal_th_asambleas').html('ACTIVIDADES<br>UNIVERSIDAD.');
+                $('#modal_th_vacaciones_group, #modal_th_vac_ord, #modal_th_vac_prof').addClass('th-hatched');
+                $('[name="vacaciones_ordinarias"], [name="descanso_profilactico"]').prop('disabled', true).addClass('td-hatched').val(0);
+            } else {
+                $('#modal_th_asambleas').html('ASAMBLEAS<br>COLEGIO MEDICO.');
+                $('#modal_th_vacaciones_group, #modal_th_vac_ord, #modal_th_vac_prof').removeClass('th-hatched');
+                $('[name="vacaciones_ordinarias"], [name="descanso_profilactico"]').prop('disabled', false).removeClass('td-hatched');
+            }
 
             $.get("{{ route('informes.hora-medico.get-hsc') }}", {
                 medico_id: medicoId,
@@ -547,7 +743,11 @@
                         if ($.isNumeric(val) && !['id', 'medico_id', 'ano', 'created_at', 'updated_at'].includes(key)) {
                             val = parseFloat(val);
                         }
-                        $(`[name="${key}"]`).val(val);
+                        if (isSS && (key === 'vacaciones_ordinarias' || key === 'descanso_profilactico')) {
+                            $(`[name="${key}"]`).val(0);
+                        } else {
+                            $(`[name="${key}"]`).val(val);
+                        }
                     });
                     if (data.observaciones !== undefined) {
                         $('#m_input_observaciones').val(data.observaciones || '');
@@ -557,6 +757,11 @@
             });
 
             $('#hscModal').modal('show');
+        }
+
+        $(document).on('click', '.btn-hsc-modal', function (e) {
+            e.preventDefault();
+            openHscModal(this);
         });
 
         $(document).on('input', '.hsc-td-input, #m_input_dias_cont', function () {
@@ -600,8 +805,8 @@
             $('#m_stat_dias_cump').text(Math.round(diasCump));
             $('#m_stat_hrs_cump').text(Math.round(hrsCump));
 
-            let pxh = 6;
-            let prog = diasCont * hrsDia * pxh;
+            let pxh = parseFloat($('#hsc_medico_id').data('pxh')) || 6;
+            let prog = diasCont * (hrsDia * pxh);
             let repr = prog - (hrsDescontadas * pxh);
             let rend = 0;
             if (repr <= 0) {
@@ -688,7 +893,7 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             if ($.fn.select2) {
-                $('.select2').select2({
+                $('#exportExcelModal .select2').select2({
                     dropdownParent: $('#exportExcelModal')
                 });
             }

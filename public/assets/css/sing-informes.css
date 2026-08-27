@@ -96,7 +96,8 @@ body:has(#report-content-container) {
 body:has(.informe-page-wrapper) .app-wrapper,
 body:has(.informe-container-centered) .app-wrapper,
 body:has(.filter-container) .app-wrapper,
-body:has(#report-content-container) .app-wrapper {
+body:has(#report-content-container) .app-wrapper,
+body:has(.detalles-page-wrapper) .app-wrapper {
   overflow: hidden !important;
   height: 100vh !important;
   display: flex !important;
@@ -106,7 +107,8 @@ body:has(#report-content-container) .app-wrapper {
 body:has(.informe-page-wrapper) .app-main,
 body:has(.informe-container-centered) .app-main,
 body:has(.filter-container) .app-main,
-body:has(#report-content-container) .app-main {
+body:has(#report-content-container) .app-main,
+body:has(.detalles-page-wrapper) .app-main {
   overflow: hidden !important;
   height: 100vh !important;
   min-height: unset !important;
@@ -118,10 +120,11 @@ body:has(#report-content-container) .app-main {
 .app-content:has(.informe-page-wrapper),
 .app-content:has(.informe-container-centered),
 .app-content:has(.filter-container),
-.app-content:has(#report-content-container) {
+.app-content:has(#report-content-container),
+.app-content:has(.detalles-page-wrapper) {
   flex: 1 1 0% !important;
   min-height: 0 !important;
-  padding: 0.75rem 1rem !important;
+  padding: 0.5rem 0.75rem !important;
   max-width: 100% !important;
   width: 100% !important;
   overflow: hidden !important;
@@ -131,7 +134,8 @@ body:has(#report-content-container) .app-main {
 
 body:has(.informe-page-wrapper) .app-footer,
 body:has(.informe-container-centered) .app-footer,
-body:has(#report-content-container) .app-footer {
+body:has(#report-content-container) .app-footer,
+body:has(.detalles-page-wrapper) .app-footer {
   display: none !important;
 }
 
@@ -1859,4 +1863,496 @@ tfoot.atenciones-tfoot .col-mes-total {
   border-radius: 4px !important;
   box-shadow: 0 0 0 2px var(--color-primary) !important;
 }
+
+/* ─── NAVEGACIÓN POR PESTAÑAS (INFORMES / HORA MÉDICO / CONSOLIDADO) ──────── */
+.nav-tab-group {
+  display: inline-flex !important;
+  align-items: center !important;
+  background: var(--bg-surface-alt, #e2e8f0) !important;
+  padding: 3px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  gap: 3px !important;
+}
+
+html.dark .nav-tab-group,
+[data-theme="dark"] .nav-tab-group {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.nav-tab-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 12px !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  border-radius: 7px !important;
+  text-decoration: none !important;
+  transition: all 0.18s ease-in-out !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.nav-tab-btn.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35) !important;
+  border: 1px solid #1d4ed8 !important;
+}
+
+.nav-tab-btn.active i {
+  color: #ffffff !important;
+}
+
+.nav-tab-btn:not(.active) {
+  background: var(--bg-surface, #ffffff) !important;
+  color: var(--text-primary, #334155) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+}
+
+.nav-tab-btn:not(.active):hover {
+  background: var(--bg-surface-alt, #f1f5f9) !important;
+  color: var(--text-primary, #0f172a) !important;
+  transform: translateY(-1px) !important;
+}
+
+html.dark .nav-tab-btn:not(.active),
+[data-theme="dark"] .nav-tab-btn:not(.active) {
+  background: #334155 !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+html.dark .nav-tab-btn:not(.active):hover,
+[data-theme="dark"] .nav-tab-btn:not(.active):hover {
+  background: #475569 !important;
+  color: #ffffff !important;
+}
+
+.btn-header-purple {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35) !important;
+  transition: all 0.18s ease-in-out !important;
+}
+
+.btn-header-purple:hover {
+  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.4) !important;
+}
+
+.btn-header-purple i {
+  color: #ffffff !important;
+}
+
+/* ─── OBSERVACIÓN TEXTO PLANO EN TABLAS ─────────────────────────────────── */
+.obs-plain-input {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 4px 6px !important;
+  font-size: 0.83rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2px !important;
+  border-radius: 4px !important;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.obs-plain-input:focus {
+  background-color: var(--input-bg, rgba(255, 255, 255, 0.08)) !important;
+  box-shadow: inset 0 0 0 1px #6366f1 !important;
+}
+
+.obs-plain-input::placeholder {
+  color: var(--text-muted, #94a3b8) !important;
+  font-weight: 400 !important;
+  font-style: italic !important;
+  text-transform: none !important;
+  opacity: 0.65 !important;
+}
+
+.btn-obs-edit {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #4f46e5 !important;
+  opacity: 1 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease-in-out !important;
+  flex-shrink: 0 !important;
+}
+
+html.dark .btn-obs-edit,
+[data-theme="dark"] .btn-obs-edit {
+  background: rgba(99, 102, 241, 0.3) !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+}
+
+.btn-obs-edit:hover {
+  transform: translateY(-1px) scale(1.08) !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+  border-color: #4f46e5 !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.45) !important;
+}
+
+.btn-obs-edit:hover i {
+  color: #ffffff !important;
+}
+
+.btn-obs-edit i {
+  font-size: 0.88rem !important;
+  color: inherit !important;
+  display: inline-block !important;
+}
+
+table#consolidadoTable thead th.col-medico-name,
+table#consolidadoTable thead th.text-left,
+table#consolidadoTable tbody td.col-medico-name,
+table#consolidadoTable tbody td.text-left,
+#consolidadoTable th.text-left,
+#consolidadoTable td.text-left,
+#consolidadoTable .text-left,
+.col-medico-name {
+  text-align: left !important;
+  padding-left: 14px !important;
+}
+
+/* ─── COLUMNAS FIJAS / STICKY EN INFORMES Y TABLAS ──────────────────────── */
+.sticky-col-1,
+#mainTable th.sticky-col-1,
+#mainTable td.sticky-col-1,
+#consolidadoTable th.sticky-col-1,
+#consolidadoTable td.sticky-col-1 {
+  position: sticky !important;
+  left: 0 !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  background-color: var(--bg-surface, #ffffff) !important;
+  z-index: 30 !important;
+  text-align: center !important;
+  font-size: 0.80rem !important;
+  box-sizing: border-box !important;
+}
+
+.sticky-col-2,
+#mainTable th.sticky-col-2,
+#mainTable td.sticky-col-2,
+#mainTable .sticky-col-2 {
+  position: sticky !important;
+  left: 36px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  background-color: var(--bg-surface, #ffffff) !important;
+  z-index: 30 !important;
+  text-align: left !important;
+  padding-left: 10px !important;
+  padding-right: 6px !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  box-sizing: border-box !important;
+}
+
+#consolidadoTable th.sticky-col-1,
+#consolidadoTable td.sticky-col-1 {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+}
+
+#consolidadoTable th.sticky-col-2,
+#consolidadoTable td.sticky-col-2 {
+  position: sticky !important;
+  left: 44px !important;
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  background-color: var(--bg-surface, #ffffff) !important;
+  z-index: 30 !important;
+  text-align: left !important;
+  padding-left: 14px !important;
+  padding-right: 6px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* En Modo Oscuro, fondo sólido 100% opaco */
+html.dark .sticky-col-1,
+html.dark #mainTable th.sticky-col-1,
+html.dark #mainTable td.sticky-col-1,
+html.dark #consolidadoTable th.sticky-col-1,
+html.dark #consolidadoTable td.sticky-col-1,
+[data-theme="dark"] .sticky-col-1,
+[data-theme="dark"] #mainTable th.sticky-col-1,
+[data-theme="dark"] #mainTable td.sticky-col-1,
+[data-theme="dark"] #consolidadoTable th.sticky-col-1,
+[data-theme="dark"] #consolidadoTable td.sticky-col-1,
+html.dark .sticky-col-2,
+html.dark #mainTable th.sticky-col-2,
+html.dark #mainTable td.sticky-col-2,
+html.dark #consolidadoTable th.sticky-col-2,
+html.dark #consolidadoTable td.sticky-col-2,
+[data-theme="dark"] .sticky-col-2,
+[data-theme="dark"] #mainTable th.sticky-col-2,
+[data-theme="dark"] #mainTable td.sticky-col-2,
+[data-theme="dark"] #consolidadoTable th.sticky-col-2,
+[data-theme="dark"] #consolidadoTable td.sticky-col-2 {
+  background-color: #0f172a !important;
+  color: var(--text-primary) !important;
+}
+
+/* En thead, z-index alto para tapar celdas que se desplazan */
+#mainTable thead th.sticky-col-1,
+#consolidadoTable thead th.sticky-col-1 {
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 100 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#mainTable thead th.sticky-col-2 {
+  top: 0 !important;
+  left: 36px !important;
+  z-index: 100 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#consolidadoTable thead th.sticky-col-2 {
+  top: 0 !important;
+  left: 44px !important;
+  z-index: 100 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+/* ─── STICKY MULTI-ROW THEAD RULES PARA TABLAS MATRICIALES (HORA MEDICO) ─── */
+#mainTable thead,
+#mainTable thead.thead-premium {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
+}
+
+#mainTable thead th {
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+  color: var(--text-primary, #0f172a) !important;
+  border: 1px solid #94a3b8 !important;
+  box-sizing: border-box !important;
+}
+
+#mainTable thead tr.header-row-main th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
+}
+
+#mainTable thead tr.header-row-mid th {
+  position: sticky !important;
+  top: 28px !important;
+  z-index: 55 !important;
+}
+
+#mainTable thead tr.header-row-sub th {
+  position: sticky !important;
+  top: 54px !important;
+  z-index: 50 !important;
+}
+
+/* Celdas de esquina en thead (N° y Nombre del Médico): máxima prioridad z-index: 120 */
+#mainTable thead tr.header-row-main th.sticky-col-1,
+#mainTable thead tr th.sticky-col-1,
+#mainTable thead th.sticky-col-1 {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 120 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#mainTable thead tr.header-row-main th.sticky-col-2,
+#mainTable thead tr th.sticky-col-2,
+#mainTable thead th.sticky-col-2 {
+  position: sticky !important;
+  top: 0 !important;
+  left: 36px !important;
+  z-index: 120 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#consolidadoTable thead tr th.sticky-col-1,
+#consolidadoTable thead th.sticky-col-1 {
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 120 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#consolidadoTable thead tr th.sticky-col-2,
+#consolidadoTable thead th.sticky-col-2 {
+  position: sticky !important;
+  top: 0 !important;
+  left: 44px !important;
+  z-index: 120 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+html.dark #mainTable thead th,
+[data-theme="dark"] #mainTable thead th {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #475569 !important;
+}
+
+html.dark #mainTable thead tr.header-row-main th.sticky-col-1,
+html.dark #mainTable thead tr.header-row-main th.sticky-col-2,
+html.dark #mainTable thead tr th.sticky-col-1,
+html.dark #mainTable thead tr th.sticky-col-2,
+html.dark #consolidadoTable thead tr th.sticky-col-1,
+html.dark #consolidadoTable thead tr th.sticky-col-2,
+[data-theme="dark"] #mainTable thead tr.header-row-main th.sticky-col-1,
+[data-theme="dark"] #mainTable thead tr.header-row-main th.sticky-col-2,
+[data-theme="dark"] #mainTable thead tr th.sticky-col-1,
+[data-theme="dark"] #mainTable thead tr th.sticky-col-2,
+[data-theme="dark"] #consolidadoTable thead tr th.sticky-col-1,
+[data-theme="dark"] #consolidadoTable thead tr th.sticky-col-2 {
+  background-color: #1e293b !important;
+}
+
+/* Hover de filas: mantener opacidad en celdas sticky */
+#mainTable tbody tr:hover td.sticky-col-1,
+#mainTable tbody tr:hover td.sticky-col-2,
+#consolidadoTable tbody tr:hover td.sticky-col-1,
+#consolidadoTable tbody tr:hover td.sticky-col-2 {
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+html.dark #mainTable tbody tr:hover td.sticky-col-1,
+html.dark #mainTable tbody tr:hover td.sticky-col-2,
+html.dark #consolidadoTable tbody tr:hover td.sticky-col-1,
+html.dark #consolidadoTable tbody tr:hover td.sticky-col-2,
+[data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-1,
+[data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-2,
+[data-theme="dark"] #consolidadoTable tbody tr:hover td.sticky-col-1,
+[data-theme="dark"] #consolidadoTable tbody tr:hover td.sticky-col-2 {
+  background-color: #1e293b !important;
+}
+
+/* ─── FILA DE TOTALES / TFOOT STICKY Y SINCRONIZADA ─────────────────────── */
+#mainTable tfoot {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 45 !important;
+}
+
+#mainTable tfoot tr {
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+}
+
+#mainTable tfoot td {
+  position: sticky !important;
+  bottom: 0 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+  color: var(--text-primary, #0f172a) !important;
+  font-weight: 800 !important;
+  font-size: 0.88rem !important;
+  border: 1px solid #94a3b8 !important;
+  vertical-align: middle !important;
+  padding: 4px 4px !important;
+  z-index: 45 !important;
+}
+
+html.dark #mainTable tfoot tr,
+html.dark #mainTable tfoot td,
+[data-theme="dark"] #mainTable tfoot tr,
+[data-theme="dark"] #mainTable tfoot td {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #475569 !important;
+}
+
+#mainTable tfoot td.sticky-col-footer {
+  position: sticky !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 266px !important;
+  min-width: 266px !important;
+  max-width: 266px !important;
+  z-index: 80 !important;
+  background-color: var(--bg-surface-alt, #e2e8f0) !important;
+  border: 1px solid #94a3b8 !important;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+  font-size: 0.82rem !important;
+  box-sizing: border-box !important;
+}
+
+html.dark #mainTable tfoot td.sticky-col-footer,
+[data-theme="dark"] #mainTable tfoot td.sticky-col-footer {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #475569 !important;
+}
+
+/* ─── TRAMA CRUZADA / RAYADA PARA ITEMS NO APLICABLES (SERVICIO SOCIAL) ─── */
+.th-hatched,
+.td-hatched {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(148, 163, 184, 0.12),
+    rgba(148, 163, 184, 0.12) 4px,
+    rgba(148, 163, 184, 0.28) 4px,
+    rgba(148, 163, 184, 0.28) 8px
+  ) !important;
+  color: var(--text-muted, #94a3b8) !important;
+}
+
+html.dark .th-hatched,
+html.dark .td-hatched,
+[data-theme="dark"] .th-hatched,
+[data-theme="dark"] .td-hatched {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(30, 41, 59, 0.4),
+    rgba(30, 41, 59, 0.4) 4px,
+    rgba(51, 65, 85, 0.65) 4px,
+    rgba(51, 65, 85, 0.65) 8px
+  ) !important;
+  color: #64748b !important;
+}
+
+
+
+
+
 

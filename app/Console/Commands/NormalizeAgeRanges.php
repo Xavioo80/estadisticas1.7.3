@@ -30,35 +30,42 @@ class NormalizeAgeRanges extends Command
             '60 Y MAS' => '9. MAYORES DE 60 AÑOS',
         ];
 
+        $tables = ['registros_globales', 'informes'];
         $columns = ['rango', 'rango_2', 'rango_3', 'rango_4', 'rango_5'];
 
-        foreach ($columns as $col) {
-            $this->info("Procesando columna: $col...");
-            
-            $distinctValues = DB::table('registros_globales')
-                ->whereNotNull($col)
-                ->where($col, '!=', '')
-                ->distinct()
-                ->pluck($col);
-
-            foreach ($distinctValues as $val) {
-                $cleanVal = $this->cleanValue($val, $col);
-                $finalVal = $cleanVal;
-
-                if ($col === 'rango') {
-                    // Asegurar prefijo en Rango 1
-                    $finalVal = $r1Map[$cleanVal] ?? $this->ensureR1Prefix($cleanVal, $r1Map);
-                } else {
-                    // Quitar prefijo en los demás
-                    $finalVal = $cleanVal;
+        foreach ($tables as $table) {
+            $this->info("=== Procesando tabla: $table ===");
+            foreach ($columns as $col) {
+                if (!\Illuminate\Support\Facades\Schema::hasColumn($table, $col)) {
+                    continue;
                 }
+                $this->info("Procesando columna: $col en $table...");
+                
+                $distinctValues = DB::table($table)
+                    ->whereNotNull($col)
+                    ->where($col, '!=', '')
+                    ->distinct()
+                    ->pluck($col);
 
-                if ($val !== $finalVal) {
-                    $this->line("  Cambio: [$val] -> [$finalVal]");
-                    if (!$dryRun) {
-                        DB::table('registros_globales')
-                            ->where($col, $val)
-                            ->update([$col => $finalVal]);
+                foreach ($distinctValues as $val) {
+                    $cleanVal = $this->cleanValue($val, $col);
+                    $finalVal = $cleanVal;
+
+                    if ($col === 'rango') {
+                        // Asegurar prefijo en Rango 1
+                        $finalVal = $r1Map[$cleanVal] ?? $this->ensureR1Prefix($cleanVal, $r1Map);
+                    } else {
+                        // Quitar prefijo en los demás
+                        $finalVal = $cleanVal;
+                    }
+
+                    if ($val !== $finalVal) {
+                        $this->line("  Cambio en $table.$col: [$val] -> [$finalVal]");
+                        if (!$dryRun) {
+                            DB::table($table)
+                                ->where($col, $val)
+                                ->update([$col => $finalVal]);
+                        }
                     }
                 }
             }

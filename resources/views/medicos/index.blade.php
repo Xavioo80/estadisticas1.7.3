@@ -188,6 +188,24 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold" style="color: var(--text-primary); font-size: 0.82rem;">Nómina</label>
+                        <select id="edit_NOMINA" name="NOMINA" class="form-control form-control-sm text-uppercase"
+                            style="background-color: var(--input-bg); color: var(--text-primary); border-color: var(--border-color); height: 34px;">
+                            <option value="MEDICO ASISTENCIAL">MEDICO ASISTENCIAL</option>
+                            <option value="ESPECIALISTA">ESPECIALISTA</option>
+                            <option value="LICENCIADA EN ENFERMERIA">LICENCIADA EN ENFERMERIA</option>
+                            <option value="ENFERMERA AUXILIAR">ENFERMERA AUXILIAR</option>
+                            <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
+                            <option value="ABOGADO">ABOGADO</option>
+                            <option value="ONG">ONG</option>
+                            <option value="OTROS">OTROS</option>
+                        </select>
+                    </div>
+
+                    {{-- Hidden FECHA_INGRESO: preserved from loaded data --}}
+                    <input type="hidden" id="edit_FECHA_INGRESO" name="FECHA_INGRESO">
+
+                    <div class="col-md-6 mb-3">
                         <label class="form-label font-weight-bold" style="color: var(--text-primary); font-size: 0.82rem;">Modalidad</label>
                         <select id="edit_MODALIDAD" name="MODALIDAD" class="form-control form-control-sm text-uppercase"
                             style="background-color: var(--input-bg); color: var(--text-primary); border-color: var(--border-color); height: 34px;">
@@ -363,10 +381,13 @@ function openEditModalByCod(cod) {
     $('#edit_NOM_MED').val(m.NOM_MED);
     $('#edit_JORNADA').val(m.JORNADA || 'MATUTINA');
     $('#edit_ESPECIALIDAD').val(m.ESPECIALIDAD || 'MEDICO GENERAL');
+    $('#edit_NOMINA').val(m.NOMINA || 'MEDICO ASISTENCIAL');
     $('#edit_MODALIDAD').val(m.MODALIDAD || 'PERMANENTE');
     $('#edit_estado').val(m.estado || 'activo');
     $('#edit_observaciones').val(m.observaciones || '');
     $('#edit_es_director').prop('checked', m.es_director == 1 || m.es_director === true);
+    // Preserve FECHA_INGRESO so the required validator doesn't fail
+    $('#edit_FECHA_INGRESO').val(m.FECHA_INGRESO || new Date().toISOString().split('T')[0]);
 
     $('#editModalSubhead').text(m.NOM_MED);
     $('#editMedicoModal').addClass('active');
