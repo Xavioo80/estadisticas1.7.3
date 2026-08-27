@@ -1,51 +1,49 @@
-<!-- Barra de Filtros y Acciones en Una Sola Fila -->
-<div class="informe-filters-card mb-3 no-print" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); padding: 0.65rem 1rem; box-shadow: var(--shadow-sm);">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-        <form id="filter-form" action="{{ route('informes.alerta-semanal') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 mb-0" style="margin: 0;">
-            <!-- Año -->
-            <div class="d-inline-flex align-items-center">
-                <select name="ano" class="form-control form-control-sm ajax-filter font-weight-bold" style="width: 95px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px); font-size: 0.85rem;">
-                    @foreach($anos as $a)
-                        <option value="{{ $a }}" {{ $a == $anoDefault ? 'selected' : '' }}>{{ $a }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Mes -->
-            <div class="d-inline-flex align-items-center">
-                <select name="mes" class="form-control form-control-sm ajax-filter font-weight-bold" style="width: 140px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px); font-size: 0.85rem;">
-                    <option value="">-- Todos los Meses --</option>
-                    @foreach($meses as $m)
-                        <option value="{{ $m }}" {{ strtoupper($m) == strtoupper($mesDefault) ? 'selected' : '' }}>{{ $m }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Semana Epidemiológica -->
-            <div class="d-inline-flex align-items-center">
-                <select name="se" class="form-control form-control-sm ajax-filter font-weight-bold" style="width: 135px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px); font-size: 0.85rem;">
-                    @foreach($semanas as $s)
-                        <option value="{{ $s }}" {{ $s == $seDefault ? 'selected' : '' }}>Semana {{ $s }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Rango Epidemiológico -->
-            <div class="d-inline-flex align-items-center px-2.5 ml-1" style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm, 6px); height: 36px; white-space: nowrap;">
-                <span class="text-muted mr-1.5" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Rango:</span>
-                <span class="font-weight-bold text-primary" style="font-size: 0.82rem;">{{ $fechaInfo['start'] }} al {{ $fechaInfo['end'] }}</span>
-            </div>
-        </form>
-
-        <!-- Acciones -->
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-subtle btn-sm" onclick="copyToExcel()" title="Copiar al Portapapeles" style="font-weight: 600; height: 36px; padding: 0 0.85rem; border-radius: var(--radius-sm, 6px);">
-                <i class="bi bi-clipboard-check mr-1 text-primary"></i> Copiar
-            </button>
-            <button type="button" class="btn btn-subtle btn-sm" onclick="window.print()" title="Imprimir informe" style="font-weight: 600; height: 36px; padding: 0 0.85rem; border-radius: var(--radius-sm, 6px);">
-                <i class="bi bi-printer mr-1"></i> Imprimir
-            </button>
+<!-- Barra de Filtros y Acciones en Una Sola Fila Horizontal -->
+<div class="filter-container no-print mb-2" style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.5rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important;">
+    <form id="filter-form" action="{{ route('informes.alerta-semanal') }}" method="GET" style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; margin: 0 !important; flex: 1 1 auto !important; min-width: 0 !important;">
+        <!-- Año -->
+        <div style="width: 95px !important; min-width: 95px !important; flex-shrink: 0 !important;">
+            <select name="ano" class="filter-select w-full ajax-filter" style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
+                @foreach($anos as $a)
+                    <option value="{{ $a }}" {{ $a == $anoDefault ? 'selected' : '' }}>{{ $a }}</option>
+                @endforeach
+            </select>
         </div>
+
+        <!-- Mes -->
+        <div style="width: 140px !important; min-width: 140px !important; flex-shrink: 0 !important;">
+            <select name="mes" class="filter-select w-full ajax-filter" style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
+                <option value="">-- Todos los Meses --</option>
+                @foreach($meses as $m)
+                    <option value="{{ $m }}" {{ strtoupper($m) == strtoupper($mesDefault) ? 'selected' : '' }}>{{ $m }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Semana Epidemiológica -->
+        <div style="width: 135px !important; min-width: 135px !important; flex-shrink: 0 !important;">
+            <select name="se" class="filter-select w-full ajax-filter" style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
+                @foreach($semanas as $s)
+                    <option value="{{ $s }}" {{ $s == $seDefault ? 'selected' : '' }}>Semana {{ $s }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Rango Epidemiológico -->
+        <div class="d-flex align-items-center px-2.5" style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 8px; height: 34px; white-space: nowrap; flex-shrink: 0;">
+            <span class="text-muted mr-1.5" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Rango:</span>
+            <span class="font-weight-bold text-primary" style="font-size: 0.82rem;">{{ $fechaInfo['start'] }} al {{ $fechaInfo['end'] }}</span>
+        </div>
+    </form>
+
+    <!-- Acciones -->
+    <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-shrink: 0 !important; gap: 6px !important;">
+        <button type="button" class="btn btn-subtle btn-sm" onclick="copyToExcel()" title="Copiar al Portapapeles" style="font-weight: 600; height: 34px; padding: 0 0.85rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="bi bi-clipboard-check text-primary"></i> <span>Copiar</span>
+        </button>
+        <button type="button" class="btn btn-subtle btn-sm" onclick="window.print()" title="Imprimir informe" style="font-weight: 600; height: 34px; padding: 0 0.85rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">
+            <i class="bi bi-printer"></i> <span>Imprimir</span>
+        </button>
     </div>
 </div>
 
