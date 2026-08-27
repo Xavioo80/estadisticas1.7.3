@@ -156,33 +156,112 @@ Route::get('/calendario-epi', [CalendarioEpiController::class, 'index'])->name('
 Route::post('/calendario-epi/upload', [CalendarioEpiController::class, 'upload'])->name('calendario_epi.upload');
 Route::get('/calendario-epi/download', [CalendarioEpiController::class, 'download'])->name('calendario_epi.download');
 
-// Rutas para Diagnósticos
-use App\Http\Controllers\DiagnosticoController;
-Route::prefix('diagnosticos')->name('diagnosticos.')->group(function () {
-    Route::get('/', [DiagnosticoController::class, 'index'])->name('index');
-    Route::get('/buscar', [DiagnosticoController::class, 'buscar'])->name('buscar');
-    Route::get('/condicionamientos', [DiagnosticoController::class, 'condicionamientos'])->name('condicionamientos');
-    Route::get('/validaciones-json', [DiagnosticoController::class, 'obtenerValidacionesJson'])->name('validaciones-json');
+// ============================================================================
+// GESTIÓN OTRAS BASES & ADMINISTRACIÓN
+// ============================================================================
+
+// Consulta de Pacientes en SESAL
+use App\Http\Controllers\PruebaConsultaController;
+Route::get('/prueba-consulta', [PruebaConsultaController::class, 'index'])->name('prueba.consulta');
+Route::match(['GET', 'POST'], '/prueba-consulta/buscar', [PruebaConsultaController::class, 'buscar'])->name('prueba.consulta.buscar');
+
+// Pacientes BD
+
+use App\Http\Controllers\PacienteController;
+Route::prefix('pacientes')->name('pacientes.')->group(function () {
+    Route::get('/', [PacienteController::class, 'index'])->name('index');
+    Route::get('/buscar-modal', [PacienteController::class, 'buscarModal'])->name('buscar_modal');
+    Route::patch('/{id}/update-field', [PacienteController::class, 'updateField'])->name('update_field');
+    Route::post('/{id}/resync', [PacienteController::class, 'resync'])->name('resync');
+    Route::post('/buscar-nuevo', [PacienteController::class, 'buscarYAgregar'])->name('buscar_nuevo');
+    Route::post('/resync-masivo', [PacienteController::class, 'resyncMasivo'])->name('resync_masivo');
+    Route::post('/recalcular-edades', [PacienteController::class, 'recalcularEdades'])->name('recalcular_edades');
+    Route::post('/{id}/recalcular-edad', [PacienteController::class, 'recalcularEdadIndividual'])->name('recalcular_edad');
 });
 
-// Rutas para Médicos
+// Adolescentes
+use App\Http\Controllers\AdolescenteController;
+Route::prefix('adolescentes')->name('adolescentes.')->group(function () {
+    Route::get('/', [AdolescenteController::class, 'index'])->name('index');
+    Route::get('/create', [AdolescenteController::class, 'create'])->name('create');
+    Route::post('/', [AdolescenteController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [AdolescenteController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [AdolescenteController::class, 'update'])->name('update');
+    Route::patch('/{id}/ajax', [AdolescenteController::class, 'ajaxUpdate'])->name('ajax-update');
+    Route::delete('/{id}', [AdolescenteController::class, 'destroy'])->name('destroy');
+    Route::get('/buscar', [AdolescenteController::class, 'checkIdentity'])->name('buscar');
+    Route::post('/guardar', [AdolescenteController::class, 'storeBatch'])->name('guardar');
+    Route::get('/seguimientos', [AdolescenteController::class, 'seguimientos'])->name('seguimientos');
+    Route::get('/depurados', [AdolescenteController::class, 'depurados'])->name('depurados');
+    Route::get('/historial/{no_expediente}', [AdolescenteController::class, 'historial'])->name('historial');
+    Route::get('/check-dni', [AdolescenteController::class, 'checkDni'])->name('check-dni');
+    Route::get('/check-expediente', [AdolescenteController::class, 'checkExpediente'])->name('check-expediente');
+    Route::get('/seguimiento/create/{no_expediente}', [AdolescenteController::class, 'seguimientoCreate'])->name('seguimiento.create');
+    Route::post('/seguimiento/store', [AdolescenteController::class, 'seguimientoStore'])->name('seguimiento.store');
+    Route::get('/seguimiento/{id}/edit', [AdolescenteController::class, 'seguimientoEdit'])->name('seguimiento.edit');
+    Route::put('/seguimiento/{id}', [AdolescenteController::class, 'seguimientoUpdate'])->name('seguimiento.update');
+    Route::delete('/seguimiento/{id}', [AdolescenteController::class, 'seguimientoDestroy'])->name('seguimiento.destroy');
+    Route::get('/export-excel', [AdolescenteController::class, 'exportExcel'])->name('export-excel');
+});
+
+// Adulto Mayor
+use App\Http\Controllers\AdultoMayorController;
+Route::prefix('adulto-mayor')->name('adulto-mayor.')->group(function () {
+    Route::get('/check-dni', [AdultoMayorController::class, 'checkDni'])->name('check-dni');
+});
+Route::resource('adulto-mayor', AdultoMayorController::class)
+    ->parameters(['adulto-mayor' => 'adultoMayor']);
+
+// Médicos
 use App\Http\Controllers\MedicoController;
 Route::prefix('medicos')->name('medicos.')->group(function () {
     Route::get('/buscar-codigo', [MedicoController::class, 'buscarPorCodigo'])->name('buscar-codigo');
     Route::get('/obtener-todos', [MedicoController::class, 'obtenerTodos'])->name('obtener-todos');
+    Route::get('/siguiente-codigo', [MedicoController::class, 'obtenerSiguienteCodigo'])->name('siguiente-codigo');
+    Route::get('/planilla', [MedicoController::class, 'planilla'])->name('planilla');
+    Route::post('/{medico}/toggle-director', [MedicoController::class, 'toggleDirector'])->name('toggle-director');
+});
+Route::resource('medicos', MedicoController::class);
+
+// Diagnósticos
+use App\Http\Controllers\DiagnosticoController;
+Route::prefix('diagnosticos')->name('diagnosticos.')->group(function () {
+    Route::get('/', [DiagnosticoController::class, 'index'])->name('index');
+    Route::post('/normalizar', [DiagnosticoController::class, 'normalizar'])->name('normalizar');
+    Route::get('/buscar', [DiagnosticoController::class, 'buscar'])->name('buscar');
+    Route::get('/salud-mental', [DiagnosticoController::class, 'obtenerSaludMental'])->name('salud-mental');
+    Route::get('/condicionamientos', [DiagnosticoController::class, 'condicionamientos'])->name('condicionamientos');
+    Route::post('/condicionamientos/batch', [DiagnosticoController::class, 'actualizarCondicionamientosBatch'])->name('condicionamientos.batch');
+    Route::put('/{diagnostico}/condicionamiento', [DiagnosticoController::class, 'actualizarCondicionamiento'])->name('condicionamiento.update');
+    Route::get('/validaciones-json', [DiagnosticoController::class, 'obtenerValidacionesJson'])->name('validaciones-json');
+    Route::get('/create', [DiagnosticoController::class, 'create'])->name('create');
+    Route::post('/', [DiagnosticoController::class, 'store'])->name('store');
+    Route::get('/siguiente-codigo', [DiagnosticoController::class, 'obtenerSiguienteCodigo'])->name('siguiente-codigo');
+    Route::get('/{diagnostico}', [DiagnosticoController::class, 'show'])->name('show');
+    Route::get('/{diagnostico}/edit', [DiagnosticoController::class, 'edit'])->name('edit');
+    Route::put('/{diagnostico}', [DiagnosticoController::class, 'update'])->name('update');
+    Route::delete('/{diagnostico}', [DiagnosticoController::class, 'destroy'])->name('destroy');
 });
 
-// Rutas para Adolescentes
-use App\Http\Controllers\AdolescenteController;
-Route::prefix('adolescentes')->name('adolescentes.')->group(function () {
-    Route::get('/', [AdolescenteController::class, 'index'])->name('index');
-    Route::get('/buscar', [AdolescenteController::class, 'checkIdentity'])->name('buscar');
-    Route::post('/guardar', [AdolescenteController::class, 'storeBatch'])->name('guardar');
-});
-
-// Rutas para Colonias y Referencias
+// Colonias y Referencias
 use App\Http\Controllers\ColoniaController;
 use App\Http\Controllers\ReferenciaController;
-Route::resource('colonias', ColoniaController::class)->only(['index', 'show']);
-Route::resource('referencias', ReferenciaController::class)->only(['index', 'show']);
+Route::resource('colonias', ColoniaController::class);
+Route::resource('referencias', ReferenciaController::class);
+
+// Documentación
+use App\Http\Controllers\DocumentacionController;
+Route::prefix('documentacion')->name('documentacion.')->group(function () {
+    Route::get('/', [DocumentacionController::class, 'index'])->name('index');
+    Route::post('/upload', [DocumentacionController::class, 'store'])->name('upload');
+    Route::post('/carpetas', [DocumentacionController::class, 'storeFolder'])->name('storeFolder');
+    Route::put('/carpetas/{id}', [DocumentacionController::class, 'updateFolder'])->name('updateFolder');
+    Route::delete('/carpetas/{id}', [DocumentacionController::class, 'destroyFolder'])->name('destroyFolder');
+    Route::get('/ver/{id}', [DocumentacionController::class, 'view'])->name('view');
+    Route::get('/descargar/{id}', [DocumentacionController::class, 'download'])->name('download');
+    Route::post('/reemplazar/{id}', [DocumentacionController::class, 'replaceFile'])->name('replaceFile');
+    Route::delete('/{id}', [DocumentacionController::class, 'destroy'])->name('destroy');
+});
+
+
 

@@ -95,11 +95,18 @@ class Trans2Controller extends Controller
             }
         }
 
-        return view('informes.trans2', compact(
+        $viewData = compact(
             'anos', 'anoDefault', 'meses', 'mesDefault', 'semanasMes',
             'sections', 'results', 'settings'
-        ));
+        );
+
+        if ($request->ajax()) {
+            return view('informes.trans2_content', $viewData);
+        }
+
+        return view('informes.trans2', $viewData);
     }
+
 
     private function getSeDeDate(string $fecha): int
     {

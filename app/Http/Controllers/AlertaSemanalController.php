@@ -128,7 +128,7 @@ class AlertaSemanalController extends Controller
         // Obtener rango de fechas de la semana epidemiológica (estimado)
         $fechaInfo = $this->getDatesFromWeek($anoDefault, $seDefault);
 
-        return view('informes.alerta_semanal', compact(
+        $viewData = compact(
             'anos',
             'anoDefault',
             'meses',
@@ -139,8 +139,15 @@ class AlertaSemanalController extends Controller
             'results',
             'settings',
             'fechaInfo'
-        ));
+        );
+
+        if ($request->ajax()) {
+            return view('informes.alerta_semanal_content', $viewData);
+        }
+
+        return view('informes.alerta_semanal', $viewData);
     }
+
 
     private function getMesNombre($n)
     {

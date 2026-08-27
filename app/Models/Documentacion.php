@@ -25,5 +25,26 @@ class Documentacion extends Model
     {
         return $this->belongsTo(CategoriaDocumentacion::class, 'categoria_id');
     }
+
+    public function getExisteFisicamenteAttribute()
+    {
+        $paths = [
+            storage_path('app/public/' . $this->ruta),
+            storage_path('app/' . $this->ruta),
+            storage_path('app/public/documentacion/' . $this->nombre_archivo),
+            storage_path('app/documentacion/' . $this->nombre_archivo),
+            public_path('storage/' . $this->ruta),
+            public_path($this->ruta),
+        ];
+
+        foreach ($paths as $path) {
+            if (file_exists($path) && is_file($path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
+
 

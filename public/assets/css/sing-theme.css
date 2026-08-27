@@ -227,7 +227,7 @@
 }
 
 /* ==========================================================================
-   GLOBAL LAYOUT BACKGROUND ENFORCEMENT
+   GLOBAL LAYOUT & COMPATIBILITY LAYER FOR RECOVERED MODULES
    ========================================================================== */
 html,
 body,
@@ -237,4 +237,55 @@ body,
   background-color: var(--bg-body) !important;
   color: var(--text-primary) !important;
 }
+
+/* Automatic Dark & Light mapping for Tailwind utility classes in legacy/migrated views */
+[data-theme="dark"] .bg-white {
+  background-color: var(--bg-surface) !important;
+}
+
+[data-theme="dark"] .bg-gray-50,
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-100 {
+  background-color: var(--bg-subtle) !important;
+}
+
+[data-theme="dark"] .border-gray-200,
+[data-theme="dark"] .border-gray-300,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-300 {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .text-gray-900,
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-gray-500,
+[data-theme="dark"] .text-gray-600,
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-600 {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Light mode crisp borders and surfaces */
+[data-theme="light"] .bg-white {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .border-gray-200,
+[data-theme="light"] .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
 

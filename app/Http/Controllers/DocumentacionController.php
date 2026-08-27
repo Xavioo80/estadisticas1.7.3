@@ -12,9 +12,11 @@ class DocumentacionController extends Controller
 {
     public function index(Request $request)
     {
-        // Solo carpetas raíz (sin padre)
+        // Carpetas raíz (sin padre) con relaciones
         $categorias = CategoriaDocumentacion::with(['documentos', 'subcarpetas'])
+            ->withCount(['documentos', 'subcarpetas'])
             ->whereNull('parent_id')
+            ->orderBy('nombre')
             ->get();
 
         $documentosSinCategoria = Documentacion::whereNull('categoria_id')->latest()->get();
@@ -22,14 +24,37 @@ class DocumentacionController extends Controller
         $categoriaActual = null;
         $breadcrumb = [];
 
-        if ($request->has('categoria')) {
-            $categoriaActual = CategoriaDocumentacion::with(['documentos', 'subcarpetas', 'parent.parent'])
+        if ($request->filled('categoria')) {
+            $categoriaActual = CategoriaDocumentacion::with(['documentos', 'subcarpetas.documentos', 'parent.parent'])
+                ->withCount(['documentos', 'subcarpetas'])
                 ->findOrFail($request->categoria);
 
             $breadcrumb = $this->buildBreadcrumb($categoriaActual);
         }
 
-        return view('documentacion.index', compact('categorias', 'documentosSinCategoria', 'categoriaActual', 'breadcrumb'));
+        // Estadísticas globales
+        $totalDocumentos = Documentacion::count();
+        $totalCategorias = CategoriaDocumentacion::count();
+        $totalTamano     = Documentacion::sum('tamano');
+        $todasCategorias = CategoriaDocumentacion::orderBy('nombre')->get();
+        $recientes       = Documentacion::with('categoria')->latest()->take(5)->get();
+
+        // Asegurar que el directorio de almacenamiento público exista
+        if (!Storage::disk('public')->exists('documentacion')) {
+            Storage::disk('public')->makeDirectory('documentacion');
+        }
+
+        return view('documentacion.index', compact(
+            'categorias',
+            'documentosSinCategoria',
+            'categoriaActual',
+            'breadcrumb',
+            'totalDocumentos',
+            'totalCategorias',
+            'totalTamano',
+            'todasCategorias',
+            'recientes'
+        ));
     }
 
     private function buildBreadcrumb($categoria)
@@ -42,6 +67,7 @@ class DocumentacionController extends Controller
         }
         return $trail;
     }
+
 
     public function store(Request $request)
     {
@@ -137,13 +163,34 @@ class DocumentacionController extends Controller
         return redirect()->route('documentacion.index')->with('success', 'Carpeta eliminada correctamente.');
     }
 
+    private function resolveFilePath($documento)
+    {
+        $possiblePaths = [
+            storage_path('app/public/' . $documento->ruta),
+            storage_path('app/' . $documento->ruta),
+            storage_path('app/public/documentacion/' . $documento->nombre_archivo),
+            storage_path('app/documentacion/' . $documento->nombre_archivo),
+            public_path('storage/' . $documento->ruta),
+            public_path($documento->ruta),
+            public_path('documentacion/' . $documento->nombre_archivo),
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path) && is_file($path)) {
+                return $path;
+            }
+        }
+
+        return null;
+    }
+
     public function view($id)
     {
         $documento = Documentacion::findOrFail($id);
-        $path = storage_path('app/public/' . $documento->ruta);
+        $path = $this->resolveFilePath($documento);
 
-        if (!file_exists($path)) {
-            return redirect()->back()->with('error', 'El archivo no existe físicamente.');
+        if (!$path) {
+            return redirect()->back()->with('error', 'El archivo "' . $documento->nombre_original . '" no se encuentra en el almacenamiento del servidor. Puede subirlo nuevamente usando el botón "Reemplazar / Subir".');
         }
 
         return response()->file($path, [
@@ -154,25 +201,61 @@ class DocumentacionController extends Controller
     public function download($id)
     {
         $documento = Documentacion::findOrFail($id);
-        $path = storage_path('app/public/' . $documento->ruta);
+        $path = $this->resolveFilePath($documento);
 
-        if (!file_exists($path)) {
-            return redirect()->back()->with('error', 'El archivo no existe físicamente.');
+        if (!$path) {
+            return redirect()->back()->with('error', 'El archivo "' . $documento->nombre_original . '" no se encuentra en el almacenamiento del servidor. Puede subirlo nuevamente usando el botón "Reemplazar / Subir".');
         }
 
         return response()->download($path, $documento->nombre_original);
+    }
+
+    public function replaceFile(Request $request, $id)
+    {
+        $request->validate([
+            'archivo' => 'required|file|max:20480',
+        ]);
+
+        $documento = Documentacion::findOrFail($id);
+        $file = $request->file('archivo');
+
+        $originalName = $file->getClientOriginalName();
+        $extension    = strtolower($file->getClientOriginalExtension());
+        $size         = $file->getSize();
+        $fileName     = Str::uuid() . '.' . $extension;
+        $path         = $file->storeAs('documentacion', $fileName, 'public');
+
+        // Eliminar archivo anterior si existiera físicamente
+        $oldPath = $this->resolveFilePath($documento);
+        if ($oldPath && file_exists($oldPath)) {
+            @unlink($oldPath);
+        }
+
+        $documento->update([
+            'nombre_original' => $originalName,
+            'nombre_archivo'  => $fileName,
+            'ruta'            => $path,
+            'extension'       => $extension,
+            'tamano'          => $size,
+        ]);
+
+        return redirect()->back()->with('success', 'Archivo "' . $originalName . '" vinculado y actualizado correctamente.');
     }
 
     public function destroy($id)
     {
         $documento = Documentacion::findOrFail($id);
 
-        if (Storage::disk('public')->exists($documento->ruta)) {
+        $path = $this->resolveFilePath($documento);
+        if ($path && file_exists($path)) {
+            @unlink($path);
+        } elseif (Storage::disk('public')->exists($documento->ruta)) {
             Storage::disk('public')->delete($documento->ruta);
         }
 
         $documento->delete();
 
-        return redirect()->back()->with('success', 'Archivo eliminado correctamente.');
+        return redirect()->back()->with('success', 'Documento eliminado correctamente.');
     }
 }
+

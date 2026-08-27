@@ -2,13 +2,26 @@
 
 @section('title', 'Alerta Semanal - Estadísticas 1.7')
 
+@push('styles')
+<style>
+    .cell-clickable:hover {
+        background-color: var(--color-primary-light) !important;
+    }
+    @media print {
+        .no-print { display: none !important; }
+        .informe-table-container { border: none !important; box-shadow: none !important; max-height: none !important; }
+        .table-alerta th, .table-alerta td { border: 1px solid #000 !important; color: #000 !important; }
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="informe-page-wrapper">
     <!-- Header -->
     <div class="informe-header">
         <div>
             <h2><i class="bi bi-exclamation-triangle text-primary mr-1"></i> Alerta Semanal</h2>
-            <p>Vigilancia de Alertas Epidemiológicas Semanales</p>
+            <p>Vigilancia de Alertas Epidemiológicas Semanales (Telegrama Semanal)</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm" style="font-weight: 600;">
@@ -26,136 +39,166 @@
             </div>
         </div>
 
+        @include('informes.alerta_semanal_content')
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
-        function alertaReport() {
-            return {
-                showModal: false,
-                modalData: { label: '', range_label: '', count: 0, details: [], summaryByDay: {}, summaryByRange: {} },
-                loading: false,
-                coldChainStatus: 'green',
-                toggleColdChain() {
-                    const states = ['green', 'yellow', 'red'];
-                    const currentIndex = states.indexOf(this.coldChainStatus);
-                    this.coldChainStatus = states[(currentIndex + 1) % states.length];
-                },
-                getColdChainClass() {
-                    const classes = {
-                        'green': 'bg-green-600 text-white',
-                        'yellow': 'bg-yellow-400 text-slate-900',
-                        'red': 'bg-red-600 text-white'
-                    };
-                    return classes[this.coldChainStatus] + ' font-bold text-[12px]';
-                },
-                getColdChainLabel() {
-                    const labels = {
-                        'green': 'VERDE',
-                        'yellow': 'AMARILLO',
-                        'red': 'ROJO'
-                    };
-                    return labels[this.coldChainStatus];
-                },
-                fetchDetails(idx, range) {
-                    this.loading = true;
-                    this.showModal = true;
-                    this.modalData = { label: 'Cargando...', range_label: 'Procesando...', count: 0, details: [], summaryByDay: {}, summaryByRange: {} };
+    let coldChainStatus = 'green';
+    function toggleColdChain() {
+        const states = ['green', 'yellow', 'red'];
+        const labels = { 'green': 'VERDE', 'yellow': 'AMARILLO', 'red': 'ROJO' };
+        const colors = { 'green': '#22c55e', 'yellow': '#f59e0b', 'red': '#ef4444' };
+        const textColors = { 'green': '#fff', 'yellow': '#000', 'red': '#fff' };
 
-                    let url = `{{ route('informes.alerta-semanal.details') }}?ano={{ $anoDefault }}&se={{ $seDefault }}&idx=${idx}&range=${range}`;
+        const currentIndex = states.indexOf(coldChainStatus);
+        coldChainStatus = states[(currentIndex + 1) % states.length];
 
-                    fetch(url)
-                        .then(res => res.json())
-                        .then(data => {
-                            this.modalData = data;
-                            this.loading = false;
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            this.loading = false;
-                            alert('Error al cargar los detalles');
-                        });
-                },
-                formatRange(range) {
-                    const labels = {
-                        'less_1': '<1',
-                        '1_4': '1-4',
-                        '5_14': '5-14',
-                        '15_plus': '+15'
-                    };
-                    return labels[range] || range;
-                },
-                getDayName(dateStr) {
-                    const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
-                    const date = new Date(dateStr + 'T12:00:00');
-                    return days[date.getDay()];
-                }
-            };
+        const cell = $('#coldChainCell');
+        const lbl = $('#coldChainLabel');
+        if (cell.length) {
+            cell.css({ 'background-color': colors[coldChainStatus], 'color': textColors[coldChainStatus] });
+            lbl.text(labels[coldChainStatus]);
         }
-    </script>
-    <script>
-        function copyToExcel() {
-            const table = document.querySelector('.table-alerta');
-            if (!table) return;
+    }
 
-            let text = "";
-            // Seleccionamos solo las filas del cuerpo (tbody) para evitar encabezados
-            const rows = table.querySelectorAll('tbody tr');
+    function fetchDetails(idx, range) {
+        const ano = $('select[name="ano"]').val() || '{{ $anoDefault }}';
+        const se = $('select[name="se"]').val() || '{{ $seDefault }}';
 
-            rows.forEach(row => {
-                const cols = row.querySelectorAll('td');
-                let rowData = [];
-                // Empezamos desde el índice 1 para saltar la columna de nombres (Diagnóstico)
-                for (let i = 1; i < cols.length; i++) {
-                    // Limpiar espacios y saltos de línea
-                    let val = cols[i].innerText.trim().replace(/\s+/g, " ");
-                    rowData.push(val);
+        $('#modalAlertaTitle').text('Cargando detalles...');
+        $('#modalAlertaRangeLabel').text('...');
+        $('#modalSummaryTotal').text('...');
+        $('#modalSummaryDays').empty();
+        $('#modalSummaryRanges').empty();
+        $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm mr-1"></div> Cargando pacientes...</td></tr>');
+        $('#modalAlertaDetalles').modal('show');
 
-                    // Si la celda tiene colspan (como en Cadena de Frío), 
-                    // agregamos espacios vacíos para mantener la alineación de columnas en Excel
-                    let colspan = cols[i].getAttribute('colspan');
-                    if (colspan) {
-                        for (let c = 1; c < parseInt(colspan); c++) {
-                            rowData.push("");
-                        }
-                    }
-                }
+        const url = `{{ route('informes.alerta-semanal.details') }}?ano=${ano}&se=${se}&idx=${idx}&range=${range}`;
 
-                if (rowData.length > 0) {
-                    text += rowData.join("\t") + "\n";
-                }
-            });
+        $.getJSON(url, function(data) {
+            $('#modalAlertaTitle').text(data.label);
+            $('#modalAlertaRangeLabel').text(data.range_label);
+            $('#modalSummaryTotal').text(data.count);
 
-            // Intentar usar el API de portapapeles moderno
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    notifyCopy();
+            // Resumen por día
+            let daysHtml = '';
+            if (data.summaryByDay) {
+                $.each(data.summaryByDay, function(date, count) {
+                    const dayNum = date.split('-')[2] || date;
+                    daysHtml += `<div class="px-2 py-1 text-center"><span class="small text-muted d-block">${dayNum}</span><strong class="text-primary">${count}</strong></div>`;
+                });
+            }
+            $('#modalSummaryDays').html(daysHtml || '<span class="text-muted small">Sin datos</span>');
+
+            // Resumen por rango
+            let rangesHtml = '';
+            const rangeLabels = { 'less_1': '<1', '1_4': '1-4', '5_14': '5-14', '15_plus': '+15' };
+            if (data.summaryByRange) {
+                $.each(data.summaryByRange, function(rng, count) {
+                    const label = rangeLabels[rng] || rng;
+                    rangesHtml += `<div class="px-2 py-1 text-center"><span class="small text-muted d-block">${label}</span><strong class="text-primary">${count}</strong></div>`;
+                });
+            }
+            $('#modalSummaryRanges').html(rangesHtml || '<span class="text-muted small">Sin datos</span>');
+
+            // Tabla de pacientes
+            let rowsHtml = '';
+            if (data.details && data.details.length > 0) {
+                $.each(data.details, function(i, item) {
+                    rowsHtml += `
+                        <tr>
+                            <td class="font-weight-600">${item.fecha}</td>
+                            <td>${item.exp || '-'}</td>
+                            <td>${item.sexo || '-'}</td>
+                            <td>${item.edad || '-'}</td>
+                            <td class="font-weight-600 text-dark">${item.diagnostico || '-'}</td>
+                            <td class="small text-muted">${item.medico || '-'}</td>
+                        </tr>
+                    `;
                 });
             } else {
-                // Fallback para navegadores antiguos o contextos no seguros
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    notifyCopy();
-                } catch (err) {
-                    Swal.fire('Error', 'No se pudo copiar automáticamente. Intenta seleccionar la tabla manualmente.', 'error');
-                }
-                document.body.removeChild(textArea);
+                rowsHtml = '<tr><td colspan="6" class="text-center py-3 text-muted">No se encontraron pacientes para este criterio.</td></tr>';
             }
-        }
+            $('#modalAlertaTableBody').html(rowsHtml);
+        }).fail(function() {
+            $('#modalAlertaTableBody').html('<tr><td colspan="6" class="text-center text-danger py-3">Error al cargar los datos.</td></tr>');
+        });
+    }
 
-        function notifyCopy() {
-            Swal.fire({
-                title: '¡Copiado!',
-                html: 'Los datos están en tu portapapeles.<br><br><b>Pasos:</b><br>1. Ve a tu Excel en OneDrive.<br>2. Selecciona la celda de inicio.<br>3. Presiona <b>Ctrl + V</b>.',
-                icon: 'success',
-                confirmButtonText: 'ENTENDIDO',
-                confirmButtonColor: '#4f46e5'
+    function copyToExcel() {
+        const table = document.querySelector('.table-alerta');
+        if (!table) return;
+
+        let text = "";
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const cols = row.querySelectorAll('td');
+            let rowData = [];
+            for (let i = 1; i < cols.length; i++) {
+                let val = cols[i].innerText.trim().replace(/\s+/g, " ");
+                rowData.push(val);
+                let colspan = cols[i].getAttribute('colspan');
+                if (colspan) {
+                    for (let c = 1; c < parseInt(colspan); c++) {
+                        rowData.push("");
+                    }
+                }
+            }
+            if (rowData.length > 0) {
+                text += rowData.join("\t") + "\n";
+            }
+        });
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles listos para pegar en Excel.', icon: 'success', confirmButtonColor: '#4d7cfe' });
+            });
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            Swal.fire({ title: '¡Copiado!', text: 'Datos copiados al portapapeles.', icon: 'success', confirmButtonColor: '#4d7cfe' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        function refreshReport() {
+            const $form = $('#filter-form');
+            if (!$form.length) return;
+            
+            const url = $form.attr('action');
+            const data = $form.serialize();
+
+            $('#table-loader').css('display', 'flex').fadeIn(200);
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: data,
+                success: function(response) {
+                    $('#dynamic-content').html(response);
+                    $('#table-loader').fadeOut(200);
+                },
+                error: function() {
+                    Swal.fire('Error', 'Error al actualizar los datos', 'error');
+                    $('#table-loader').fadeOut(200);
+                }
             });
         }
-    </script>
 
-@endsection
+        $(document).on('change', '.ajax-filter', function() {
+            refreshReport();
+        });
+
+        $(document).on('click', '#btn-refresh-report', function() {
+            refreshReport();
+        });
+    });
+</script>
+@endpush

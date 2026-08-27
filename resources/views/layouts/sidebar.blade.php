@@ -97,8 +97,8 @@
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Documentación">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Documentación', message: 'Manuales y guías del sistema estadístico', type: 'info'});">
+    <li class="sidebar-item {{ (request()->routeIs('documentacion.*') || request()->is('documentacion*')) ? 'active' : '' }}" data-tooltip="Documentación">
+      <a href="{{ route('documentacion.index') }}" class="sidebar-link">
         <i class="bi bi-journal-text nav-icon"></i>
         <span class="nav-label">Documentación</span>
       </a>
@@ -133,15 +133,18 @@
     <!-- GRUPO 3: GESTIÓN OTRAS BASES -->
     <li class="sidebar-heading">Gestión Otras Bases</li>
 
-    <li class="sidebar-item" data-tooltip="Pacientes BD">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Pacientes BD', message: 'Base de datos maestra de pacientes', type: 'info'});">
+    <li class="sidebar-item {{ request()->routeIs('pacientes.*') ? 'active' : '' }}" data-tooltip="Pacientes BD">
+      <a href="{{ route('pacientes.index') }}" class="sidebar-link">
         <i class="bi bi-person-vcard-fill nav-icon"></i>
         <span class="nav-label">Pacientes BD</span>
       </a>
     </li>
 
     <!-- Adolescentes con Submenú -->
-    <li class="sidebar-item has-submenu {{ in_array('adolescentes', $openSubmenus) ? 'open' : '' }}" data-submenu="adolescentes" data-tooltip="Adolescentes">
+    @php
+      $isAdolescentesActive = request()->routeIs('adolescentes.*');
+    @endphp
+    <li class="sidebar-item has-submenu {{ $isAdolescentesActive || in_array('adolescentes', $openSubmenus) ? 'open' : '' }}" data-submenu="adolescentes" data-tooltip="Adolescentes">
       <a href="javascript:void(0)" class="sidebar-link">
         <i class="bi bi-people-fill nav-icon"></i>
         <span class="nav-label">Adolescentes</span>
@@ -149,14 +152,22 @@
       </a>
       <div class="sidebar-submenu-wrapper">
         <ul class="sidebar-submenu">
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Base Adolescentes', message: 'Padrón de población adolescente', type: 'primary'});"><i class="bi bi-person-lines-fill"></i> Base Adolescentes</a></li>
-          <li><a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Seguimientos', message: 'Registro de citas y seguimientos', type: 'info'});"><i class="bi bi-clipboard-check"></i> Seguimientos</a></li>
+          <li class="{{ request()->routeIs('adolescentes.index') || request()->routeIs('adolescentes.create') || request()->routeIs('adolescentes.edit') || request()->routeIs('adolescentes.historial') || request()->routeIs('adolescentes.depurados') ? 'active' : '' }}">
+            <a href="{{ route('adolescentes.index') }}" class="sidebar-link">
+              <i class="bi bi-person-lines-fill"></i> Base Adolescentes
+            </a>
+          </li>
+          <li class="{{ request()->routeIs('adolescentes.seguimientos') || request()->routeIs('adolescentes.seguimiento.*') ? 'active' : '' }}">
+            <a href="{{ route('adolescentes.seguimientos') }}" class="sidebar-link">
+              <i class="bi bi-clipboard-check"></i> Seguimientos
+            </a>
+          </li>
         </ul>
       </div>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Adulto Mayor">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Adulto Mayor', message: 'Control y atenciones de Adulto Mayor', type: 'success'});">
+    <li class="sidebar-item {{ request()->routeIs('adulto-mayor.*') ? 'active' : '' }}" data-tooltip="Adulto Mayor">
+      <a href="{{ route('adulto-mayor.index') }}" class="sidebar-link">
         <i class="bi bi-heart-fill nav-icon"></i>
         <span class="nav-label">Adulto Mayor</span>
       </a>
@@ -165,29 +176,29 @@
     <!-- GRUPO 4: ADMINISTRACIÓN -->
     <li class="sidebar-heading">Administración</li>
 
-    <li class="sidebar-item" data-tooltip="Médicos">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Médicos', message: 'Directorio de personal médico y turnos', type: 'info'});">
+    <li class="sidebar-item {{ request()->routeIs('medicos.*') ? 'active' : '' }}" data-tooltip="Médicos">
+      <a href="{{ route('medicos.index') }}" class="sidebar-link">
         <i class="bi bi-person-badge-fill nav-icon"></i>
         <span class="nav-label">Médicos</span>
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Diagnósticos">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Diagnósticos', message: 'Catálogo de diagnósticos y códigos CIE-10', type: 'warning'});">
+    <li class="sidebar-item {{ request()->routeIs('diagnosticos.*') ? 'active' : '' }}" data-tooltip="Diagnósticos">
+      <a href="{{ route('diagnosticos.index') }}" class="sidebar-link">
         <i class="bi bi-clipboard-data-fill nav-icon"></i>
         <span class="nav-label">Diagnósticos</span>
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Colonias">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Colonias', message: 'Catálogo de sectores y colonias', type: 'primary'});">
+    <li class="sidebar-item {{ request()->routeIs('colonias.*') ? 'active' : '' }}" data-tooltip="Colonias">
+      <a href="{{ route('colonias.index') }}" class="sidebar-link">
         <i class="bi bi-geo-alt-fill nav-icon"></i>
         <span class="nav-label">Colonias</span>
       </a>
     </li>
 
-    <li class="sidebar-item" data-tooltip="Referencias">
-      <a href="javascript:void(0)" class="sidebar-link" onclick="SingApp.toast({title: 'Referencias', message: 'Control de referencias y traslados', type: 'info'});">
+    <li class="sidebar-item {{ request()->routeIs('referencias.*') ? 'active' : '' }}" data-tooltip="Referencias">
+      <a href="{{ route('referencias.index') }}" class="sidebar-link">
         <i class="bi bi-arrow-left-right nav-icon"></i>
         <span class="nav-label">Referencias</span>
       </a>
