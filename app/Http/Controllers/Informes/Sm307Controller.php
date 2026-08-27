@@ -48,7 +48,7 @@ class Sm307Controller extends Controller
             'DICIEMBRE' => 12
         ];
 
-        $meses = collect($mesesRaw)->map(fn($m) => strtoupper(trim($m)))
+        $meses = collect($mesesRaw)->filter()->map(fn($m) => strtoupper(trim($m ?? '')))
             ->unique()
             ->sort(fn($a, $b) => ($mesMap[$a] ?? 0) <=> ($mesMap[$b] ?? 0))
             ->values();
