@@ -134,9 +134,15 @@
                 if (daysObj && Object.keys(daysObj).length > 0) {
                     for (const [day, count] of Object.entries(daysObj)) {
                         daysHtml += `
-                            <div class="d-inline-flex align-items-center px-2.5 py-1 rounded-pill mr-1 mb-1" style="background: var(--bg-surface); border: 1px solid var(--border-color); font-size: 0.75rem; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                                <span class="text-muted"><i class="bi bi-calendar3 mr-1 text-primary"></i> ${day}</span>
-                                <span class="badge badge-primary font-weight-bold" style="border-radius: 9999px; font-size: 0.70rem; padding: 2px 6px;">${count}</span>
+                            <div class="date-kpi-card" style="display: inline-flex; align-items: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); flex-shrink: 0;">
+                                <div style="width: 26px; height: 26px; border-radius: 6px; background: var(--color-primary-light, rgba(99, 102, 241, 0.12)); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+                                    <i class="bi bi-calendar-event"></i>
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 0.60rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; line-height: 1;">FECHA</span>
+                                    <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;">${day}</span>
+                                </div>
+                                <span class="badge badge-primary font-weight-bold" style="font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; box-shadow: 0 1px 3px rgba(79, 70, 229, 0.25);">${count}</span>
                             </div>
                         `;
                     }
