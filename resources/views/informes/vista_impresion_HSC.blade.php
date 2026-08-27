@@ -157,7 +157,15 @@
                 @php
                     $medico = $row['medico'];
                     $hsc = $row['hsc'];
-                    $obsTexto = $hsc ? ($hsc->observaciones ?? '') : '';
+                    $obsMedico = trim($medico->observaciones ?? '');
+                    $obsHsc = $hsc ? trim($hsc->observaciones ?? '') : '';
+                    if ($obsMedico && $obsHsc) {
+                        $obsTexto = $obsMedico . ', ' . $obsHsc;
+                    } elseif ($obsMedico) {
+                        $obsTexto = $obsMedico;
+                    } else {
+                        $obsTexto = $obsHsc;
+                    }
                 @endphp
                 <tr>
                     <td class="col-num">{{ $index + 1 }}</td>

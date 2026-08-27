@@ -69,14 +69,23 @@
                     <td class="border border-slate-300 dark:border-slate-700 p-2 text-left font-bold uppercase text-slate-900 dark:text-white">
                         {{ $medico->NOM_MED }}
                     </td>
-                    <td class="border border-slate-300 dark:border-slate-700 p-1.5 text-left">
-                        {{-- Input de texto plano: muestra el texto combinado; al guardar se salva la parte dinámica --}}
-                        <input type="text"
-                               class="w-full bg-transparent border-0 focus:ring-1 focus:ring-blue-400 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 no-print"
-                               value="{{ $obsTexto }}"
-                               placeholder="Escriba observaciones para este médico..."
-                               data-static="{{ $obsEstatica }}"
-                               onchange="guardarObservacionConsolidado({{ $medico->id }}, this.value, this.dataset.static)">
+                    <td class="border border-slate-300 dark:border-slate-700 p-1 text-left">
+                        {{-- Input editable y botón de modal detallado --}}
+                        <div class="flex items-center gap-1.5 no-print">
+                            <input type="text"
+                                   id="obs_input_{{ $medico->id }}"
+                                   class="w-full bg-transparent border-0 focus:ring-1 focus:ring-blue-400 text-xs font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400"
+                                   value="{{ $obsTexto }}"
+                                   placeholder="Escriba observaciones para este médico..."
+                                   data-static="{{ $obsEstatica }}"
+                                   onchange="guardarObservacionConsolidado({{ $medico->id }}, this.value, this.dataset.static, this)">
+                            <button type="button" 
+                                    class="p-1 px-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-blue-600 transition-colors shrink-0" 
+                                    onclick="abrirModalObservacion({{ $medico->id }}, '{{ addslashes($medico->NOM_MED) }}', '{{ addslashes($obsEstatica) }}', '{{ addslashes($obsDinamica) }}')" 
+                                    title="Editar detalle de observación">
+                                <i class="fas fa-edit text-[11px]"></i>
+                            </button>
+                        </div>
                         <span class="hidden print:inline font-medium text-slate-800">{{ $obsTexto }}</span>
                     </td>
                 </tr>
