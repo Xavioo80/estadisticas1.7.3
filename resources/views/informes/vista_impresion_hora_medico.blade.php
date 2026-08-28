@@ -11,7 +11,7 @@
         /* ─── Configuración de Página: Ajustado al Área de Impresión (Landscape) ─── */
         @page {
             size: landscape;
-            margin: 2mm 4mm 1mm 4mm;
+            margin: 2mm 2mm 2mm 2mm;
         }
 
         * {
@@ -171,7 +171,7 @@
         table.table-oficial {
             width: 100%;
             border-collapse: collapse !important;
-            border: 2px solid #000000 !important;
+            border: 2.5px solid #000000 !important;
             table-layout: fixed;
             margin: 0 !important;
             -webkit-font-smoothing: antialiased;
@@ -180,7 +180,7 @@
 
         table.table-oficial th,
         table.table-oficial td {
-            border: 1.2px solid #000000 !important;
+            border: 1px solid #000000 !important;
             text-align: center;
             vertical-align: middle !important;
             color: #000000 !important;
@@ -191,9 +191,9 @@
             font-family: Arial, Helvetica, sans-serif !important;
         }
 
-        /* Encabezados de la Tabla (Con Negrita y tamaño reducido en 1px) */
+        /* Encabezados de la Tabla (Negrita Intensa - 900) */
         table.table-oficial thead th {
-            font-weight: bold !important;
+            font-weight: 900 !important;
             background-color: #ffffff !important;
             color: #000000 !important;
         }
@@ -202,28 +202,28 @@
             height: 21px !important;
             font-size: 0.62rem !important;
             letter-spacing: 0.2px;
-            font-weight: bold !important;
+            font-weight: 900 !important;
         }
 
         table.table-oficial thead tr.row-mid th {
             height: 19px !important;
             font-size: 0.58rem !important;
             letter-spacing: 0.1px;
-            font-weight: bold !important;
+            font-weight: 900 !important;
         }
 
         table.table-oficial thead tr.row-sub th {
             height: 75px !important;
             max-height: 76px !important;
-            font-weight: bold !important;
+            font-weight: 900 !important;
         }
 
-        /* Texto Vertical en Columnas (Con Negrita y reducido 1px) */
+        /* Texto Vertical en Columnas (Negrita Intensa - 900) */
         .v-text {
             writing-mode: vertical-rl !important;
             transform: rotate(180deg) !important;
             font-size: 0.48rem !important;
-            font-weight: bold !important;
+            font-weight: 900 !important;
             line-height: 1.06 !important;
             letter-spacing: 0px !important;
             white-space: normal !important;
@@ -235,11 +235,11 @@
 
         /* Bordes Gruesos Oficiales (Divisores de grupos según matriz física) */
         .b-thick-r {
-            border-right: 2.2px solid #000000 !important;
+            border-right: 2.5px solid #000000 !important;
         }
 
         table.table-oficial thead {
-            border-bottom: 2.2px solid #000000 !important;
+            border-bottom: 2.5px solid #000000 !important;
         }
 
         /* Filas del Cuerpo (Sin Negrita) */
@@ -267,8 +267,8 @@
         table.table-oficial tr.total-row {
             height: 23px !important;
             background-color: #f1f5f9 !important;
-            border-top: 2.2px solid #000000 !important;
-            border-bottom: 2.2px solid #000000 !important;
+            border-top: 2.5px solid #000000 !important;
+            border-bottom: 2.5px solid #000000 !important;
         }
 
         table.table-oficial tr.total-row td {
@@ -469,9 +469,9 @@
                     <thead>
                         {{-- Fila 1: Grupos Superiores --}}
                         <tr class="row-main">
-                            <th rowspan="3" style="width: 2.5%;">#</th>
+                            <th rowspan="3" class="b-thick-r" style="width: 2.5%;">#</th>
                             <th rowspan="3" class="b-thick-r" style="width: 21.5%; text-align: left; padding-left: 6px !important;">NOMBRE COMPLETO DEL MEDICO</th>
-                            <th colspan="2" rowspan="2" style="width: 6.2%;">MODALIDAD</th>
+                            <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.2%;">MODALIDAD</th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">CATEGORIA</th>
                             <th rowspan="3" class="b-thick-r" style="width: 3.5%;"><div class="v-text">HORAS CONTRATADAS X DIA</div></th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">DIAS MES</th>
@@ -490,7 +490,7 @@
                         <tr class="row-sub">
                             {{-- Modalidad --}}
                             <th style="width: 3.1%;"><div class="v-text">ACUERDO.</div></th>
-                            <th style="width: 3.1%;"><div class="v-text">CONTRATO.</div></th>
+                            <th class="b-thick-r" style="width: 3.1%;"><div class="v-text">CONTRATO.</div></th>
                             {{-- Categoría --}}
                             <th style="width: 3.2%;"><div class="v-text">MÉDICO GENERAL.</div></th>
                             <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">MÉDICO ESPECIALISTA.</div></th>
@@ -582,10 +582,10 @@
                                 @endphp
 
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
+                                    <td class="b-thick-r">{{ $i + 1 }}</td>
                                     <td class="col-name b-thick-r">{{ $nombreLimpio }}</td>
                                     <td class="{{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}</td>
-                                    <td>{{ $isContrato ? 'X' : '-' }}</td>
+                                    <td class="b-thick-r">{{ $isContrato ? 'X' : '-' }}</td>
                                     <td>{{ $isGeneral ? 'X' : '-' }}</td>
                                     <td class="{{ $isSS ? 'td-hatched' : '' }} b-thick-r">{{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
                                     <td class="b-thick-r">{{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}</td>
@@ -611,9 +611,9 @@
                             @else
                                 {{-- Fila Vacía para Completar la Matriz de 24 Filas Oficial --}}
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
+                                    <td class="b-thick-r">{{ $i + 1 }}</td>
                                     <td class="col-name b-thick-r">&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td><td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
                                     <td class="b-thick-r">&nbsp;</td>
                                     <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
                                     <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
@@ -631,10 +631,10 @@
                             $rendTotal = ($totals['repr'] > 0) ? round(($totals['atend'] / $totals['repr']) * 100) . '%' : '0%';
                         @endphp
                         <tr class="total-row">
-                            <td>&nbsp;</td>
+                            <td class="b-thick-r">&nbsp;</td>
                             <td class="col-name b-thick-r" style="font-size: 0.72rem !important;">TOTAL JORNADA.</td>
                             <td>{{ round($totals['acuerdo']) }}</td>
-                            <td>{{ round($totals['contrato']) }}</td>
+                            <td class="b-thick-r">{{ round($totals['contrato']) }}</td>
                             <td>{{ round($totals['m_general']) }}</td>
                             <td class="b-thick-r">{{ round($totals['m_especialista']) }}</td>
                             <td class="b-thick-r">{{ round($totals['hrs_tadas']) }}</td>
