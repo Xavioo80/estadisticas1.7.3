@@ -191,9 +191,9 @@
             font-family: Arial, Helvetica, sans-serif !important;
         }
 
-        /* Encabezados de la Tabla (Sin Negrita y tamaño reducido en 1px) */
+        /* Encabezados de la Tabla (Con Negrita y tamaño reducido en 1px) */
         table.table-oficial thead th {
-            font-weight: normal !important;
+            font-weight: bold !important;
             background-color: #ffffff !important;
             color: #000000 !important;
         }
@@ -202,28 +202,28 @@
             height: 21px !important;
             font-size: 0.62rem !important;
             letter-spacing: 0.2px;
-            font-weight: normal !important;
+            font-weight: bold !important;
         }
 
         table.table-oficial thead tr.row-mid th {
             height: 19px !important;
             font-size: 0.58rem !important;
             letter-spacing: 0.1px;
-            font-weight: normal !important;
+            font-weight: bold !important;
         }
 
         table.table-oficial thead tr.row-sub th {
             height: 75px !important;
             max-height: 76px !important;
-            font-weight: normal !important;
+            font-weight: bold !important;
         }
 
-        /* Texto Vertical en Columnas (Sin Negrita y reducido 1px) */
+        /* Texto Vertical en Columnas (Con Negrita y reducido 1px) */
         .v-text {
             writing-mode: vertical-rl !important;
             transform: rotate(180deg) !important;
             font-size: 0.48rem !important;
-            font-weight: normal !important;
+            font-weight: bold !important;
             line-height: 1.06 !important;
             letter-spacing: 0px !important;
             white-space: normal !important;
@@ -231,6 +231,15 @@
             padding: 1px 1px !important;
             margin: 0 auto;
             max-height: 73px;
+        }
+
+        /* Bordes Gruesos Oficiales (Divisores de grupos según matriz física) */
+        .b-thick-r {
+            border-right: 2.2px solid #000000 !important;
+        }
+
+        table.table-oficial thead {
+            border-bottom: 2.2px solid #000000 !important;
         }
 
         /* Filas del Cuerpo (Sin Negrita) */
@@ -254,11 +263,12 @@
             text-transform: uppercase;
         }
 
-        /* Fila de Totales (Sin Negrita) */
+        /* Fila de Totales (Sin Negrita, bordes superior e inferior gruesos) */
         table.table-oficial tr.total-row {
             height: 23px !important;
             background-color: #f1f5f9 !important;
-            border-top: 2px solid #000000 !important;
+            border-top: 2.2px solid #000000 !important;
+            border-bottom: 2.2px solid #000000 !important;
         }
 
         table.table-oficial tr.total-row td {
@@ -437,9 +447,9 @@
                              style="display: {{ $mostrarLogoDer ? 'inline-block' : 'none' }}; margin: 0 auto; width: {{ $settings['logo_derecho_width'] ?? '65px' }}; height: {{ $settings['logo_derecho_height'] ?? '65px' }};">
                             <img src="{{ asset('img/logos/logo_derecho.png') }}" alt="Logo Derecho" id="img_logo_derecho" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                         </div>
-                        <div class="signature-box" style="width: 175px; margin: 0 auto; padding-top: {{ $mostrarLogoDer ? '4px' : '22px' }};">
-                            <div style="border-top: 1.5px solid #000; width: 100%;"></div>
-                            <div style="font-size: 0.62rem; font-weight: 900; letter-spacing: 0.5px; padding-top: 2px;">FIRMA Y SELLO</div>
+                        <div class="signature-box" style="width: 175px; margin: 0 auto; padding-top: {{ $mostrarLogoDer ? '4px' : '36px' }};">
+                            <div style="border-top: 1.8px solid #000; width: 100%;"></div>
+                            <div style="font-size: 0.62rem; font-weight: bold; letter-spacing: 0.5px; padding-top: 3px;">FIRMA Y SELLO</div>
                         </div>
                     </div>
                 </div>
@@ -460,20 +470,20 @@
                         {{-- Fila 1: Grupos Superiores --}}
                         <tr class="row-main">
                             <th rowspan="3" style="width: 2.5%;">#</th>
-                            <th rowspan="3" style="width: 21.5%; text-align: left; padding-left: 6px !important;">NOMBRE COMPLETO DEL MEDICO</th>
+                            <th rowspan="3" class="b-thick-r" style="width: 21.5%; text-align: left; padding-left: 6px !important;">NOMBRE COMPLETO DEL MEDICO</th>
                             <th colspan="2" rowspan="2" style="width: 6.2%;">MODALIDAD</th>
-                            <th colspan="2" rowspan="2" style="width: 6.4%;">CATEGORIA</th>
-                            <th rowspan="3" style="width: 3.5%;"><div class="v-text">HORAS CONTRATADAS X DIA</div></th>
-                            <th colspan="2" rowspan="2" style="width: 6.4%;">DIAS MES</th>
-                            <th colspan="2" rowspan="2" style="width: 6.4%;">HORAS MES</th>
-                            <th colspan="3" rowspan="2" style="width: 10.5%;">ATENCIONES</th>
-                            <th rowspan="3" style="width: 3.6%;"><div class="v-text">% DE RENDIMIENTO</div></th>
+                            <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">CATEGORIA</th>
+                            <th rowspan="3" class="b-thick-r" style="width: 3.5%;"><div class="v-text">HORAS CONTRATADAS X DIA</div></th>
+                            <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">DIAS MES</th>
+                            <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">HORAS MES</th>
+                            <th colspan="3" rowspan="2" class="b-thick-r" style="width: 10.5%;">ATENCIONES</th>
+                            <th rowspan="3" class="b-thick-r" style="width: 3.6%;"><div class="v-text">% DE RENDIMIENTO</div></th>
                             <th colspan="10" style="width: 33.0%; background-color: #f8fafc !important;">HORAS SIN CONSULTA</th>
                         </tr>
                         {{-- Fila 2: Subgrupos bajo Horas Sin Consulta --}}
                         <tr class="row-mid">
-                            <th colspan="7" style="width: 23.1%;">TOTAL DE HORAS OFICIALES</th>
-                            <th colspan="2" style="width: 6.6%;">VACACIONES</th>
+                            <th colspan="7" class="b-thick-r" style="width: 23.1%;">TOTAL DE HORAS OFICIALES</th>
+                            <th colspan="2" class="b-thick-r" style="width: 6.6%;">VACACIONES</th>
                             <th rowspan="2" style="width: 3.3%;"><div class="v-text">PERMISOS PERSONALES.</div></th>
                         </tr>
                         {{-- Fila 3: Subcolumnas Verticales Detalladas --}}
@@ -483,17 +493,17 @@
                             <th style="width: 3.1%;"><div class="v-text">CONTRATO.</div></th>
                             {{-- Categoría --}}
                             <th style="width: 3.2%;"><div class="v-text">MÉDICO GENERAL.</div></th>
-                            <th style="width: 3.2%;"><div class="v-text">MÉDICO ESPECIALISTA.</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">MÉDICO ESPECIALISTA.</div></th>
                             {{-- Días Mes --}}
                             <th style="width: 3.2%;"><div class="v-text">CONTRATADOS.</div></th>
-                            <th style="width: 3.2%;"><div class="v-text">CUMPLIDOS.</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDOS.</div></th>
                             {{-- Horas Mes --}}
                             <th style="width: 3.2%;"><div class="v-text">CONTRATADAS.</div></th>
-                            <th style="width: 3.2%;"><div class="v-text">CUMPLIDAS.</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDAS.</div></th>
                             {{-- Atenciones --}}
                             <th style="width: 3.5%;"><div class="v-text">PROGRAMADAS.</div></th>
                             <th style="width: 3.5%;"><div class="v-text">REPROGRAMADAS.</div></th>
-                            <th style="width: 3.5%;"><div class="v-text">ATENDIDAS.</div></th>
+                            <th class="b-thick-r" style="width: 3.5%;"><div class="v-text">ATENDIDAS.</div></th>
                             {{-- Horas Sin Consulta: Oficiales --}}
                             <th style="width: 3.3%;"><div class="v-text">FERIADOS / COMPENSATORIOS</div></th>
                             <th style="width: 3.3%;"><div class="v-text">ESFAM.</div></th>
@@ -501,10 +511,10 @@
                             <th style="width: 3.3%;"><div class="v-text">CONGRESOS / TALLERES.</div></th>
                             <th style="width: 3.3%;"><div class="v-text">INVESTIGACION DE CAMPO.</div></th>
                             <th style="width: 3.3%;"><div class="v-text">ASAMBLEAS COLEGIO MEDICO.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">CITAS, INCAPACIDADES IHSS / PRIVADA.</div></th>
+                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">CITAS, INCAPACIDADES IHSS / PRIVADA.</div></th>
                             {{-- Horas Sin Consulta: Vacaciones --}}
                             <th style="width: 3.3%;"><div class="v-text">ORDINARIAS.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">PROFILACTICAS.</div></th>
+                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">PROFILACTICAS.</div></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -573,42 +583,45 @@
 
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td class="col-name">{{ $nombreLimpio }}</td>
+                                    <td class="col-name b-thick-r">{{ $nombreLimpio }}</td>
                                     <td class="{{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}</td>
                                     <td>{{ $isContrato ? 'X' : '-' }}</td>
                                     <td>{{ $isGeneral ? 'X' : '-' }}</td>
-                                    <td class="{{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}</td>
+                                    <td class="{{ $isSS ? 'td-hatched' : '' }} b-thick-r">{{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
+                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}</td>
                                     <td>{{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round($row['diasContratados']) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
+                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
                                     <td>{{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round($row['horasContratadasMes']) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
+                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
                                     <td>{{ $isONG ? '-' : ($row['prog'] > 0 ? round($row['prog']) : '0') }}</td>
-                                    <td style="font-weight: 800;">{{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
-                                    <td style="font-weight: 900;">{{ round($row['atenciones']) }}</td>
-                                    <td style="font-weight: 800;">{{ $isONG ? '-' : $rendVal }}</td>
+                                    <td>{{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
+                                    <td class="b-thick-r">{{ round($row['atenciones']) }}</td>
+                                    <td class="b-thick-r">{{ $isONG ? '-' : $rendVal }}</td>
                                     <td>{{ $hsc_comp > 0 ? $hsc_comp : '0' }}</td>
                                     <td>{{ $hsc_esfam > 0 ? $hsc_esfam : '0' }}</td>
                                     <td>{{ $hsc_prom > 0 ? $hsc_prom : '0' }}</td>
                                     <td>{{ $hsc_cong > 0 ? $hsc_cong : '0' }}</td>
                                     <td>{{ $hsc_campo > 0 ? $hsc_campo : '0' }}</td>
                                     <td>{{ $hsc_asam > 0 ? $hsc_asam : '0' }}</td>
-                                    <td>{{ $hsc_citas > 0 ? $hsc_citas : '0' }}</td>
+                                    <td class="b-thick-r">{{ $hsc_citas > 0 ? $hsc_citas : '0' }}</td>
                                     <td class="{{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($hsc_ord > 0 ? $hsc_ord : '0') }}</td>
-                                    <td class="{{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
+                                    <td class="{{ $isSS ? 'td-hatched' : '' }} b-thick-r">{{ $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
                                     <td>{{ $hsc_pers > 0 ? $hsc_pers : '0' }}</td>
                                 </tr>
                             @else
                                 {{-- Fila Vacía para Completar la Matriz de 24 Filas Oficial --}}
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
-                                    <td class="col-name">&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+                                    <td class="col-name b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td><td class="b-thick-r">&nbsp;</td>
+                                    <td>&nbsp;</td>
                                 </tr>
                             @endif
                         @endfor
@@ -619,29 +632,29 @@
                         @endphp
                         <tr class="total-row">
                             <td>&nbsp;</td>
-                            <td class="col-name" style="font-size: 0.72rem !important;">TOTAL JORNADA.</td>
+                            <td class="col-name b-thick-r" style="font-size: 0.72rem !important;">TOTAL JORNADA.</td>
                             <td>{{ round($totals['acuerdo']) }}</td>
                             <td>{{ round($totals['contrato']) }}</td>
                             <td>{{ round($totals['m_general']) }}</td>
-                            <td>{{ round($totals['m_especialista']) }}</td>
-                            <td>{{ round($totals['hrs_tadas']) }}</td>
+                            <td class="b-thick-r">{{ round($totals['m_especialista']) }}</td>
+                            <td class="b-thick-r">{{ round($totals['hrs_tadas']) }}</td>
                             <td>{{ round($totals['dia_cont']) }}</td>
-                            <td>{{ round($totals['dia_cump']) }}</td>
+                            <td class="b-thick-r">{{ round($totals['dia_cump']) }}</td>
                             <td>{{ round($totals['hr_cont']) }}</td>
-                            <td>{{ round($totals['hr_cump']) }}</td>
+                            <td class="b-thick-r">{{ round($totals['hr_cump']) }}</td>
                             <td>{{ round($totals['prog']) }}</td>
                             <td>{{ round($totals['repr']) }}</td>
-                            <td>{{ round($totals['atend']) }}</td>
-                            <td>{{ $rendTotal }}</td>
+                            <td class="b-thick-r">{{ round($totals['atend']) }}</td>
+                            <td class="b-thick-r">{{ $rendTotal }}</td>
                             <td>{{ $totals['hsc_comp'] }}</td>
                             <td>{{ $totals['hsc_esfam'] }}</td>
                             <td>{{ $totals['hsc_prom'] }}</td>
                             <td>{{ $totals['hsc_cong'] }}</td>
                             <td>{{ $totals['hsc_campo'] }}</td>
                             <td>{{ $totals['hsc_asam'] }}</td>
-                            <td>{{ $totals['hsc_citas'] }}</td>
+                            <td class="b-thick-r">{{ $totals['hsc_citas'] }}</td>
                             <td>{{ $totals['hsc_ord'] }}</td>
-                            <td>{{ $totals['hsc_profil'] }}</td>
+                            <td class="b-thick-r">{{ $totals['hsc_profil'] }}</td>
                             <td>{{ $totals['hsc_pers'] }}</td>
                         </tr>
                     </tbody>
