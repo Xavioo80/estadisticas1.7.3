@@ -69,6 +69,9 @@
 
             <!-- Botones de acción -->
             <div style="display: flex; align-items: center; gap: 0.375rem; flex-shrink: 0; margin-left: auto;">
+                <button type="button" class="btn btn-sm btn-subtle-primary" onclick="abrirModalComparacion()" title="Auditoría y Comparación Cruzada (AT2-R, Morbilidad, TRANS-2 y AT1)" style="height: 30px; font-weight: 700; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 4px; padding: 0 10px;">
+                    <i class="bi bi-diagram-3-fill"></i> Comparar
+                </button>
                 <button type="button" id="btn-refresh-report" class="btn-action-fullscreen" title="Actualizar datos">
                     <i class="bi bi-arrow-clockwise"></i>
                 </button>
@@ -282,4 +285,5 @@
         });
     </script>
 
+@include('informes.partials.modal_comparacion_cruzada')
 @endsection

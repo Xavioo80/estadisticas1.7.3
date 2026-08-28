@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Informe;
+use App\Models\RegistroGlobal;
 use App\Models\Setting;
 use App\Traits\InformesHelperTrait;
 use Illuminate\Http\Request;
@@ -18,39 +18,25 @@ class Trans2Controller extends Controller
 
     public function index(Request $request)
     {
-        $anos = Informe::distinct()->orderBy('ano', 'desc')->pluck('ano');
-        if ($anos->isEmpty()) {
-            $anos = collect([(int) date('Y')]);
-        }
-
+        $anos = $this->getAnosDisponibles();
         $anoDefault = $request->input('ano', (int) date('Y'));
         if (!$anos->contains($anoDefault)) {
-            $anoDefault = $anos->first();
+            $anoDefault = $anos->first() ?? (int)date('Y');
         }
-
-        $mesesDisponibles = Informe::where('ano', $anoDefault)
-            ->distinct()
-            ->pluck('mes')
-            ->toArray();
 
         $mesMap = [
             1 => 'ENERO', 2 => 'FEBRERO', 3 => 'MARZO', 4 => 'ABRIL', 5 => 'MAYO', 6 => 'JUNIO',
             7 => 'JULIO', 8 => 'AGOSTO', 9 => 'SEPTIEMBRE', 10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE',
         ];
-        $ordenMeses = array_flip($mesMap);
 
-        usort($mesesDisponibles, function ($a, $b) use ($ordenMeses) {
-            return ($ordenMeses[strtoupper($a)] ?? 0) <=> ($ordenMeses[strtoupper($b)] ?? 0);
-        });
-
-        $meses = $mesesDisponibles ?: [$mesMap[(int) date('n')]];
+        $meses = $this->getMesesDisponibles($anoDefault)->toArray() ?: [$mesMap[(int) date('n')]];
         $mesDefault = $request->input('mes');
         if (!$mesDefault || !in_array(strtoupper($mesDefault), array_map('strtoupper', $meses))) {
             $mesDefault = end($meses);
         }
 
         // Obtener TODAS las semanas del mes seleccionado
-        $semanasMes = Informe::where('ano', $anoDefault)
+        $semanasMes = RegistroGlobal::where('ano', $anoDefault)
             ->where('mes', $mesDefault)
             ->whereNotNull('se')
             ->distinct()
@@ -60,13 +46,49 @@ class Trans2Controller extends Controller
         $settings = Setting::pluck('value', 'key');
         $sections = $this->getSectionsDefinition();
 
-        // Consulta de datos para todo el mes
-        $rawData = Informe::query()
+        // Consulta de datos directamente desde RegistroGlobal (Casos Nuevos)
+        $rgRecords = RegistroGlobal::query()
             ->where('ano', $anoDefault)
-            ->whereIn('se', $semanasMes)
-            ->where('cond_diagnostico', 'N')
-            ->select('diagnostico', 'sexo', 'edad', 'tipo', 'se')
-            ->get();
+            ->where('mes', $mesDefault)
+            ->get([
+                'fecha', 'se', 'edad', 'tipo', 'sexo', 'cond',
+                'diagnostico_1', 'cod_1', 'cond_1',
+                'diagnostico_2', 'cod_2', 'cond_2',
+                'diagnostico_3', 'cod_3', 'cond_3',
+                'diagnostico_4', 'cod_4', 'cond_4',
+                'diagnostico_5', 'cod_5', 'cond_5',
+                'diagnostico_6', 'cod_6', 'cond_6',
+                'diagnostico_7', 'cod_7', 'cond_7',
+            ]);
+
+        $unrolled = [];
+        foreach ($rgRecords as $rg) {
+            $se = $rg->se;
+            if (!$se && $rg->fecha) {
+                $se = $this->getSeDeDate($rg->fecha);
+            }
+            if (!$se) continue;
+
+            for ($i = 1; $i <= 7; $i++) {
+                $diag = trim($rg->{"diagnostico_$i"} ?? '');
+                if ($diag === '') continue;
+
+                $cond = strtoupper(trim($rg->{"cond_$i"} ?? ($rg->cond ?? '')));
+                // TRANS-2 solo contabiliza casos nuevos
+                if ($cond !== 'N') continue;
+
+                $unrolled[] = (object)[
+                    'diagnostico' => $diag,
+                    'cod' => trim($rg->{"cod_$i"} ?? ''),
+                    'sexo' => $rg->sexo,
+                    'edad' => $rg->edad,
+                    'tipo' => $rg->tipo,
+                    'se' => (int)$se,
+                ];
+            }
+        }
+
+        $rawData = collect($unrolled);
 
         $results = [];
         foreach ($sections as $section) {
@@ -264,8 +286,8 @@ class Trans2Controller extends Controller
 
     public function getDetails(Request $request)
     {
-        $ano = $request->input('ano');
-        $se = $request->input('se');
+        $ano = (int)$request->input('ano', date('Y'));
+        $se = (int)$request->input('se');
         $rowId = $request->input('row_id');
         $range = $request->input('range');
 
@@ -285,14 +307,73 @@ class Trans2Controller extends Controller
         $diags = is_array($targetRow['diag']) ? $targetRow['diag'] : [$targetRow['diag']];
         $diagsNorm = array_map([$this, 'normalizeForMatch'], $diags);
 
-        $rawData = Informe::where('ano', $ano)->where('se', $se)->where('cond_diagnostico', 'N')->get()
-            ->filter(fn($r) => in_array($this->normalizeForMatch($r->diagnostico), $diagsNorm));
+        // Consultar directamente desde RegistroGlobal (100% fuente viva)
+        $rgRecords = RegistroGlobal::query()
+            ->where('ano', $ano)
+            ->where(function($q) use ($se) {
+                $q->where('se', $se)
+                  ->orWhereNull('se');
+            })
+            ->get([
+                'id', 'fecha', 'se', 'edad', 'tipo', 'sexo', 'cond', 'exp', 'medico', 'prof',
+                'diagnostico_1', 'cod_1', 'cond_1',
+                'diagnostico_2', 'cod_2', 'cond_2',
+                'diagnostico_3', 'cod_3', 'cond_3',
+                'diagnostico_4', 'cod_4', 'cond_4',
+                'diagnostico_5', 'cod_5', 'cond_5',
+                'diagnostico_6', 'cod_6', 'cond_6',
+                'diagnostico_7', 'cod_7', 'cond_7',
+            ]);
 
-        $filteredData = $rawData->filter(fn($r) => $range === 'total' || $this->getAgeRange($r) === $range);
+        $unrolled = [];
+        foreach ($rgRecords as $rg) {
+            $recordSe = $rg->se;
+            if (!$recordSe && $rg->fecha) {
+                $recordSe = $this->getSeDeDate($rg->fecha);
+            }
+            if ((int)$recordSe !== $se) continue;
+
+            for ($i = 1; $i <= 7; $i++) {
+                $diag = trim($rg->{"diagnostico_$i"} ?? '');
+                if ($diag === '') continue;
+
+                $cond = strtoupper(trim($rg->{"cond_$i"} ?? ($rg->cond ?? '')));
+                // TRANS-2 solo contabiliza casos nuevos (N)
+                if ($cond !== 'N') continue;
+
+                if (in_array($this->normalizeForMatch($diag), $diagsNorm)) {
+                    $item = (object)[
+                        'fecha' => $rg->fecha ? Carbon::parse($rg->fecha)->format('d/m/Y') : '-',
+                        'raw_fecha' => $rg->fecha,
+                        'exp' => $rg->exp ?: '-',
+                        'sexo' => strtoupper(trim($rg->sexo)) === 'H' ? 'H' : 'M',
+                        'edad' => $rg->edad . ' ' . strtoupper(trim($rg->tipo)),
+                        'tipo' => $rg->tipo,
+                        'edad_num' => (int)$rg->edad,
+                        'diagnostico' => $diag,
+                        'cod' => trim($rg->{"cod_$i"} ?? ''),
+                        'medico' => $rg->medico ?: 'No asignado',
+                        'prof' => $rg->prof ?: '',
+                        'se' => (int)$recordSe,
+                    ];
+
+                    $ageRange = $this->getAgeRange($item);
+                    if ($range === 'total' || $ageRange === $range) {
+                        $unrolled[] = $item;
+                    }
+                }
+            }
+        }
+
+        $filteredData = collect($unrolled);
 
         $details = $filteredData->map(fn($r) => [
-            'fecha' => $r->fecha, 'exp' => $r->exp, 'sexo' => $r->sexo,
-            'edad' => $r->edad . ' ' . $r->tipo, 'diagnostico' => $r->diagnostico, 'medico' => $r->medico
+            'fecha' => $r->fecha,
+            'exp' => $r->exp,
+            'sexo' => $r->sexo,
+            'edad' => $r->edad,
+            'diagnostico' => $r->diagnostico . ($r->cod ? " ({$r->cod})" : ''),
+            'medico' => $r->medico . ($r->prof ? " - {$r->prof}" : '')
         ])->values();
 
         return response()->json([

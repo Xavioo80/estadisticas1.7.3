@@ -71,6 +71,13 @@
       </a>
     </li>
 
+    <li class="sidebar-item {{ (request()->routeIs('notas.*') || request()->is('notas*')) ? 'active' : '' }}" data-tooltip="Bloc de Notas & Tareas">
+      <a href="{{ route('notas.index') }}" class="sidebar-link">
+        <i class="bi bi-journal-check nav-icon"></i>
+        <span class="nav-label">Notas & Tareas</span>
+      </a>
+    </li>
+
     <li class="sidebar-item {{ (request()->routeIs('ingresos.*') || request()->routeIs('ingresos') || request()->routeIs('forms')) ? 'active' : '' }}" data-tooltip="Ingresos AT-1">
       <a href="{{ route('ingresos.index') }}" class="sidebar-link">
         <i class="bi bi-pencil-square nav-icon"></i>

@@ -1500,11 +1500,11 @@
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  background-color: var(--card-bg, var(--bg-surface));
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: var(--modal-bg, var(--bg-surface-elevated, #ffffff)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--modal-border, var(--border-color)) !important;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--modal-shadow, var(--shadow-xl)) !important;
   outline: 0;
   overflow: hidden;
 }
@@ -1514,7 +1514,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.25rem;
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--modal-header-bg, var(--bg-subtle)) !important;
+  border-bottom: 1px solid var(--modal-border, var(--border-color)) !important;
+  color: var(--text-primary) !important;
 }
 
 .modal-title {
@@ -1522,22 +1524,25 @@
   line-height: 1.5;
   font-size: 1.05rem;
   font-weight: 600;
+  color: var(--text-primary) !important;
 }
 
-.modal-header .close {
+.modal-header .close,
+.modal-header .btn-close {
   padding: 0.5rem;
   margin: -0.5rem -0.5rem -0.5rem auto;
   background: transparent;
   border: none;
   font-size: 1.25rem;
   line-height: 1;
-  color: inherit;
+  color: var(--text-primary) !important;
   opacity: 0.8;
   cursor: pointer;
   transition: opacity var(--transition-fast);
 }
 
-.modal-header .close:hover {
+.modal-header .close:hover,
+.modal-header .btn-close:hover {
   opacity: 1;
 }
 
@@ -1545,8 +1550,8 @@
   position: relative;
   flex: 1 1 auto;
   padding: 1.25rem;
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
+  background-color: var(--modal-bg, var(--bg-surface)) !important;
+  color: var(--text-primary) !important;
 }
 
 .modal-footer {
@@ -1555,19 +1560,28 @@
   justify-content: flex-end;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-subtle);
+  border-top: 1px solid var(--modal-border, var(--border-color)) !important;
+  background-color: var(--modal-footer-bg, var(--bg-subtle)) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 0.75 !important;
+  background-color: var(--modal-backdrop-bg, rgba(0, 0, 0, 0.75)) !important;
+  backdrop-filter: blur(4px) !important;
 }
 
 .modal-body .table {
   color: var(--text-primary);
-  background-color: var(--bg-surface);
+  background-color: var(--modal-bg, var(--bg-surface));
 }
 
-.modal-body .thead-light th {
-  background-color: var(--bg-subtle) !important;
+.modal-body .thead-light th,
+.modal-body thead th {
+  background-color: var(--modal-header-bg, var(--bg-subtle)) !important;
   color: var(--text-primary) !important;
-  border-bottom: 2px solid var(--border-color) !important;
+  border-bottom: 2px solid var(--modal-border, var(--border-color)) !important;
+}
 }
 
 .modal-body .table tbody tr:hover {

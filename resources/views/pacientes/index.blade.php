@@ -40,7 +40,7 @@
         position: fixed;
         inset: 0;
         z-index: 1050;
-        background-color: rgba(11, 17, 32, 0.75);
+        background-color: var(--modal-backdrop-bg, rgba(3, 7, 18, 0.8));
         backdrop-filter: blur(4px);
         display: none !important;
         align-items: center;
@@ -51,13 +51,13 @@
         display: flex !important;
     }
     .modal-dialog-custom {
-        background-color: var(--bg-surface);
-        border: 1px solid var(--border-color);
+        background-color: var(--modal-bg, var(--bg-surface-elevated, #1e293b));
+        border: 1px solid var(--modal-border, rgba(255, 255, 255, 0.22));
         border-radius: var(--radius-lg);
         width: 100%;
         max-width: 650px;
         max-height: 90vh;
-        box-shadow: var(--shadow-xl);
+        box-shadow: var(--modal-shadow, 0 30px 60px -12px rgba(0, 0, 0, 0.85));
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -68,83 +68,93 @@
 @section('content')
 <div class="informe-page-wrapper">
     <!-- Header -->
-    <div class="informe-header">
+    <div class="informe-header d-flex flex-wrap align-items-center justify-content-between gap-3 py-2 px-3 mb-2" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px);">
         <div class="d-flex align-items-center gap-3">
-            <div class="d-inline-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(77, 124, 254, 0.12); color: var(--color-primary);">
-                <i class="bi bi-person-lines-fill" style="font-size: 1.25rem;"></i>
+            <div class="d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px; border-radius: var(--radius-md); background: rgba(77, 124, 254, 0.12); color: var(--color-primary); flex-shrink: 0;">
+                <i class="bi bi-person-lines-fill" style="font-size: 1.2rem;"></i>
             </div>
             <div>
-                <h2 class="mb-1 d-flex align-items-center gap-2">
+                <h2 class="mb-0 d-flex align-items-center gap-2" style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary);">
                     Base de Datos de Pacientes
-                    <span id="badge-total-pacientes" class="badge badge-subtle-primary" style="font-size: 0.8rem; font-weight: 700;">
+                    <span id="badge-total-pacientes" class="badge badge-subtle-primary" style="font-size: 0.75rem; font-weight: 700;">
                         {{ number_format($totalPacientes) }} Pacientes
                     </span>
                 </h2>
-                <p>Registro local sincronizado automáticamente desde SNVS/SESAL y consultas médicas</p>
+                <p class="mb-0" style="font-size: 0.72rem; color: var(--text-muted);">Registro local sincronizado automáticamente desde SNVS/SESAL y consultas médicas</p>
             </div>
-        </div>
-
-        <!-- Buscador en tiempo real en la cabecera -->
-        <div style="min-width: 320px; max-width: 420px; width: 100%;">
-            <form id="search-pacientes-form" action="{{ route('pacientes.index') }}" method="GET" class="position-relative mb-0">
-                <i class="bi bi-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
-                <input type="text" id="input-search-pacientes" name="search" value="{{ $search }}"
-                    placeholder="Buscar por DNI, Nombre o Colonia..."
-                    class="form-control form-control-sm pacientes-search-input" style="height: 36px;">
-                @if($search)
-                    <a href="{{ route('pacientes.index') }}"
-                        class="position-absolute" style="right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"
-                        title="Limpiar búsqueda">
-                        <i class="bi bi-x-circle-fill"></i>
-                    </a>
-                @endif
-            </form>
         </div>
     </div>
 
-    <!-- Barra de herramientas secundaria: Consultar nuevo DNI + Acciones masivas -->
-    <div class="pacientes-toolbar d-flex flex-wrap align-items-center justify-content-between gap-3">
-        <!-- Consultar nuevo paciente por DNI -->
-        <div class="d-flex align-items-center gap-2 flex-grow-1" style="min-width: 280px; max-width: 460px;">
-            <div class="position-relative flex-grow-1">
-                <i class="bi bi-person-plus-fill position-absolute text-warning" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.9rem;"></i>
-                <input type="text" id="input-nuevo-dni" maxlength="19"
-                    placeholder="Consultar nuevo DNI (0000-0000-00000)..."
-                    class="form-control form-control-sm font-monospace"
-                    style="padding-left: 2rem; height: 34px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--border-color); font-size: 0.82rem;">
+    <!-- Barra de Herramientas en Una Sola Fila Horizontal Estricta -->
+    <div class="pacientes-toolbar no-print mb-2"
+        style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.45rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important; width: 100% !important; overflow-x: auto !important;">
+        
+        <!-- Izquierda: Buscador General + Consultar DNI a la par -->
+        <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; flex-shrink: 0 !important;">
+            
+            <!-- Buscador General -->
+            <div style="width: 250px; min-width: 190px;">
+                <form id="search-pacientes-form" action="{{ route('pacientes.index') }}" method="GET" class="position-relative mb-0">
+                    <i class="bi bi-search position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+                    <input type="text" id="input-search-pacientes" name="search" value="{{ $search }}"
+                        placeholder="Buscar por DNI, Nombre o Colonia..."
+                        class="form-control form-control-sm pacientes-search-input" style="height: 34px; font-size: 0.8rem; padding-left: 1.9rem; background-color: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px);">
+                    @if($search)
+                        <a href="{{ route('pacientes.index') }}"
+                            class="position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"
+                            title="Limpiar búsqueda">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </a>
+                    @endif
+                </form>
             </div>
-            <button type="button" id="btn-buscar-nuevo" class="btn btn-warning btn-sm pacientes-action-btn" title="Buscar este DNI en SESAL/SNVS y agregarlo a la tabla">
-                <i class="bi bi-search"></i>
-                <span>Consultar</span>
-            </button>
+
+            <!-- Separador -->
+            <div style="height: 22px; width: 1px; background: var(--border-color); flex-shrink: 0;"></div>
+
+            <!-- Input DNI + Botón Consultar a la par -->
+            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 6px !important; width: 340px !important; min-width: 320px !important;">
+                <div class="position-relative flex-grow-1" style="min-width: 0;">
+                    <i class="bi bi-person-badge position-absolute text-warning" style="left: 9px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
+                    <input type="text" id="input-nuevo-dni" maxlength="19"
+                        placeholder="DNI (0801-1990-00000)..."
+                        class="form-control form-control-sm font-monospace"
+                        style="padding-left: 1.8rem; height: 34px; background-color: var(--input-bg); color: var(--text-primary); border-color: var(--border-color); font-size: 0.78rem; border-radius: var(--radius-sm, 6px); width: 100%;">
+                </div>
+                <button type="button" id="btn-buscar-nuevo" class="btn btn-warning btn-sm font-weight-bold" style="height: 34px; padding: 0 0.85rem; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; border-radius: var(--radius-sm, 6px); flex-shrink: 0;" title="Buscar este DNI en SESAL/SNVS y agregarlo">
+                    <i class="bi bi-cloud-arrow-down-fill"></i>
+                    <span>Consultar</span>
+                </button>
+            </div>
+
+            <!-- Separador -->
+            <div style="height: 22px; width: 1px; background: var(--border-color); flex-shrink: 0;"></div>
+
+            <!-- Mensaje de estado -->
+            <span id="status-message" class="badge badge-subtle-info px-2 py-1 d-none" style="font-size: 0.75rem; white-space: nowrap;"></span>
         </div>
 
-        <div class="d-none d-md-block" style="width: 1px; height: 26px; background-color: var(--border-color);"></div>
-
-        <!-- Acciones masivas -->
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" id="btn-recargar-tabla" class="btn btn-subtle btn-sm pacientes-action-btn" title="Recargar la tabla con los datos locales actuales">
+        <!-- Derecha: Acciones Masivas en la misma fila -->
+        <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 6px !important; flex-shrink: 0 !important; margin-left: auto !important;">
+            <button type="button" id="btn-recargar-tabla" class="btn btn-subtle btn-sm pacientes-action-btn" style="height: 34px; padding: 0 0.65rem; font-size: 0.76rem; border-radius: var(--radius-sm, 6px);" title="Recargar la tabla con los datos locales actuales">
                 <i class="bi bi-arrow-clockwise"></i>
                 <span>Recargar</span>
             </button>
 
-            <button type="button" id="btn-recalcular-edades" class="btn btn-subtle-info btn-sm pacientes-action-btn" title="Recalcular todas las edades a partir de la fecha de nacimiento">
+            <button type="button" id="btn-recalcular-edades" class="btn btn-subtle-info btn-sm pacientes-action-btn" style="height: 34px; padding: 0 0.65rem; font-size: 0.76rem; border-radius: var(--radius-sm, 6px);" title="Recalcular todas las edades a partir de la fecha de nacimiento">
                 <i class="bi bi-calculator"></i>
                 <span>Recalc. Edades</span>
             </button>
 
-            <button type="button" id="btn-resync-pagina" class="btn btn-subtle-primary btn-sm pacientes-action-btn" title="Volver a consultar los 50 pacientes de la página actual en SESAL/SNVS">
+            <button type="button" id="btn-resync-pagina" class="btn btn-subtle-primary btn-sm pacientes-action-btn" style="height: 34px; padding: 0 0.65rem; font-size: 0.76rem; border-radius: var(--radius-sm, 6px);" title="Volver a consultar los 50 pacientes de la página actual en SESAL/SNVS">
                 <i class="bi bi-arrow-repeat"></i>
                 <span>Resync Página</span>
             </button>
 
-            <button type="button" id="btn-resync-todos" class="btn btn-danger btn-sm pacientes-action-btn" title="ATENCIÓN: Volver a consultar TODOS los pacientes registrados en SESAL/SNVS">
+            <button type="button" id="btn-resync-todos" class="btn btn-subtle-danger btn-sm pacientes-action-btn" style="height: 34px; padding: 0 0.65rem; font-size: 0.76rem; border-radius: var(--radius-sm, 6px);" title="ATENCIÓN: Volver a consultar TODOS los pacientes registrados en SESAL/SNVS">
                 <i class="bi bi-cloud-arrow-down-fill"></i>
                 <span>Resync Todos</span>
             </button>
-
-            <!-- Mensaje de estado -->
-            <span id="status-message" class="badge badge-subtle-info px-2 py-1 ml-1 d-none" style="font-size: 0.8rem;"></span>
         </div>
     </div>
 

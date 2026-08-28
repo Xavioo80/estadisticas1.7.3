@@ -220,16 +220,8 @@ class HoraMedicoController extends Controller
         });
     }
 
-    private function getDoctorPriority($medico, $ano = null, $mesNombre = null)
+    private function getDoctorPriority($medico, $monthlyDirectorId = null)
     {
-        $monthlyDirectorId = null;
-        if ($ano && $mesNombre) {
-            $monthlyDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mesNombre}")->value('value');
-        }
-        if (!$monthlyDirectorId) {
-            $monthlyDirectorId = Setting::where('key', 'director_medico_id')->value('value');
-        }
-
         // 1. Director siempre primero
         if (!empty($medico->es_director) || ($monthlyDirectorId && (int)$medico->id === (int)$monthlyDirectorId)) {
             return 1;
@@ -283,6 +275,14 @@ class HoraMedicoController extends Controller
         ]));
 
         // 🚀 Optimización de Rendimiento Extrema: Uso del índice compuesto (ano, mes) de MySQL
+        $allHSC = HoraSinConsulta::where('ano', $ano)
+            ->whereIn('mes', $mesVariants)
+            ->get()
+            ->keyBy('medico_id');
+
+        // Director ID resuelto UNA SOLA VEZ fuera del loop de ordenamiento
+        $monthlyDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mesNombre}")->value('value')
+            ?: Setting::where('key', 'director_medico_id')->value('value');
         $allHSC = HoraSinConsulta::where('ano', $ano)
             ->whereIn('mes', $mesVariants)
             ->get()
@@ -466,9 +466,9 @@ class HoraMedicoController extends Controller
             ->pluck('posicion', 'medico_id')
             ->toArray();
 
-        usort($data, function ($a, $b) use ($ano, $mesNombre, $posicionesExistentes) {
-            $pA = $this->getDoctorPriority($a['medico'], $ano, $mesNombre);
-            $pB = $this->getDoctorPriority($b['medico'], $ano, $mesNombre);
+        usort($data, function ($a, $b) use ($monthlyDirectorId, $posicionesExistentes) {
+            $pA = $this->getDoctorPriority($a['medico'], $monthlyDirectorId);
+            $pB = $this->getDoctorPriority($b['medico'], $monthlyDirectorId);
 
             if ($pA !== $pB) {
                 return $pA <=> $pB;

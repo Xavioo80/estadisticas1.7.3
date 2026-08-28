@@ -11,6 +11,9 @@
             <p>Consolidado General de Morbilidad</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-subtle-primary btn-sm" onclick="abrirModalComparacion()" style="font-weight: 600;">
+                <i class="bi bi-diagram-3-fill mr-1"></i> Comparar con otros informes
+            </button>
             <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm" style="font-weight: 600;">
                 <i class="bi bi-arrow-clockwise mr-1"></i> Actualizar
             </button>
@@ -29,6 +32,8 @@
         @include('informes.morbilidad_content')
     </div>
 </div>
+
+@include('informes.partials.modal_comparacion_cruzada')
 
 <script>
         document.addEventListener('DOMContentLoaded', function() {

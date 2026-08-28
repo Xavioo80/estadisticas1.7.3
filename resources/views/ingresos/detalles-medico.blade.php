@@ -80,41 +80,147 @@
                     ]);
         }
     @endphp
-    <div class="detalles-page-wrapper">
+    <style>
+        .detalles-page-wrapper {
+            padding: 0.5rem 0.85rem;
+            height: calc(100vh - var(--navbar-height) - var(--footer-height, 0px) - 20px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .detalles-header-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md, 10px);
+            padding: 0.65rem 1rem;
+            margin-bottom: 0.65rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .info-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm, 6px);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+        .table-detalles {
+            font-size: 0.70rem !important;
+            background-color: var(--bg-surface);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-detalles thead th {
+            font-size: 0.76rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+            padding: 7px 4px !important;
+            color: var(--text-primary) !important;
+            background-color: var(--bg-subtle) !important;
+            border-bottom: 2px solid var(--border-color) !important;
+            border-right: 1px solid var(--border-color) !important;
+            border-top: none !important;
+            vertical-align: middle !important;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            white-space: nowrap;
+        }
+        .table-detalles thead th.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 30;
+            background-color: var(--bg-subtle) !important;
+        }
+        .table-detalles tbody td {
+            font-size: 0.70rem !important;
+            line-height: 1.25 !important;
+            padding: 3px 4px !important;
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            border-right: 1px solid var(--border-color) !important;
+            border-top: none !important;
+            border-left: none !important;
+            vertical-align: middle !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 25px;
+        }
+        .table-detalles tbody td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background-color: var(--bg-subtle) !important;
+            font-weight: 700;
+        }
+        .table-detalles tbody tr:hover td {
+            background-color: rgba(var(--color-primary-rgb, 77, 124, 254), 0.08) !important;
+        }
+        .table-detalles td[contenteditable="true"]:focus {
+            outline: 2px solid var(--color-primary) !important;
+            background-color: rgba(var(--color-primary-rgb, 77, 124, 254), 0.15) !important;
+        }
+        .table-detalles .active-row {
+            background-color: var(--color-primary) !important;
+            color: #ffffff !important;
+        }
+    </style>
+
+    <div class="detalles-page-wrapper">
         <div ng-app="TablaDetalles" ng-cloak ng-controller="TablaDetallesCtrl" id="ingresosApp" class="h-100 d-flex flex-column">
-            <!-- Header Compacto y Estático -->
-            <div class="detalles-top-bar d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
-                    <h2 class="mb-0 font-weight-bold" style="font-size: 1.05rem; color: var(--text-primary);">
-                        Detalles: {{ $medicoNombre }} - {{ \Carbon\Carbon::parse($fecha)->format('d-m-Y') }}
-                    </h2>
-                    <span class="badge badge-subtle-primary font-weight-bold px-2 py-1" style="font-size: 0.72rem;">
-                        <i class="fas fa-list-ol mr-1"></i> @{{lista.length}} Registros
-                    </span>
+            <!-- Header Container Card -->
+            <div class="detalles-header-card d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center flex-wrap" style="gap: 12px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded" style="background: rgba(77, 124, 254, 0.12); color: var(--color-primary);">
+                            <i class="fas fa-user-md" style="font-size: 1.15rem;"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0 font-weight-bold" style="font-size: 1.15rem; color: var(--text-primary); letter-spacing: -0.01em;">
+                                Detalles: {{ $medicoNombre }}
+                            </h2>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-calendar-alt mr-1"></i> Fecha: {{ \Carbon\Carbon::parse($fecha)->format('d-m-Y') }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Info Badges Container -->
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="info-pill" style="color: var(--color-primary);">
+                            <i class="fas fa-list-ol mr-1.5 text-primary"></i> @{{lista.length}} Registros
+                        </span>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center flex-wrap" style="gap: 5px;">
-                    <a href="{{ route('ingresos.index') }}" class="btn btn-secondary btn-sm py-1 px-3" style="font-size: 0.75rem; font-weight: 600;">
+
+                <!-- Action Buttons Container (Agrandados y Estilizados) -->
+                <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                    <a href="{{ route('ingresos.index') }}" class="btn btn-subtle btn-sm font-weight-bold" style="font-size: 0.82rem; padding: 6px 14px; border-radius: var(--radius-sm, 6px);">
                         <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
-                    <button type="button" class="btn btn-sm py-1 px-3 font-weight-bold"
+                    <button type="button" class="btn btn-sm font-weight-bold"
                         ng-class="{'btn-primary': !tablaGuardada, 'btn-success': tablaGuardada}"
-                        ng-click="guardarCambios()" style="font-size: 0.75rem;">
+                        ng-click="guardarCambios()" style="font-size: 0.82rem; padding: 6px 16px; border-radius: var(--radius-sm, 6px);">
                         <i class="fas" ng-class="{'fa-save': !tablaGuardada, 'fa-check': tablaGuardada}"></i>
-                        @{{ tablaGuardada ? 'Guardado' : 'Guardar Cambios' }}
+                        @{{ tablaGuardada ? ' Guardado' : ' Guardar Cambios' }}
                     </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2"
-                        ng-click="abrirBuscadorMedicos()" title="Buscar Médico (Alt+M)" style="font-size: 0.75rem;">
-                        <i class="fas fa-user-md mr-1"></i> Médicos
+                    <button type="button" class="btn btn-subtle-primary btn-sm font-weight-bold"
+                        ng-click="abrirBuscadorMedicos()" title="Buscar Médico (Alt+M)" style="font-size: 0.82rem; padding: 6px 12px; border-radius: var(--radius-sm, 6px);">
+                        <i class="fas fa-user-md mr-1"></i> Médicos <span class="badge badge-secondary ml-1" style="font-size: 0.65rem;">Alt+M</span>
                     </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-2"
-                        ng-click="abrirBuscadorDiagnosticos()" title="Buscar Diagnóstico (Alt+D)" style="font-size: 0.75rem;">
-                        <i class="fas fa-stethoscope mr-1"></i> Diagnósticos
+                    <button type="button" class="btn btn-subtle-primary btn-sm font-weight-bold"
+                        ng-click="abrirBuscadorDiagnosticos()" title="Buscar Diagnóstico (Alt+D)" style="font-size: 0.82rem; padding: 6px 12px; border-radius: var(--radius-sm, 6px);">
+                        <i class="fas fa-stethoscope mr-1"></i> Diagnósticos <span class="badge badge-secondary ml-1" style="font-size: 0.65rem;">Alt+D</span>
                     </button>
                 </div>
             </div>
 
             <!-- Card Contenedor de la Tabla -->
-            <div class="detalles-card card shadow-sm flex-grow-1 d-flex flex-column mb-0">
+            <div class="detalles-card card shadow-sm flex-grow-1 d-flex flex-column mb-0" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); overflow: hidden;">
                 <div class="card-body p-0 flex-grow-1 position-relative" style="min-height: 0; overflow: hidden;">
                     <div class="table-responsive h-100 w-100" style="overflow: auto;">
                         <table class="table table-bordered table-sm mb-0 table-detalles">

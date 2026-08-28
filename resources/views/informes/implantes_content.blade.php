@@ -1,39 +1,60 @@
-    <div class="filter-container flex flex-wrap items-center gap-1.5 p-2 bg-slate-50 shrink-0 border-b border-slate-200 no-print">
-        <form id="filter-form" action="{{ route('informes.implantes') }}" method="GET" class="flex flex-1 items-center gap-2 mb-0">
-            <div class="flex items-center gap-1.5 flex-1">
-                <div class="w-16">
-                    <select name="ano" class="filter-select w-full ajax-filter">
+    <!-- Barra de Filtros en Una Sola Fila Horizontal Estricta -->
+    <div class="filter-container no-print mb-2"
+        style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.5rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important; width: 100% !important; overflow-x: auto !important;">
+        <form id="filter-form" action="{{ route('informes.implantes') }}" method="GET"
+            style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; margin: 0 !important; width: 100% !important; min-width: 0 !important;">
+            
+            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; flex-shrink: 0 !important;">
+                <!-- Año -->
+                <div style="width: 85px !important; min-width: 85px !important; flex-shrink: 0 !important;">
+                    <select name="ano" class="filter-select ajax-filter"
+                        style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                         @foreach($anos as $a)
                             <option value="{{ $a }}" {{ $a == $ano ? 'selected' : '' }}>{{ $a }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="w-24">
-                    <select name="mes" class="filter-select w-full ajax-filter">
+
+                <!-- Mes -->
+                <div style="width: 120px !important; min-width: 120px !important; flex-shrink: 0 !important;">
+                    <select name="mes" class="filter-select ajax-filter"
+                        style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                         @foreach($meses as $m)
                             <option value="{{ $m }}" {{ $m == $mes ? 'selected' : '' }}>{{ $m }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="flex-1 max-w-[200px]">
-                    <select name="search" class="filter-select w-full ajax-filter">
+
+                <!-- Separador vertical -->
+                <div style="height: 22px !important; width: 1px !important; background: var(--border-color) !important; flex-shrink: 0 !important; margin: 0 2px !important;"></div>
+
+                <!-- Médico / Profesional (Acortado) -->
+                <div style="width: 220px !important; min-width: 200px !important; flex-shrink: 0 !important;">
+                    <select name="search" class="filter-select ajax-filter" title="Médico / Profesional"
+                        style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                         <option value="TODOS">TODOS LOS PROFESIONALES</option>
                         @foreach($nombresMedicos as $nm)
                             <option value="{{ $nm }}" {{ $nm == $search ? 'selected' : '' }}>{{ $nm }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="w-24">
-                    <select name="prof" class="filter-select w-full ajax-filter">
-                        <option value="TODAS">PROFESIÓN</option>
+
+                <!-- Profesión (Alargado) -->
+                <div style="width: 180px !important; min-width: 160px !important; flex-shrink: 0 !important;">
+                    <select name="prof" class="filter-select ajax-filter" title="Profesión"
+                        style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
+                        <option value="TODAS">TODAS LAS PROFESIONES</option>
                         @foreach($profesiones as $p)
                             <option value="{{ $p }}" {{ $p == $profFilter ? 'selected' : '' }}>{{ $p }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="w-24">
-                    <select name="jornada" class="filter-select w-full ajax-filter">
-                        <option value="TODAS">JORNADA</option>
+
+                <!-- Jornada (Alargado) -->
+                <div style="width: 165px !important; min-width: 150px !important; flex-shrink: 0 !important;">
+                    <select name="jornada" class="filter-select ajax-filter" title="Jornada"
+                        style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
+                        <option value="TODAS">TODAS LAS JORNADAS</option>
                         @foreach($jornadas as $j)
                             <option value="{{ $j }}" {{ $j == $jornada ? 'selected' : '' }}>{{ $j }}</option>
                         @endforeach
@@ -41,10 +62,11 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-1.5 ml-auto">
+            <!-- Acciones a la derecha -->
+            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 6px !important; flex-shrink: 0 !important; margin-left: auto !important;">
                 <button type="button" onclick="toggleFullScreen()" class="btn-action-fullscreen" title="Pantalla Completa"><i class="bi bi-arrows-fullscreen" id="fullScreenIcon"></i></button>
                 <button type="button" onclick="window.print()" class="btn-action-print" title="Imprimir"><i class="bi bi-printer"></i></button>
-                <a id="btn-export-implantes" href="{{ route('informes.implantes.export', request()->all()) }}" class="font-medium flex items-center justify-center rounded h-7 w-7 text-[10px] bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm" title="Exportar Excel">
+                <a id="btn-export-implantes" href="{{ route('informes.implantes.export', request()->all()) }}" class="font-medium d-flex align-items-center justify-content-center rounded text-white shadow-sm" style="width: 28px !important; height: 28px !important; font-size: 13px !important; background: #059669 !important;" title="Exportar Excel">
                     <i class="bi bi-file-earmark-excel"></i>
                 </a>
             </div>
@@ -86,7 +108,7 @@
                         
                         @forelse($data as $medico => $mD)
                             <tr>
-                                <td class="sticky-col-first text-left pl-3 font-weight-bold text-black" >
+                                <td class="sticky-col-first text-left pl-3 font-weight-bold" style="color: var(--text-primary);">
                                     {{ $medico }}
                                 </td>
                                 

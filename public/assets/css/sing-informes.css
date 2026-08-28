@@ -2351,6 +2351,279 @@ html.dark .td-hatched,
   color: #64748b !important;
 }
 
+/* ==========================================================================
+   INFORME DE MORBILIDAD (SING APP THEME ADAPTATION)
+   ========================================================================== */
+
+#morbilidadTable {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+#morbilidadTable th,
+#morbilidadTable td {
+  border-right: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  border-top: none !important;
+  border-left: none !important;
+  transition: background-color var(--transition-fast);
+}
+
+#morbilidadTable thead tr:first-child th {
+  border-top: 1px solid var(--border-color) !important;
+}
+
+#morbilidadTable th:first-child,
+#morbilidadTable td:first-child {
+  border-left: 1px solid var(--border-color) !important;
+}
+
+/* Divisores reforzados entre grupos de edad */
+#morbilidadTable .border-heavy-right {
+  border-right: 2px solid var(--border-color) !important;
+}
+
+#morbilidadTable .border-heavy-bottom {
+  border-bottom: 2px solid var(--border-color) !important;
+}
+
+/* thead sticky */
+#morbilidadTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Columna 1: DIAGNOSTICO (Header) */
+#morbilidadTable thead .sticky-col-first-v2 {
+  position: sticky;
+  left: 0;
+  z-index: 60 !important;
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Fila 1 – Rangos de Edad */
+#morbilidadTable thead th.th-age-range {
+  background-color: rgba(77, 124, 254, 0.14) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+}
+
+/* Fila 1 – Columna SUMA */
+#morbilidadTable thead th.th-suma {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-weight: 900;
+}
+
+/* Fila 2 – Sexo (Hombres / Mujeres) */
+#morbilidadTable thead th.th-sexo-hom {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+#morbilidadTable thead th.th-sexo-muj {
+  background-color: rgba(244, 63, 94, 0.1) !important;
+  color: #f43f5e !important;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+/* Fila 3 – Condición N / S */
+#morbilidadTable thead tr:nth-child(3) th {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+/* Tbody Cells */
+#morbilidadTable tbody .sticky-col-first-v2 {
+  position: sticky;
+  left: 0;
+  z-index: 30 !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+}
+
+#morbilidadTable tbody td {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+#morbilidadTable tbody td.cell-has-value {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.92rem;
+}
+
+#morbilidadTable tbody td.cell-zero {
+  color: var(--text-muted) !important;
+  opacity: 0.35;
+  font-size: 0.8rem;
+}
+
+#morbilidadTable tbody td.col-suma {
+  background-color: var(--bg-subtle) !important;
+  color: var(--color-primary) !important;
+  font-weight: 800;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.95rem;
+}
+
+/* Tfoot Sticky */
+#morbilidadTable tfoot {
+  position: sticky;
+  bottom: 0;
+  z-index: 55;
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800;
+}
+
+#morbilidadTable tfoot .sticky-col-first-v2 {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  z-index: 65 !important;
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-weight: 900;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12);
+}
+
+#morbilidadTable tfoot td {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 0.95rem;
+}
+
+#morbilidadTable tfoot td.td-grand-total {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+/* Hover Crosshairs */
+#morbilidadTable tbody tr.hover-row > td {
+  background-color: rgba(77, 124, 254, 0.08) !important;
+}
+
+#morbilidadTable .hover-col {
+  background-color: rgba(77, 124, 254, 0.06) !important;
+}
+
+#morbilidadTable tbody td.hover-cell {
+  background-color: rgba(77, 124, 254, 0.22) !important;
+  color: var(--color-primary) !important;
+  font-weight: 900 !important;
+}
+
+/* ==========================================================================
+   GLOBAL TABLE BORDERS & MODAL ELEVATION ENHANCEMENTS (ALL REPORTS)
+   ========================================================================== */
+.table,
+.table-bordered,
+.table-sm107,
+.table-trans2,
+.table-its,
+.table-excel,
+.table-premium,
+#screenTable,
+#sm2Table,
+#sm307Table,
+#morbilidadTable,
+#tb9Table,
+.sing-table-excel {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--border-color, #334155) !important;
+}
+
+.table th,
+.table td,
+.table-bordered th,
+.table-bordered td,
+.table-sm107 th,
+.table-sm107 td,
+.table-trans2 th,
+.table-trans2 td,
+.table-its th,
+.table-its td,
+.table-premium th,
+.table-premium td,
+#screenTable th,
+#screenTable td,
+#sm2Table th,
+#sm2Table td,
+#sm307Table th,
+#sm307Table td,
+#morbilidadTable th,
+#morbilidadTable td,
+#tb9Table th,
+#tb9Table td,
+.sing-table-excel th,
+.sing-table-excel td {
+  border-right: 1px solid var(--border-color, #334155) !important;
+  border-bottom: 1px solid var(--border-color, #334155) !important;
+}
+
+/* Modals High Elevation & Distinct Contrast across ALL reports */
+.modal-content {
+  background-color: var(--modal-bg, #1e293b) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--modal-border, rgba(255, 255, 255, 0.22)) !important;
+  box-shadow: var(--modal-shadow, 0 30px 60px -12px rgba(0, 0, 0, 0.85)) !important;
+  border-radius: var(--radius-md, 12px) !important;
+}
+
+.modal-header {
+  background-color: var(--modal-header-bg, #27354f) !important;
+  border-bottom: 1px solid var(--modal-border, rgba(255, 255, 255, 0.18)) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-body {
+  background-color: var(--modal-bg, #1e293b) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-footer {
+  background-color: var(--modal-footer-bg, #27354f) !important;
+  border-top: 1px solid var(--modal-border, rgba(255, 255, 255, 0.18)) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 0.75 !important;
+  background-color: var(--modal-backdrop-bg, rgba(3, 7, 18, 0.8)) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.modal-body .table {
+  background-color: var(--modal-bg, #1e293b) !important;
+}
+
+.modal-body .table thead th {
+  background-color: var(--modal-header-bg, #27354f) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 2px solid var(--modal-border, rgba(255, 255, 255, 0.18)) !important;
+}
+
+
 
 
 

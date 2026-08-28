@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Informes;
 
 use App\Http\Controllers\Controller;
-use App\Models\Informe;
+use App\Models\RegistroGlobal;
 use App\Traits\InformesHelperTrait;
 use Illuminate\Http\Request;
 
@@ -31,7 +31,7 @@ class MorbilidadController extends Controller
             $mes = $this->resolverMesPorDefecto($ano);
 
         $jornada = $request->input('jornada', 'TODAS') ?: 'TODAS';
-        $jornadas = Informe::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
+        $jornadas = RegistroGlobal::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
 
         // =====================================================================
         // DEFINICIÓN DE FILAS DEL INFORME DE MORBILIDAD
@@ -117,12 +117,43 @@ class MorbilidadController extends Controller
             ['label' => 'ATENCIÓN PRENATAL DESPUÉS DE LAS 12 SEMANAS DE GESTACIÓN', 'diag' => 'ATENCION PRENATAL DESPUES DE LAS 12 SG'],
         ];
 
-        // Consulta base
-        $query = Informe::query()->where('ano', $ano)->where('mes', $mes);
+        // Consulta base directamente desde RegistroGlobal
+        $query = RegistroGlobal::query()->where('ano', $ano)->where('mes', $mes);
         if ($jornada != 'TODAS')
             $query->where('jornada', $jornada);
 
-        $rawData = $query->select('cod', 'diagnostico', 'cond_diagnostico', 'sexo', 'edad', 'tipo')->get();
+        $rgRecords = $query->get([
+            'edad', 'tipo', 'sexo', 'cond',
+            'diagnostico_1', 'cod_1', 'cond_1',
+            'diagnostico_2', 'cod_2', 'cond_2',
+            'diagnostico_3', 'cod_3', 'cond_3',
+            'diagnostico_4', 'cod_4', 'cond_4',
+            'diagnostico_5', 'cod_5', 'cond_5',
+            'diagnostico_6', 'cod_6', 'cond_6',
+            'diagnostico_7', 'cod_7', 'cond_7',
+        ]);
+
+        $unrolled = [];
+        foreach ($rgRecords as $rg) {
+            for ($i = 1; $i <= 7; $i++) {
+                $diag = trim($rg->{"diagnostico_$i"} ?? '');
+                if ($diag === '') continue;
+
+                $cond = strtoupper(trim($rg->{"cond_$i"} ?? ($rg->cond ?? '')));
+                if ($cond !== 'N' && $cond !== 'S') $cond = 'N';
+
+                $unrolled[] = (object)[
+                    'cod' => trim($rg->{"cod_$i"} ?? ''),
+                    'diagnostico' => $diag,
+                    'cond_diagnostico' => $cond,
+                    'sexo' => $rg->sexo,
+                    'edad' => $rg->edad,
+                    'tipo' => $rg->tipo,
+                ];
+            }
+        }
+
+        $rawData = collect($unrolled);
 
         // Función de columna (32 columnas: 7 rangos × 4 sub + 4 totales)
         $getCol = function ($r) {

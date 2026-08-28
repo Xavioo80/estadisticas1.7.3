@@ -103,37 +103,45 @@
   --text-inverse: #ffffff;
 
   /* Borders & Dividers */
-  --border-color: #e2e8f0;
-  --border-color-subtle: #edf2f7;
-  --border-color-focus: var(--color-primary);
+  --border-color: #cbd5e1;
+  --border-color-subtle: #e2e8f0;
+  --border-color-focus: #4d7cfe;
 
   /* Shadows */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.06), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 10px -4px rgba(0, 0, 0, 0.03);
-  --shadow-xl: 0 20px 35px -5px rgba(0, 0, 0, 0.1), 0 8px 15px -6px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
   /* Form Elements */
   --input-bg: #ffffff;
   --input-border: #cbd5e1;
-  --input-focus-border: var(--color-primary);
+  --input-focus-border: #4d7cfe;
   --input-focus-ring: rgba(77, 124, 254, 0.2);
   --input-text: #1e293b;
   --input-placeholder: #94a3b8;
 
   /* Card & Widget specific */
   --card-bg: #ffffff;
-  --card-border: #e2e8f0;
-  --card-header-border: #f1f5f9;
-  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --card-border: #cbd5e1;
+  --card-header-border: #cbd5e1;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 
   /* Table styling */
   --table-bg: transparent;
   --table-header-bg: #f8fafc;
   --table-header-text: #475569;
   --table-row-hover: #f1f5f9;
-  --table-border: #e2e8f0;
+  --table-border: #cbd5e1;
+
+  /* Modal tokens Light */
+  --modal-bg: #ffffff;
+  --modal-header-bg: #f8fafc;
+  --modal-footer-bg: #f8fafc;
+  --modal-border: #cbd5e1;
+  --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  --modal-backdrop-bg: rgba(15, 23, 42, 0.65);
 
   /* Scrollbar */
   --scrollbar-track: #f1f5f9;
@@ -162,7 +170,7 @@
 
   /* Sidebar Dark */
   --sidebar-bg: #0f172a;
-  --sidebar-border: #1e293b;
+  --sidebar-border: #334155;
   --sidebar-text: #94a3b8;
   --sidebar-text-muted: #64748b;
   --sidebar-item-hover: #1e293b;
@@ -171,7 +179,7 @@
 
   /* Top Navbar */
   --navbar-bg: rgba(15, 23, 42, 0.85);
-  --navbar-border: #1e293b;
+  --navbar-border: #334155;
   --navbar-text: #e2e8f0;
   --navbar-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 
@@ -181,9 +189,9 @@
   --text-muted: #64748b;
   --text-inverse: #0b1120;
 
-  /* Borders & Dividers */
-  --border-color: #1e293b;
-  --border-color-subtle: #26334d;
+  /* Borders & Dividers - Mayor contraste para máxima visibilidad */
+  --border-color: #334155;
+  --border-color-subtle: #475569;
   --border-color-focus: #60a5fa;
 
   /* Shadows */
@@ -195,7 +203,7 @@
 
   /* Form Elements */
   --input-bg: #111827;
-  --input-border: #334155;
+  --input-border: #475569;
   --input-focus-border: #60a5fa;
   --input-focus-ring: rgba(96, 165, 250, 0.25);
   --input-text: #f8fafc;
@@ -203,24 +211,32 @@
 
   /* Card & Widget specific */
   --card-bg: #151e32;
-  --card-border: #1e293b;
-  --card-header-border: #1e293b;
+  --card-border: #334155;
+  --card-header-border: #334155;
   --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 
-  /* Table styling */
+  /* Table styling - Bordes bien visibles en modo oscuro */
   --table-bg: transparent;
-  --table-header-bg: #111827;
-  --table-header-text: #94a3b8;
+  --table-header-bg: #1a233a;
+  --table-header-text: #cbd5e1;
   --table-row-hover: #1e293b;
-  --table-border: #1e293b;
+  --table-border: rgba(255, 255, 255, 0.18);
+
+  /* Modal tokens Dark - Elevado con contraste distintivo sobre el fondo de tabla */
+  --modal-bg: #1e293b;
+  --modal-header-bg: #27354f;
+  --modal-footer-bg: #27354f;
+  --modal-border: rgba(255, 255, 255, 0.22);
+  --modal-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  --modal-backdrop-bg: rgba(3, 7, 18, 0.8);
 
   /* Scrollbar */
   --scrollbar-track: #0f172a;
-  --scrollbar-thumb: #334155;
-  --scrollbar-thumb-hover: #475569;
+  --scrollbar-thumb: #475569;
+  --scrollbar-thumb-hover: #64748b;
 
   /* Charts Palette */
-  --chart-grid: #1e293b;
+  --chart-grid: #334155;
   --chart-text: #94a3b8;
   --chart-tooltip-bg: #1e293b;
   --chart-tooltip-text: #f8fafc;

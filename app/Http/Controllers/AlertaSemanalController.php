@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Informe;
+use App\Models\RegistroGlobal;
 use App\Models\Setting;
 use App\Traits\InformesHelperTrait;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class AlertaSemanalController extends Controller
     public function index(Request $request)
     {
         // 1. Obtener AÑOS disponibles en la base de datos
-        $anos = Informe::distinct()->orderBy('ano', 'desc')->pluck('ano');
+        $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
         if ($anos->isEmpty()) {
             $anos = collect([(int) date('Y')]);
         }
@@ -31,7 +31,7 @@ class AlertaSemanalController extends Controller
         }
 
         // 2. Obtener MESES disponibles para el AÑO seleccionado
-        $mesesDisponibles = Informe::where('ano', $anoDefault)
+        $mesesDisponibles = RegistroGlobal::where('ano', $anoDefault)
             ->distinct()
             ->pluck('mes')
             ->toArray();
@@ -69,7 +69,7 @@ class AlertaSemanalController extends Controller
         }
 
         // 3. Obtener SEMANAS disponibles para el AÑO y MES seleccionado
-        $semanas = Informe::where('ano', $anoDefault)
+        $semanas = RegistroGlobal::where('ano', $anoDefault)
             ->where('mes', $mesDefault)
             ->whereNotNull('se')
             ->distinct()
@@ -89,13 +89,50 @@ class AlertaSemanalController extends Controller
         // Definición de filas del Telegrama Semanal
         $rowsDef = $this->getRowsDefinition();
 
-        // Consulta de datos
-        $query = Informe::query()
+        // Consulta de datos directamente desde RegistroGlobal
+        $rgRecords = RegistroGlobal::query()
             ->where('ano', $anoDefault)
-            ->where('se', $seDefault)
-            ->where('cond_diagnostico', 'N');
+            ->where(function($q) use ($seDefault) {
+                $q->where('se', $seDefault);
+            })
+            ->get([
+                'fecha', 'se', 'edad', 'tipo', 'sexo', 'cond',
+                'diagnostico_1', 'cod_1', 'cond_1',
+                'diagnostico_2', 'cod_2', 'cond_2',
+                'diagnostico_3', 'cod_3', 'cond_3',
+                'diagnostico_4', 'cod_4', 'cond_4',
+                'diagnostico_5', 'cod_5', 'cond_5',
+                'diagnostico_6', 'cod_6', 'cond_6',
+                'diagnostico_7', 'cod_7', 'cond_7',
+            ]);
 
-        $rawData = $query->select('diagnostico', 'sexo', 'edad', 'tipo', 'cond_diagnostico')->get();
+        $unrolled = [];
+        foreach ($rgRecords as $rg) {
+            $se = $rg->se;
+            if (!$se && $rg->fecha) {
+                $se = $this->getSeDeDate($rg->fecha);
+            }
+            if ((int)$se !== (int)$seDefault) continue;
+
+            for ($i = 1; $i <= 7; $i++) {
+                $diag = trim($rg->{"diagnostico_$i"} ?? '');
+                if ($diag === '') continue;
+
+                $cond = strtoupper(trim($rg->{"cond_$i"} ?? ($rg->cond ?? '')));
+                if ($cond !== 'N') continue;
+
+                $unrolled[] = (object)[
+                    'diagnostico' => $diag,
+                    'cod' => trim($rg->{"cod_$i"} ?? ''),
+                    'sexo' => $rg->sexo,
+                    'edad' => $rg->edad,
+                    'tipo' => $rg->tipo,
+                    'cond_diagnostico' => 'N',
+                ];
+            }
+        }
+
+        $rawData = collect($unrolled);
 
         $results = [];
         foreach ($rowsDef as $idx => $row) {

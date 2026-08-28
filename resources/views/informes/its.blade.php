@@ -133,30 +133,25 @@
         });
 
         window.openItsDetailsModal = function(label, colIdx) {
-            const modal = document.getElementById('itsDetailsModal');
-            const loader = document.getElementById('itsModalLoader');
-            const body = document.getElementById('itsModalBody');
+            const $modal = $('#itsDetailsModal');
+            const $loader = $('#itsModalLoader');
+            const $body = $('#itsModalBody');
 
-            if (!modal) return;
+            $modal.modal('show');
+            $loader.show();
+            $body.hide();
 
-            if (modal.parentElement !== document.body) {
-                document.body.appendChild(modal);
-            }
-
-            modal.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            body.classList.add('hidden');
-
-            const ano = document.querySelector('select[name="ano"]')?.value || '{{ $ano }}';
-            const mes = document.querySelector('select[name="mes"]')?.value || '{{ $mes }}';
-            const jornada = document.querySelector('select[name="jornada"]')?.value || '{{ $jornada }}';
+            const ano = $('select[name="ano"]').val() || '{{ $ano }}';
+            const mes = $('select[name="mes"]').val() || '{{ $mes }}';
+            const jornada = $('select[name="jornada"]').val() || '{{ $jornada }}';
 
             const params = new URLSearchParams({
                 ano: ano,
                 mes: mes,
                 jornada: jornada,
                 label: label,
-                col: colIdx
+                col: colIdx,
+                _t: new Date().getTime()
             });
 
             fetch(`{{ route('informes.its.details') }}?${params.toString()}`)
@@ -166,98 +161,107 @@
                         throw new Error(data.message || 'Error al cargar los datos');
                     }
 
-                    document.getElementById('itsModalLabelTitle').innerText = data.label;
-                    document.getElementById('itsModalColTitle').innerText = data.columna;
-                    document.getElementById('itsModalBadgeTotal').innerText = `${data.total} Atenciones`;
+                    $('#itsModalLabelTitle').text(data.label);
+                    $('#itsModalColTitle').text(data.columna);
+                    $('#itsModalBadgeTotal').text(`${data.total} Atenciones`);
 
                     const tbody = document.getElementById('itsModalTableBody');
                     tbody.innerHTML = '';
 
                     if (!data.records || data.records.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-500 font-medium">No se encontraron registros detallados para esta celda.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-muted font-weight-bold">No se encontraron registros detallados para esta celda.</td></tr>`;
                     } else {
                         data.records.forEach((r, idx) => {
                             const tr = document.createElement('tr');
-                            tr.className = 'hover:bg-slate-50 transition-colors border-b border-slate-100';
+                            tr.style.borderBottom = '1px solid var(--border-color)';
                             tr.innerHTML = `
-                                <td class="py-3 px-4 text-center font-semibold text-slate-400 w-12">${idx + 1}</td>
-                                <td class="py-3 px-4">
-                                    <div class="font-bold text-slate-900 text-sm">${r.medico}</div>
-                                    ${r.prof ? `<div class="text-[11px] font-semibold text-blue-600 uppercase">${r.prof}</div>` : ''}
+                                <td class="text-center font-weight-bold text-muted py-2" style="font-size: 0.78rem;">${idx + 1}</td>
+                                <td class="text-center font-weight-bold py-2" style="font-size: 0.8rem; color: var(--text-primary);">${r.fecha}</td>
+                                <td class="text-center py-2" style="font-size: 0.78rem; font-family: monospace; color: var(--color-primary); font-weight: 700;">${r.exp || '-'}</td>
+                                <td class="py-2 text-left">
+                                    <div class="font-weight-bold" style="font-size: 0.82rem; color: var(--text-primary);">${r.medico}</div>
+                                    ${r.prof ? `<span class="badge badge-subtle-primary text-uppercase" style="font-size: 0.68rem;">${r.prof}</span>` : ''}
                                 </td>
-                                <td class="py-3 px-4 text-center font-bold text-slate-700 text-sm whitespace-nowrap w-36">${r.fecha}</td>
+                                <td class="text-center py-2" style="font-size: 0.78rem;">
+                                    <span class="badge badge-subtle-secondary">${r.edad}</span>
+                                    <span class="badge badge-subtle-info ml-1">${r.sexo}</span>
+                                </td>
+                                <td class="py-2 text-left">
+                                    <div class="font-weight-bold" style="font-size: 0.8rem; color: var(--text-primary);">${r.diagnostico}</div>
+                                    ${r.cod && r.cod !== '-' ? `<span class="badge badge-secondary" style="font-size: 0.68rem; background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border-color);">${r.cod}</span>` : ''}
+                                    <span class="badge ${r.cond.includes('N') ? 'badge-subtle-success' : 'badge-subtle-warning'} ml-1" style="font-size: 0.68rem;">${r.cond}</span>
+                                </td>
                             `;
                             tbody.appendChild(tr);
                         });
                     }
 
-                    loader.classList.add('hidden');
-                    body.classList.remove('hidden');
+                    $loader.hide();
+                    $body.show();
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    loader.innerHTML = `<div class="p-6 text-center text-red-600 font-bold">Error al cargar la información: ${err.message}</div>`;
+                    $loader.html(`<div class="p-4 text-center text-danger font-weight-bold"><i class="bi bi-exclamation-octagon-fill mr-1"></i> Error al cargar la información: ${err.message}</div>`).show();
+                    $body.hide();
                 });
-        };
-
-        window.closeItsDetailsModal = function() {
-            const modal = document.getElementById('itsDetailsModal');
-            if (modal) modal.classList.add('hidden');
         };
     </script>
 
     <!-- Modal de Detalles de Atenciones ITS -->
-    <div id="itsDetailsModal" class="fixed inset-0 hidden items-center justify-center p-4 sm:p-6" style="z-index: 999999 !important;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm transition-opacity" style="z-index: 999998 !important;" onclick="closeItsDetailsModal()"></div>
-        
-        <div id="itsDetailsModalCard" class="relative flex flex-col w-full max-w-xl max-h-[80vh] transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all border border-slate-200" style="fff !important; z-index: 999999 !important;">
-            <!-- Header -->
-            <div class="bg-slate-900 px-6 py-4 flex-shrink-0 flex items-center justify-between border-b border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                        <i class="fas fa-stethoscope text-base"></i>
+    <div class="modal fade" id="itsDetailsModal" tabindex="-1" role="dialog" aria-labelledby="itsModalLabelTitle" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" style="max-width: 1000px;">
+            <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);">
+                <!-- Header -->
+                <div class="modal-header d-flex align-items-center justify-content-between py-2.5 px-3" style="background: var(--bg-subtle); border-bottom: 1px solid var(--border-color);">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded" style="background: rgba(77, 124, 254, 0.15); color: var(--color-primary);">
+                            <i class="bi bi-shield-plus" style="font-size: 1.15rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title font-weight-bold mb-0" id="itsModalLabelTitle" style="font-size: 1rem; color: var(--text-primary);">Patología</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.72rem;" id="itsModalColTitle">Detalle de atenciones</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-white leading-tight" id="itsModalLabelTitle">Patología</h3>
-                        <p class="text-xs text-blue-400 font-semibold" id="itsModalColTitle">Detalle de atenciones</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="itsModalBadgeTotal" class="badge badge-subtle-primary px-2.5 py-1 font-weight-bold" style="font-size: 0.75rem; border: 1px solid var(--border-color);">
+                            0 Atenciones
+                        </span>
+                        <button type="button" class="close text-muted" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8; font-size: 1.25rem; background: none; border: none; cursor: pointer; color: var(--text-primary);">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <span id="itsModalBadgeTotal" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                        0 Atenciones
-                    </span>
-                    <button type="button" onclick="closeItsDetailsModal()" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-slate-800">
-                        <i class="fas fa-times text-base"></i>
+
+                <!-- Loader -->
+                <div id="itsModalLoader" class="py-5 text-center" style="display: none;">
+                    <div class="spinner-border text-primary mb-2" role="status" style="width: 2rem; height: 2rem;"></div>
+                    <p class="mb-0 text-muted font-weight-bold" style="font-size: 0.85rem;">Cargando registros de atenciones...</p>
+                </div>
+
+                <!-- Body (Con scroll interno y cabecera pegajosa) -->
+                <div id="itsModalBody" class="modal-body p-0 custom-scrollbar" style="max-height: 480px; overflow-y: auto;">
+                    <table class="table table-sm table-hover mb-0 align-middle" style="font-size: 0.8rem; background: var(--bg-surface);">
+                        <thead class="sticky-top" style="background: var(--bg-subtle); z-index: 10; border-bottom: 2px solid var(--border-color);">
+                            <tr style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">
+                                <th class="text-center py-2 px-2" style="width: 40px;">#</th>
+                                <th class="text-center py-2 px-2" style="width: 90px;">Fecha</th>
+                                <th class="text-center py-2 px-2" style="width: 95px;">Expediente</th>
+                                <th class="py-2 px-3">Quién Atendió (Médico / Profesional)</th>
+                                <th class="text-center py-2 px-2" style="width: 140px;">Edad / Sexo</th>
+                                <th class="py-2 px-3" style="width: 240px;">Diagnóstico & Condición</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itsModalTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer py-2 px-3 d-flex justify-content-end" style="background: var(--bg-subtle); border-top: 1px solid var(--border-color);">
+                    <button type="button" class="btn btn-sm btn-subtle" data-dismiss="modal" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg mr-1"></i> Cerrar
                     </button>
                 </div>
-            </div>
-
-            <!-- Loader -->
-            <div id="itsModalLoader" class="p-12 text-center bg-white flex-1">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
-                <p class="mt-3 text-sm font-semibold text-slate-600">Cargando registros de atenciones...</p>
-            </div>
-
-            <!-- Body (Con scroll interno y cabecera pegajosa) -->
-            <div id="itsModalBody" class="hidden flex-1 overflow-y-auto bg-white p-0">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead class="sticky top-0 bg-slate-100 shadow-sm z-10">
-                        <tr class="bg-slate-100 text-slate-700 font-bold uppercase text-[11px] tracking-wider border-b border-slate-200">
-                            <th class="py-3 px-4 w-12 text-center">#</th>
-                            <th class="py-3 px-4">Quién Atendió (Médico)</th>
-                            <th class="py-3 px-4 text-center w-36">Fecha</th>
-                        </tr>
-                    </thead>
-                    <tbody id="itsModalTableBody" class="divide-y divide-slate-100">
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Footer -->
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex-shrink-0 flex justify-end">
-                <button type="button" onclick="closeItsDetailsModal()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 transition-all shadow-sm">
-                    Cerrar
-                </button>
             </div>
         </div>
     </div>

@@ -32,20 +32,9 @@ class ItsController extends Controller
 
         $jornada = $request->input('jornada', 'TODAS') ?: 'TODAS';
 
-        $anos = $this->service->getAnosDisponibles();
-
-        $mesesRaw = Informe::distinct()->pluck('mes')->merge(RegistroGlobal::distinct()->pluck('mes'))->unique()->toArray();
-        $mesMap = [
-            'ENERO' => 1, 'FEBRERO' => 2, 'MARZO' => 3, 'ABRIL' => 4, 'MAYO' => 5, 'JUNIO' => 6,
-            'JULIO' => 7, 'AGOSTO' => 8, 'SEPTIEMBRE' => 9, 'OCTUBRE' => 10, 'NOVIEMBRE' => 11, 'DICIEMBRE' => 12
-        ];
-        $meses = collect($mesesRaw)->map(fn($m) => strtoupper(trim($m)))
-            ->filter()
-            ->unique()
-            ->sort(fn($a, $b) => ($mesMap[$a] ?? 0) <=> ($mesMap[$b] ?? 0))
-            ->values();
-
-        $jornadas = Informe::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
+        $anos = $this->getAnosDisponibles();
+        $meses = $this->getMesesDisponibles($ano);
+        $jornadas = $this->getJornadasDisponibles();
 
         $itsDef = [
             'SINDRÓMICO' => [

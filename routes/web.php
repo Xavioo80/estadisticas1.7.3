@@ -107,6 +107,9 @@ Route::prefix('informes')->name('informes.')->group(function () {
     Route::get('/morbilidad', [MorbilidadController::class, 'index'])->name('morbilidad');
     Route::get('/morbilidad/export', [MorbilidadController::class, 'export'])->name('morbilidad.export');
 
+    Route::get('/comparacion-cruzada', [\App\Http\Controllers\Informes\ComparacionInformesController::class, 'index'])->name('comparacion-cruzada');
+    Route::get('/comparacion-cruzada/detalles', [\App\Http\Controllers\Informes\ComparacionInformesController::class, 'detalles'])->name('comparacion-cruzada.detalles');
+
     Route::get('/its', [ItsController::class, 'index'])->name('its');
     Route::get('/its/details', [ItsController::class, 'details'])->name('its.details');
     Route::get('/its/export', [ItsController::class, 'export'])->name('its.export');
@@ -263,5 +266,17 @@ Route::prefix('documentacion')->name('documentacion.')->group(function () {
     Route::delete('/{id}', [DocumentacionController::class, 'destroy'])->name('destroy');
 });
 
+// Bloc de Notas, Mensajes y Gestor de Tareas
+use App\Http\Controllers\NotaController;
+Route::prefix('notas')->name('notas.')->group(function () {
+    Route::get('/', [NotaController::class, 'index'])->name('index');
+    Route::post('/', [NotaController::class, 'store'])->name('store');
+    Route::put('/{id}', [NotaController::class, 'update'])->name('update');
+    Route::delete('/{id}', [NotaController::class, 'destroy'])->name('destroy');
+    Route::post('/{id}/toggle-checklist', [NotaController::class, 'toggleChecklist'])->name('toggle_checklist');
 
-
+    // Tareas
+    Route::post('/tareas', [NotaController::class, 'storeTarea'])->name('tareas.store');
+    Route::put('/tareas/{id}', [NotaController::class, 'updateTarea'])->name('tareas.update');
+    Route::delete('/tareas/{id}', [NotaController::class, 'destroyTarea'])->name('tareas.destroy');
+});

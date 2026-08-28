@@ -7,6 +7,7 @@ use App\Models\RegistroGlobal;
 use App\Models\Setting;
 use App\Traits\InformesHelperTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class At2rNController extends Controller
 {
@@ -34,8 +35,8 @@ class At2rNController extends Controller
         $medicoFilter = $request->input('medico', 'TODOS');
         $sexoFilter = $request->input('sexo', 'AMBOS');
 
-        $jornadas = RegistroGlobal::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
-        $profesiones = RegistroGlobal::distinct()->whereNotNull('prof')->where('prof', '!=', '')->orderBy('prof')->pluck('prof');
+        $jornadas = $this->getJornadasDisponibles();
+        $profesiones = $this->getProfesionesDisponibles();
 
         $nombresMedicos = RegistroGlobal::distinct()
             ->where('ano', $ano)->where('mes', $mes)
@@ -116,6 +117,15 @@ class At2rNController extends Controller
 
         $atencionesRaw = $registrosRaw;
 
+        $colCache = [];
+        $getCol = function ($prof, $medico = '', $force = false) use (&$colCache) {
+            $key = ($prof ?? '') . '|' . ($medico ?? '') . '|' . ($force ? '1' : '0');
+            if (!isset($colCache[$key])) {
+                $colCache[$key] = $this->resolveColumnaProfesion($prof, $medico, $force);
+            }
+            return $colCache[$key];
+        };
+
         $diagnosticosRaw = collect();
         foreach ($registrosRaw as $reg) {
             for ($i = 1; $i <= 7; $i++) {
@@ -123,11 +133,18 @@ class At2rNController extends Controller
                 $diag = $reg->{"diagnostico_{$i}"} ?? '';
                 if ((($cod === null || trim((string) $cod) === '')) && trim((string) $diag) === '')
                     continue;
+                $condVal = strtoupper(trim((string)($reg->{"cond_{$i}"} ?? '')));
+                if ($condVal !== 'N' && $condVal !== 'S') {
+                    $condVal = strtoupper(trim((string)($reg->cond ?? '')));
+                    if ($condVal !== 'N' && $condVal !== 'S') {
+                        $condVal = 'N';
+                    }
+                }
                 $diagnosticosRaw->push((object) [
                     'reg_id' => $reg->id, // Guardamos el ID original
                     'cod' => trim((string) $cod),
-                    'diagnostico' => $reg->{"diagnostico_{$i}"} ?? '',
-                    'cond_diag' => $reg->{"cond_{$i}"} ?? '',
+                    'diagnostico' => $diag,
+                    'cond_diag' => $condVal,
                     'prof' => $reg->prof,
                     'medico' => $reg->medico ?? '',
                     'edad' => $reg->edad,
@@ -138,12 +155,11 @@ class At2rNController extends Controller
         }
 
         $results = [];
-        $getCol = function ($prof, $medico = '', $force = false) {
-            return $this->resolveColumnaProfesion($prof, $medico, $force);
-        };
-
         $ageRows = $this->getAgeRows();
         $progRows = $this->getProgRows($ano, $mes, $jornada, $profFilter, $medicoFilter, $sexoFilter);
+
+        // Preload manual settings in 1 single query
+        $manualSettings = Setting::where('key', 'like', "at2rn_manual_%_{$ano}_{$mes}_%")->pluck('value', 'key')->toArray();
 
         // ── Procesar ageRows ───────────────────────────────────────────────
         foreach ($ageRows as $idx => $def) {
@@ -211,9 +227,9 @@ class At2rNController extends Controller
             } elseif (!empty($def['is_manual'])) {
                 $manualKey = $def['manual_key'] ?? 'rehidratados';
                 $settingKey = "at2rn_manual_{$manualKey}_{$ano}_{$mes}_{$jornada}_{$profFilter}_{$medicoFilter}_{$sexoFilter}";
-                $setting = Setting::where('key', $settingKey)->first();
-                if ($setting) {
-                    $manualVals = json_decode($setting->value, true);
+                $valStr = $manualSettings[$settingKey] ?? null;
+                if ($valStr) {
+                    $manualVals = json_decode($valStr, true);
                     $results[$absIdx][1] = $manualVals[1] ?? 0;
                     $results[$absIdx][2] = $manualVals[2] ?? 0;
                     $results[$absIdx][3] = $manualVals[3] ?? 0;
@@ -739,66 +755,77 @@ class At2rNController extends Controller
                 'label' => 'No. De niños/as menores de 5 años con diarrea nuevo',
                 'is_menor5' => true,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'DIARREA') || $cod === 'A09.X') && $c === 'N',
             ],
             'diarreas_subs' => [
                 'label' => 'No. De niños/as menores de 5 años con diarrea que acuden a cita de seguimiento',
                 'is_menor5' => true,
                 'cond' => 'S',
+                'has_trans2' => false,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'DIARREA') || $cod === 'A09.X') && $c === 'S',
             ],
             'neumonias_nuevas' => [
                 'label' => 'No. De Niños/as menores de 5 años con casos de Neumonía nuevos en el año',
                 'is_menor5' => true,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA')) && $c === 'N',
             ],
             'neumonias_subs' => [
                 'label' => 'No. De Niños/as menores de 5 años con Neumonía que acuden a su cita de Seguimiento',
                 'is_menor5' => true,
                 'cond' => 'S',
+                'has_trans2' => false,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA')) && $c === 'S',
             ],
             'anemias_nuevas' => [
                 'label' => 'No. de niños/as menores de 5 años con algun grado de Síndrome anémico diagnosticado',
                 'is_menor5' => true,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => str_contains($d, 'ANEMIA') && $c === 'N',
             ],
             'diabetes_nuevas' => [
                 'label' => 'Número de atenciones brindadas Nuevas de Diabetes Mellitus',
                 'is_menor5' => false,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'DIABETES') || $cod === 'E14.9' || $d === 'DM2') && $c === 'N',
             ],
             'diabetes_subs' => [
                 'label' => 'Número de atenciones brindadas Subsiguientes de Diabetes Mellitus',
                 'is_menor5' => false,
                 'cond' => 'S',
+                'has_trans2' => false,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'DIABETES') || $cod === 'E14.9' || $d === 'DM2') && $c === 'S',
             ],
             'hta_nuevas' => [
                 'label' => 'Número de atenciones brindadas Nuevas de Hipertensión Arterial',
                 'is_menor5' => false,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || $cod === 'I10.X') && $c === 'N',
             ],
             'hta_subs' => [
                 'label' => 'Número de atenciones brindadas Subsiguientes de Hipertensión Arterial',
                 'is_menor5' => false,
                 'cond' => 'S',
+                'has_trans2' => false,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'HIPERTENSION') || $d === 'HTA' || $cod === 'I10.X') && $c === 'S',
             ],
             'erc_nuevas' => [
                 'label' => 'Número de atenciones brindadas Nuevas de Enfermedad Renal Crónica',
                 'is_menor5' => false,
                 'cond' => 'N',
+                'has_trans2' => true,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && $c === 'N',
             ],
             'erc_subs' => [
                 'label' => 'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica',
                 'is_menor5' => false,
                 'cond' => 'S',
+                'has_trans2' => false,
                 'test' => fn($d, $c, $cod) => (str_contains($d, 'RENAL CRONICA') || str_contains($d, 'ENFERMEDAD RENAL') || $d === 'ERC') && $c === 'S',
             ],
         ];
@@ -809,138 +836,264 @@ class At2rNController extends Controller
 
         $def = $matchers[$conceptKey];
 
-        // 1. Pacientes en AT2 (RegistroGlobal)
-        $rgQuery = RegistroGlobal::where('ano', $ano)->where('mes', $mes);
-        if ($jornada !== 'TODAS') $rgQuery->where('jornada', $jornada);
-        $rgRecords = $rgQuery->get();
+        // Definición de rangos de edad
+        if ($def['is_menor5']) {
+            $ageRanges = [
+                '< 28 Días' => fn($e, $t) => ($t === 'D'),
+                '1 a 11 Meses' => fn($e, $t) => ($t === 'M'),
+                '1 Año' => fn($e, $t) => ($t === 'A' && $e == 1),
+                '2 Años' => fn($e, $t) => ($t === 'A' && $e == 2),
+                '3 Años' => fn($e, $t) => ($t === 'A' && $e == 3),
+                '4 Años' => fn($e, $t) => ($t === 'A' && $e == 4),
+            ];
+        } else {
+            $ageRanges = [
+                '< 1 Año' => fn($e, $t) => ($t === 'D' || $t === 'M' || ($t === 'A' && $e == 0)),
+                '1 a 4 Años' => fn($e, $t) => ($t === 'A' && $e >= 1 && $e <= 4),
+                '5 a 14 Años' => fn($e, $t) => ($t === 'A' && $e >= 5 && $e <= 14),
+                '15 a 19 Años' => fn($e, $t) => ($t === 'A' && $e >= 15 && $e <= 19),
+                '20 a 49 Años' => fn($e, $t) => ($t === 'A' && $e >= 20 && $e <= 49),
+                '50 a 59 Años' => fn($e, $t) => ($t === 'A' && $e >= 50 && $e <= 59),
+                '60 Años y más' => fn($e, $t) => ($t === 'A' && $e >= 60),
+            ];
+        }
 
-        $at2Patients = [];
-        $duplicatesInRG = [];
-        $excludedProfessions = [];
+        $cacheKey = "morb_audit_v5_{$ano}_{$mes}_{$jornada}_{$conceptKey}";
+        $data = Cache::remember($cacheKey, 45, function() use ($ano, $mes, $jornada, $def, $ageRanges) {
+            // 1. Pacientes en Registros Globales (AT1)
+            $rgQuery = RegistroGlobal::where('ano', $ano)->where('mes', $mes);
+            if ($jornada !== 'TODAS') $rgQuery->where('jornada', $jornada);
+            $rgRecords = $rgQuery->get();
 
-        foreach ($rgRecords as $r) {
-            $t = strtoupper(trim($r->tipo ?? ''));
-            $e = (int)($r->edad ?? 0);
-            if ($def['is_menor5']) {
-                if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
-            }
+            $rgPatients = [];
+            $at2Patients = [];
+            $duplicatesInRG = [];
+            $excludedProfessions = [];
 
-            $col = $this->resolveColumnaProfesion($r->prof, $r->medico ?? '', false);
-
-            $matchedDiags = [];
-            for ($i = 1; $i <= 7; $i++) {
-                $diag = $this->cleanDiag($r->{"diagnostico_$i"} ?? '');
-                $cond = strtoupper(trim($r->{"cond_$i"} ?? ($r->cond ?? '')));
-                $cod = strtoupper(trim($r->{"cod_$i"} ?? ''));
-                if ($def['test']($diag, $cond, $cod)) {
-                    $matchedDiags[] = [
-                        'pos' => $i,
-                        'diag' => $r->{"diagnostico_$i"},
-                        'cond' => $cond,
-                        'cod' => $cod
-                    ];
+            foreach ($rgRecords as $r) {
+                $t = strtoupper(trim($r->tipo ?? ''));
+                $e = (int)($r->edad ?? 0);
+                if ($def['is_menor5']) {
+                    if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
                 }
-            }
 
-            if (count($matchedDiags) > 0) {
-                if (!$col) {
-                    $excludedProfessions[] = [
-                        'registro_id' => $r->id,
-                        'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
-                        'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
-                        'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
-                        'prof' => $r->prof ?: 'SIN PROFESIÓN',
-                        'diagnosticos' => $matchedDiags,
-                        'motivo' => "La profesión '{$r->prof}' está excluida o no pertenece a las 4 columnas del AT2-r N."
-                    ];
-                } else {
-                    $at2Patients[$r->id] = [
+                $col = $this->resolveColumnaProfesion($r->prof, $r->medico ?? '', false);
+
+                $matchedDiags = [];
+                for ($i = 1; $i <= 7; $i++) {
+                    $diag = $this->cleanDiag($r->{"diagnostico_$i"} ?? '');
+                    $cond = strtoupper(trim($r->{"cond_$i"} ?? ($r->cond ?? '')));
+                    $cod = strtoupper(trim($r->{"cod_$i"} ?? ''));
+                    if ($def['test']($diag, $cond, $cod)) {
+                        $matchedDiags[] = [
+                            'pos' => $i,
+                            'diag' => $r->{"diagnostico_$i"},
+                            'cond' => $cond,
+                            'cod' => $cod
+                        ];
+                    }
+                }
+
+                if (count($matchedDiags) > 0) {
+                    // Determinar rango de edad
+                    $rangoAsignado = 'Otro / No especificado';
+                    foreach ($ageRanges as $rLabel => $rFunc) {
+                        if ($rFunc($e, $t)) {
+                            $rangoAsignado = $rLabel;
+                            break;
+                        }
+                    }
+
+                    $patientItem = [
                         'registro_id' => $r->id,
                         'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
                         'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
                         'edad' => ($r->edad !== null ? $r->edad . ' ' . $r->tipo : 'S/E'),
+                        'tipo' => $t,
+                        'edad_num' => $e,
+                        'rango_edad' => $rangoAsignado,
                         'sexo' => $r->sexo ?: 'S/S',
                         'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
                         'prof' => $r->prof ?: 'SIN PROFESIÓN',
                         'col' => $col,
-                        'diagnosticos' => $matchedDiags
+                        'diagnosticos' => $matchedDiags,
+                        'en_rg' => true,
+                        'en_at2' => (bool)$col,
+                        'en_morb' => false,
                     ];
 
-                    if (count($matchedDiags) > 1) {
-                        $duplicatesInRG[] = [
+                    $rgPatients[$r->id] = $patientItem;
+
+                    if (!$col) {
+                        $excludedProfessions[] = [
+                            'registro_id' => $r->id,
+                            'fecha' => $patientItem['fecha'],
+                            'paciente' => $patientItem['paciente'],
+                            'medico' => $patientItem['medico'],
+                            'prof' => $patientItem['prof'],
+                            'rango_edad' => $rangoAsignado,
+                            'diagnosticos' => $matchedDiags,
+                            'motivo' => "La profesión '{$r->prof}' está excluida o no pertenece a las 4 columnas del AT2-r N."
+                        ];
+                    } else {
+                        $at2Patients[$r->id] = $patientItem;
+
+                        if (count($matchedDiags) > 1) {
+                            $duplicatesInRG[] = [
+                                'registro_id' => $r->id,
+                                'fecha' => $patientItem['fecha'],
+                                'paciente' => $patientItem['paciente'],
+                                'medico' => $patientItem['medico'],
+                                'prof' => $patientItem['prof'],
+                                'rango_edad' => $rangoAsignado,
+                                'count' => count($matchedDiags),
+                                'diagnosticos' => $matchedDiags,
+                                'motivo' => "El diagnóstico se registró en " . count($matchedDiags) . " casillas de la misma atención. En AT2 cuenta 1 paciente; en Morbilidad suma " . count($matchedDiags) . " líneas."
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // 2. Líneas de Diagnóstico de Morbilidad y TRANS-2 (Extraídas directamente de RegistroGlobal)
+            $morbMatched = [];
+            $morbMatchedByRegId = [];
+            $orphansInMorb = [];
+
+            foreach ($rgRecords as $r) {
+                $t = strtoupper(trim($r->tipo ?? ''));
+                $e = (int)($r->edad ?? 0);
+                if ($def['is_menor5']) {
+                    if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
+                }
+
+                $rangoMorb = 'Otro / No especificado';
+                foreach ($ageRanges as $rLabel => $rFunc) {
+                    if ($rFunc($e, $t)) {
+                        $rangoMorb = $rLabel;
+                        break;
+                    }
+                }
+
+                for ($i = 1; $i <= 7; $i++) {
+                    $diagRaw = $r->{"diagnostico_$i"} ?? '';
+                    if (trim($diagRaw) === '') continue;
+
+                    $diag = $this->cleanDiag($diagRaw);
+                    $cond = strtoupper(trim($r->{"cond_$i"} ?? ($r->cond ?? '')));
+                    $cod = strtoupper(trim($r->{"cod_$i"} ?? ''));
+
+                    if ($def['test']($diag, $cond, $cod)) {
+                        $infItem = [
+                            'id' => "RG-{$r->id}-{$i}",
                             'registro_id' => $r->id,
                             'fecha' => $r->fecha ? \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') : 'SIN FECHA',
                             'paciente' => trim($r->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
+                            'edad' => ($r->edad !== null ? $r->edad . ' ' . $r->tipo : 'S/E'),
+                            'tipo' => $t,
+                            'edad_num' => $e,
+                            'rango_edad' => $rangoMorb,
+                            'sexo' => $r->sexo ?: 'S/S',
                             'medico' => trim($r->medico ?? '') ?: 'NO ESPECIFICADO',
                             'prof' => $r->prof ?: 'SIN PROFESIÓN',
-                            'count' => count($matchedDiags),
-                            'diagnosticos' => $matchedDiags,
-                            'motivo' => "El diagnóstico se registró en " . count($matchedDiags) . " casillas de la misma atención. En AT2 cuenta 1 paciente; en Morbilidad suma " . count($matchedDiags) . " líneas."
+                            'diagnostico' => $diagRaw . ($cond ? " ($cond)" : ''),
+                            'cod' => $cod,
                         ];
+
+                        $morbMatched[] = $infItem;
+                        $morbMatchedByRegId[$r->id][] = $infItem;
+
+                        if (isset($at2Patients[$r->id])) {
+                            $at2Patients[$r->id]['en_morb'] = true;
+                        }
+                        if (isset($rgPatients[$r->id])) {
+                            $rgPatients[$r->id]['en_morb'] = true;
+                        }
                     }
                 }
             }
-        }
 
-        // 2. Líneas en Informe (Morbilidad)
-        $infQuery = \App\Models\Informe::where('ano', $ano)->where('mes', $mes);
-        if ($jornada !== 'TODAS') $infQuery->where('jornada', $jornada);
-        $infRecords = $infQuery->get();
-
-        $morbMatched = [];
-        $orphansInMorb = [];
-
-        foreach ($infRecords as $inf) {
-            $t = strtoupper(trim($inf->tipo ?? ''));
-            $e = (int)($inf->edad ?? 0);
-            if ($def['is_menor5']) {
-                if (!($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4))) continue;
-            }
-
-            $diag = $this->cleanDiag($inf->diagnostico ?? '');
-            $cond = strtoupper(trim($inf->cond_diagnostico ?? ''));
-            $cod = strtoupper(trim($inf->cod ?? ''));
-
-            if ($def['test']($diag, $cond, $cod)) {
-                $morbMatched[] = $inf;
-
-                if (!isset($at2Patients[$inf->registro_id])) {
-                    $isExcluded = false;
-                    foreach ($excludedProfessions as $ex) {
-                        if ($ex['registro_id'] == $inf->registro_id) $isExcluded = true;
-                    }
-                    if (!$isExcluded) {
-                        $orphansInMorb[] = [
-                            'informe_id' => $inf->id,
-                            'registro_id' => $inf->registro_id,
-                            'fecha' => $inf->fecha ? \Carbon\Carbon::parse($inf->fecha)->format('d/m/Y') : 'SIN FECHA',
-                            'paciente' => trim($inf->nombre_paciente ?? '') ?: 'NO ESPECIFICADO',
-                            'medico' => trim($inf->medico ?? '') ?: 'NO ESPECIFICADO',
-                            'prof' => $inf->prof ?: 'SIN PROFESIÓN',
-                            'diagnostico' => $inf->diagnostico . ($cond ? " ($cond)" : ''),
-                            'motivo' => "El registro existe en la tabla de Morbilidad, pero la atención original ID #{$inf->registro_id} fue eliminada o no existe en Registro Global."
-                        ];
-                    }
+            // 3. Faltantes en Morbilidad (Registrados en AT2 / RG pero sin línea en la tabla informes)
+            $faltantesEnMorbilidad = [];
+            foreach ($at2Patients as $regId => $p) {
+                if (!$p['en_morb']) {
+                    $faltantesEnMorbilidad[] = [
+                        'registro_id' => $regId,
+                        'fecha' => $p['fecha'],
+                        'paciente' => $p['paciente'],
+                        'edad' => $p['edad'],
+                        'rango_edad' => $p['rango_edad'],
+                        'sexo' => $p['sexo'],
+                        'medico' => $p['medico'],
+                        'prof' => $p['prof'],
+                        'diagnosticos' => $p['diagnosticos'],
+                        'motivo' => "El paciente está registrado en Registro Global / AT2-r N pero NO aparece en la tabla de Morbilidad (requiere sincronización o fue guardado con otra condición)."
+                    ];
                 }
             }
-        }
 
-        $at2Total = count($at2Patients);
-        $morbTotal = count($morbMatched);
-        $diferencia = $morbTotal - $at2Total;
-        $cuadra = ($diferencia === 0);
+            // 4. Desglose comparativo por rango de edad
+            $desgloseEdad = [];
+            foreach ($ageRanges as $rLabel => $rFunc) {
+                $countRG = 0;
+                $countAT2 = 0;
+                $countMorb = 0;
 
-        return response()->json([
-            'concepto' => $def['label'],
-            'at2_total' => $at2Total,
-            'morb_total' => $morbTotal,
-            'diferencia' => $diferencia,
-            'cuadra' => $cuadra,
-            'duplicados' => $duplicatesInRG,
-            'huerfanos' => $orphansInMorb,
-            'excluidos_profesion' => $excludedProfessions,
-            'pacientes' => array_values($at2Patients),
-        ]);
+                foreach ($rgPatients as $p) {
+                    if ($rFunc($p['edad_num'], $p['tipo'])) $countRG++;
+                }
+                foreach ($at2Patients as $p) {
+                    if ($rFunc($p['edad_num'], $p['tipo'])) $countAT2++;
+                }
+                foreach ($morbMatched as $m) {
+                    if ($rFunc($m['edad_num'], $m['tipo'])) $countMorb++;
+                }
+
+                $dif = $countAT2 - $countMorb;
+                $hasTrans2 = $def['has_trans2'] ?? false;
+                $trans2TotalRow = $hasTrans2 ? $countMorb : null;
+
+                $desgloseEdad[] = [
+                    'rango' => $rLabel,
+                    'rg_total' => $countRG,
+                    'at2_total' => $countAT2,
+                    'morb_total' => $countMorb,
+                    'trans2_total' => $trans2TotalRow,
+                    'diferencia' => $dif,
+                    'cuadra' => ($dif === 0),
+                    'motivo_rango' => ($dif !== 0) 
+                        ? ($dif > 0 ? "AT2-r N tiene {$dif} más que Morbilidad" : "Morbilidad tiene " . abs($dif) . " más que AT2-r N")
+                        : "Coincidencia exacta"
+                ];
+            }
+
+            $rgTotal = count($rgPatients);
+            $at2Total = count($at2Patients);
+            $morbTotal = count($morbMatched);
+            $hasTrans2 = $def['has_trans2'] ?? false;
+            $trans2Total = $hasTrans2 ? $morbTotal : null;
+            $diferencia = $at2Total - $morbTotal;
+            $cuadra = ($diferencia === 0);
+
+            return [
+                'concepto' => $def['label'],
+                'has_trans2' => $hasTrans2,
+                'rg_total' => $rgTotal,
+                'at2_total' => $at2Total,
+                'morb_total' => $morbTotal,
+                'trans2_total' => $trans2Total,
+                'diferencia' => $diferencia,
+                'cuadra' => $cuadra,
+                'desglose_edad' => $desgloseEdad,
+                'faltantes_morb' => $faltantesEnMorbilidad,
+                'duplicados' => $duplicatesInRG,
+                'huerfanos' => $orphansInMorb,
+                'excluidos_profesion' => $excludedProfessions,
+                'pacientes' => array_values($at2Patients),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     public function export(Request $request)
@@ -1020,12 +1173,21 @@ class At2rNController extends Controller
 
     private function getMorbilidadReferenceData($ano, $mes, $jornada): array
     {
-        $query = \App\Models\Informe::query()->where('ano', $ano)->where('mes', $mes);
+        $query = RegistroGlobal::query()->where('ano', $ano)->where('mes', $mes);
         if ($jornada !== 'TODAS') {
             $query->where('jornada', $jornada);
         }
 
-        $records = $query->get(['cod', 'diagnostico', 'cond_diagnostico', 'edad', 'tipo']);
+        $records = $query->get([
+            'edad', 'tipo', 'cond',
+            'diagnostico_1', 'cod_1', 'cond_1',
+            'diagnostico_2', 'cod_2', 'cond_2',
+            'diagnostico_3', 'cod_3', 'cond_3',
+            'diagnostico_4', 'cod_4', 'cond_4',
+            'diagnostico_5', 'cod_5', 'cond_5',
+            'diagnostico_6', 'cod_6', 'cond_6',
+            'diagnostico_7', 'cod_7', 'cond_7',
+        ]);
 
         $diarreasN = 0;
         $diarreasS = 0;
@@ -1040,46 +1202,53 @@ class At2rNController extends Controller
         $ercS = 0;
 
         foreach ($records as $r) {
-            $diag = $this->cleanDiag($r->diagnostico ?? '');
-            $cod = strtoupper(trim($r->cod ?? ''));
-            $cond = strtoupper(trim($r->cond_diagnostico ?? ''));
             $tipo = strtoupper(trim($r->tipo ?? ''));
             $edad = (int)($r->edad ?? 0);
             $isMenor5 = ($tipo === 'D' || $tipo === 'M' || ($tipo === 'A' && $edad <= 4));
 
-            // Diarreas (< 5 años)
-            if ($isMenor5 && (str_contains($diag, 'DIARREA') || $cod === 'A09.X')) {
-                if ($cond === 'N') $diarreasN++;
-                elseif ($cond === 'S') $diarreasS++;
-            }
+            for ($i = 1; $i <= 7; $i++) {
+                $diagRaw = $r->{"diagnostico_$i"} ?? '';
+                if (trim($diagRaw) === '') continue;
 
-            // Neumonías (< 5 años)
-            if ($isMenor5 && (str_contains($diag, 'NEUMONIA') || str_contains($diag, 'BRONCONEUMONIA'))) {
-                if ($cond === 'N') $neumoniasN++;
-                elseif ($cond === 'S') $neumoniasS++;
-            }
+                $diag = $this->cleanDiag($diagRaw);
+                $cod = strtoupper(trim($r->{"cod_$i"} ?? ''));
+                $cond = strtoupper(trim($r->{"cond_$i"} ?? ($r->cond ?? '')));
+                if ($cond !== 'N' && $cond !== 'S') $cond = 'N';
 
-            // Anemias (< 5 años)
-            if ($isMenor5 && str_contains($diag, 'ANEMIA')) {
-                if ($cond === 'N') $anemiasN++;
-            }
+                // Diarreas (< 5 años)
+                if ($isMenor5 && (str_contains($diag, 'DIARREA') || $cod === 'A09.X')) {
+                    if ($cond === 'N') $diarreasN++;
+                    elseif ($cond === 'S') $diarreasS++;
+                }
 
-            // Diabetes (Todas las edades)
-            if (str_contains($diag, 'DIABETES') || $cod === 'E14.9' || $diag === 'DM2') {
-                if ($cond === 'N') $diabetesN++;
-                elseif ($cond === 'S') $diabetesS++;
-            }
+                // Neumonías (< 5 años)
+                if ($isMenor5 && (str_contains($diag, 'NEUMONIA') || str_contains($diag, 'BRONCONEUMONIA'))) {
+                    if ($cond === 'N') $neumoniasN++;
+                    elseif ($cond === 'S') $neumoniasS++;
+                }
 
-            // Hipertensión (Todas las edades)
-            if (str_contains($diag, 'HIPERTENSION') || $diag === 'HTA' || $cod === 'I10.X') {
-                if ($cond === 'N') $htaN++;
-                elseif ($cond === 'S') $htaS++;
-            }
+                // Anemias (< 5 años)
+                if ($isMenor5 && str_contains($diag, 'ANEMIA')) {
+                    if ($cond === 'N') $anemiasN++;
+                }
 
-            // ERC (Todas las edades)
-            if (str_contains($diag, 'RENAL CRONICA') || str_contains($diag, 'ENFERMEDAD RENAL') || $diag === 'ERC') {
-                if ($cond === 'N') $ercN++;
-                elseif ($cond === 'S') $ercS++;
+                // Diabetes (Todas las edades)
+                if (str_contains($diag, 'DIABETES') || $cod === 'E14.9' || $diag === 'DM2') {
+                    if ($cond === 'N') $diabetesN++;
+                    elseif ($cond === 'S') $diabetesS++;
+                }
+
+                // Hipertensión (Todas las edades)
+                if (str_contains($diag, 'HIPERTENSION') || $diag === 'HTA' || $cod === 'I10.X') {
+                    if ($cond === 'N') $htaN++;
+                    elseif ($cond === 'S') $htaS++;
+                }
+
+                // ERC (Todas las edades)
+                if (str_contains($diag, 'RENAL CRONICA') || str_contains($diag, 'ENFERMEDAD RENAL') || $diag === 'ERC') {
+                    if ($cond === 'N') $ercN++;
+                    elseif ($cond === 'S') $ercS++;
+                }
             }
         }
 
@@ -1269,12 +1438,77 @@ class At2rNController extends Controller
 
         return [
             ['label' => 'Numero de Atenciones del Recién Nacido para Control Temprano antes de los 5 dias', 'match_atencion' => fn($r) => trim(strtoupper($r->tipo ?? '')) == 'D' && $r->edad < 5, 'color' => 'bg-green-soft'],
-            ['label' => 'No. De niños/as menores de 5 años con diarrea nuevo', 'diag' => ['DIARREAS', 'DIARREAS CON DESHIDRATACION', 'DIARREAS SIN SANGRE'], 'cond' => 'N', 'age_max' => 4, 'color' => 'bg-green-soft'],
-            ['label' => 'No. De niños/as menores de 5 años con diarrea que acuden a cita de seguimiento', 'diag' => ['DIARREAS', 'DIARREAS CON DESHIDRATACION', 'DIARREAS SIN SANGRE'], 'cond' => 'S', 'age_max' => 4, 'color' => 'bg-green-soft'],
+            [
+                'label' => 'No. De niños/as menores de 5 años con diarrea nuevo',
+                'match' => function($r) {
+                    $t = strtoupper(trim($r->tipo ?? ''));
+                    $e = (int)($r->edad ?? 0);
+                    $isMenor5 = ($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4));
+                    if (!$isMenor5) return false;
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    $c = strtoupper(trim($r->cod ?? ''));
+                    $cond = strtoupper(trim($r->cond_diag ?? ''));
+                    return (str_contains($d, 'DIARREA') || $c === 'A09.X') && $cond === 'N';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'No. De niños/as menores de 5 años con diarrea que acuden a cita de seguimiento',
+                'match' => function($r) {
+                    $t = strtoupper(trim($r->tipo ?? ''));
+                    $e = (int)($r->edad ?? 0);
+                    $isMenor5 = ($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4));
+                    if (!$isMenor5) return false;
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    $c = strtoupper(trim($r->cod ?? ''));
+                    $cond = strtoupper(trim($r->cond_diag ?? ''));
+                    return (str_contains($d, 'DIARREA') || $c === 'A09.X') && $cond === 'S';
+                },
+                'color' => 'bg-green-soft'
+            ],
             ['label' => 'No. De Niños/as menores de 5 años con deshidratación rehidratados en la US', 'diag' => 'REHIDRATACION ORAL', 'age_max' => 4, 'color' => 'bg-green-soft', 'is_manual' => true, 'manual_key' => 'rehidratados'],
-            ['label' => 'No. De Niños/as menores de 5 años con casos de Neumonía nuevos en el año', 'diag' => ['NEUMONIAS', 'NEUMONIAS/BRONCONEUMONIAS'], 'cond' => 'N', 'age_max' => 4, 'color' => 'bg-green-soft'],
-            ['label' => 'No. De Niños/as menores de 5 años con Neumonía que acuden a su cita de Seguimiento', 'diag' => ['NEUMONIAS', 'NEUMONIAS/BRONCONEUMONIAS'], 'cond' => 'S', 'age_max' => 4, 'color' => 'bg-green-soft'],
-            ['label' => 'No. de niños/as menores de 5 años con algun grado de Síndrome anémico diagnosticado', 'diag' => 'ANEMIAS', 'cond' => 'N', 'age_max' => 4, 'color' => 'bg-green-soft'],
+            [
+                'label' => 'No. De Niños/as menores de 5 años con casos de Neumonía nuevos en el año',
+                'match' => function($r) {
+                    $t = strtoupper(trim($r->tipo ?? ''));
+                    $e = (int)($r->edad ?? 0);
+                    $isMenor5 = ($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4));
+                    if (!$isMenor5) return false;
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    $c = strtoupper(trim($r->cod ?? ''));
+                    $cond = strtoupper(trim($r->cond_diag ?? ''));
+                    return (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA') || $c === 'J18.9' || $c === 'J18.0') && $cond === 'N';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'No. De Niños/as menores de 5 años con Neumonía que acuden a su cita de Seguimiento',
+                'match' => function($r) {
+                    $t = strtoupper(trim($r->tipo ?? ''));
+                    $e = (int)($r->edad ?? 0);
+                    $isMenor5 = ($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4));
+                    if (!$isMenor5) return false;
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    $c = strtoupper(trim($r->cod ?? ''));
+                    $cond = strtoupper(trim($r->cond_diag ?? ''));
+                    return (str_contains($d, 'NEUMONIA') || str_contains($d, 'BRONCONEUMONIA') || $c === 'J18.9' || $c === 'J18.0') && $cond === 'S';
+                },
+                'color' => 'bg-green-soft'
+            ],
+            [
+                'label' => 'No. de niños/as menores de 5 años con algun grado de Síndrome anémico diagnosticado',
+                'match' => function($r) {
+                    $t = strtoupper(trim($r->tipo ?? ''));
+                    $e = (int)($r->edad ?? 0);
+                    $isMenor5 = ($t === 'D' || $t === 'M' || ($t === 'A' && $e <= 4));
+                    if (!$isMenor5) return false;
+                    $d = $this->cleanDiag($r->diagnostico ?? '');
+                    $c = strtoupper(trim($r->cod ?? ''));
+                    $cond = strtoupper(trim($r->cond_diag ?? ''));
+                    return (str_contains($d, 'ANEMIA') || $c === 'D64.9') && $cond === 'N';
+                },
+                'color' => 'bg-green-soft'
+            ],
             ['label' => 'Número de menores de 5 años con crecimiento adecuado (Gráficas peso/talla y talla/edad)', 'diff' => [27, 37, 39, 40, 41], 'color' => 'bg-green-soft'],
             ['label' => 'Número de menores de 5 años sin desnutrición crónica (Gráfica talla/edad)', 'diff' => [27, 37, 39, 40, 41], 'color' => 'bg-green-soft'],
             ['label' => 'Número de menores de 5 años con baja talla y baja talla severa (Gráfica talla/edad)', 'match' => fn($r) => in_array(strtoupper(trim($r->diagnostico ?? '')), ['BAJA TALLA', 'BAJA TALLA SEVERA', 'TALLA BAJA', 'TALLA BAJA SEVERA']) && (strtoupper($r->tipo) == 'D' || strtoupper($r->tipo) == 'M' || (strtoupper($r->tipo) == 'A' && $r->edad < 5)), 'color' => 'bg-green-soft'],

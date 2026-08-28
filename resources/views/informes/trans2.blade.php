@@ -25,6 +25,9 @@
             <p>Formulario de Notificación Semanal de Alerta (Consolidado Mensual)</p>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-subtle-primary btn-sm" onclick="abrirModalComparacion()" style="font-weight: 600;">
+                <i class="bi bi-diagram-3-fill mr-1"></i> Comparar con otros informes
+            </button>
             <button type="button" id="btn-refresh-report" class="btn btn-subtle btn-sm" style="font-weight: 600;">
                 <i class="bi bi-arrow-clockwise mr-1"></i> Actualizar
             </button>
@@ -43,6 +46,8 @@
         @include('informes.trans2_content')
     </div>
 </div>
+
+@include('informes.partials.modal_comparacion_cruzada')
 @endsection
 
 @push('scripts')
@@ -52,10 +57,10 @@
 
         $('#modalTrans2Title').text('Cargando detalles...');
         $('#modalTrans2SemanaBadge').text(`Semana ${se}`);
-        $('#modalTrans2TableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm mr-1"></div> Cargando pacientes...</td></tr>');
+        $('#modalTrans2TableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted font-weight-bold"><div class="spinner-border spinner-border-sm text-primary mr-1"></div> Cargando registros de pacientes...</td></tr>');
         $('#modalTrans2Detalles').modal('show');
 
-        const url = `{{ route('informes.trans2.details') }}?ano=${ano}&se=${se}&row_id=${rowId}&range=${range}`;
+        const url = `{{ route('informes.trans2.details') }}?ano=${ano}&se=${se}&row_id=${rowId}&range=${range}&_t=${new Date().getTime()}`;
 
         $.getJSON(url, function(data) {
             $('#modalTrans2Title').text(data.label || 'Detalles');
@@ -64,22 +69,23 @@
             if (data.details && data.details.length > 0) {
                 $.each(data.details, function(i, item) {
                     rowsHtml += `
-                        <tr>
-                            <td class="font-weight-600">${item.fecha}</td>
-                            <td>${item.exp || '-'}</td>
-                            <td>${item.sexo || '-'}</td>
-                            <td>${item.edad || '-'}</td>
-                            <td class="font-weight-600 text-dark">${item.diagnostico || '-'}</td>
-                            <td class="small text-muted">${item.medico || '-'}</td>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td class="font-weight-600" style="color: var(--text-primary); font-size: 0.8rem;">${item.fecha}</td>
+                            <td style="font-family: monospace; font-size: 0.8rem; color: var(--color-primary); font-weight: 700;">${item.exp || '-'}</td>
+                            <td class="text-center" style="font-size: 0.8rem;">${item.sexo || '-'}</td>
+                            <td style="font-size: 0.8rem;"><span class="badge badge-subtle-secondary">${item.edad || '-'}</span></td>
+                            <td class="font-weight-bold" style="color: var(--text-primary); font-size: 0.82rem;">${item.diagnostico || '-'}</td>
+                            <td class="small" style="color: var(--text-secondary); font-size: 0.78rem;">${item.medico || '-'}</td>
                         </tr>
                     `;
                 });
             } else {
-                rowsHtml = '<tr><td colspan="6" class="text-center py-3 text-muted">No se encontraron pacientes para este criterio.</td></tr>';
+                rowsHtml = '<tr><td colspan="6" class="text-center py-4 text-muted font-weight-bold">No se encontraron pacientes para este criterio en la Semana ' + se + '.</td></tr>';
             }
             $('#modalTrans2TableBody').html(rowsHtml);
-        }).fail(function() {
-            $('#modalTrans2TableBody').html('<tr><td colspan="6" class="text-center text-danger py-3">Error al cargar los datos.</td></tr>');
+        }).fail(function(xhr) {
+            console.error('Error fetching TRANS-2 details:', xhr);
+            $('#modalTrans2TableBody').html('<tr><td colspan="6" class="text-center text-danger py-4 font-weight-bold"><i class="bi bi-exclamation-octagon-fill mr-1"></i> Error al cargar los datos. Intente de nuevo.</td></tr>');
         });
     }
 
@@ -119,8 +125,8 @@
         // Alternador Anverso / Reverso
         $(document).on('click', '.btn-toggle-side', function() {
             const side = $(this).data('side');
-            $('.btn-toggle-side').removeClass('btn-primary active').addClass('btn-outline-secondary');
-            $(this).removeClass('btn-outline-secondary').addClass('btn-primary active');
+            $('.btn-toggle-side').removeClass('btn-primary').addClass('btn-subtle');
+            $(this).removeClass('btn-subtle').addClass('btn-primary');
 
             if (side === 'obverso') {
                 $('#side-obverso').removeClass('d-none');

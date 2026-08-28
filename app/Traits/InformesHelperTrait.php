@@ -38,22 +38,8 @@ trait InformesHelperTrait
     private function getAnosMesesDisponiblesInformes(): array
     {
         $currentYear = (int)date('Y');
-        $dbAnos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano')->toArray();
-        
-        // Crear un rango de años por defecto sin límite estricto
-        $rangeAnos = range($currentYear - 4, $currentYear + 5);
-        $anos = collect(array_unique(array_merge($dbAnos, $rangeAnos)))->sortDesc()->values();
-
-        if ($anos->isEmpty()) {
-            $anos = collect([$currentYear]);
-            $anoDefault = $currentYear;
-        }
-        else {
-            $latestWithData = Informe::where('ano', '<=', $currentYear)->orderBy('ano', 'desc')->first();
-            $anoDefault = $latestWithData
-                ? $latestWithData->ano
-                : ($anos->contains($currentYear) ? $currentYear : $anos->first());
-        }
+        $anos = $this->getAnosDisponibles();
+        $anoDefault = $anos->contains($currentYear) ? $currentYear : ($anos->first() ?? $currentYear);
 
         $mesMap = [
             1 => 'ENERO', 2 => 'FEBRERO', 3 => 'MARZO',
@@ -62,16 +48,10 @@ trait InformesHelperTrait
             10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE',
         ];
 
-        $meses = Informe::where('ano', $anoDefault)->distinct()->pluck('mes')->toArray();
-
+        $meses = $this->getMesesDisponibles($anoDefault)->toArray();
         if (empty($meses) && $anoDefault == $currentYear) {
             $meses = [$mesMap[(int)date('n')]];
         }
-
-        $ordenMeses = array_flip($mesMap);
-        usort($meses, function ($a, $b) use ($ordenMeses) {
-            return ($ordenMeses[strtoupper($a)] ?? 0) <=> ($ordenMeses[strtoupper($b)] ?? 0);
-        });
 
         $mesDefault = !empty($meses)
             ? end($meses)
@@ -79,6 +59,65 @@ trait InformesHelperTrait
         reset($meses);
 
         return compact('anos', 'anoDefault', 'meses', 'mesDefault');
+    }
+
+    public function getJornadasDisponibles(): \Illuminate\Support\Collection
+    {
+        return \Illuminate\Support\Facades\Cache::remember('rg_distinct_jornadas', 1800, function() {
+            return RegistroGlobal::distinct()
+                ->whereNotNull('jornada')
+                ->where('jornada', '!=', '')
+                ->orderBy('jornada')
+                ->pluck('jornada');
+        });
+    }
+
+    public function getProfesionesDisponibles(): \Illuminate\Support\Collection
+    {
+        return \Illuminate\Support\Facades\Cache::remember('rg_distinct_profesiones', 1800, function() {
+            return RegistroGlobal::distinct()
+                ->whereNotNull('prof')
+                ->where('prof', '!=', '')
+                ->orderBy('prof')
+                ->pluck('prof');
+        });
+    }
+
+    public function getAnosDisponibles(): \Illuminate\Support\Collection
+    {
+        return \Illuminate\Support\Facades\Cache::remember('rg_distinct_anos', 1800, function() {
+            $currentYear = (int)date('Y');
+            $dbAnos = RegistroGlobal::distinct()
+                ->whereNotNull('ano')
+                ->where('ano', '>', 1900)
+                ->orderBy('ano', 'desc')
+                ->pluck('ano')
+                ->toArray();
+            
+            $rangeAnos = range($currentYear - 4, $currentYear + 5);
+            $anos = collect(array_unique(array_merge($dbAnos, $rangeAnos)))->sortDesc()->values();
+            return $anos->isEmpty() ? collect([$currentYear]) : $anos;
+        });
+    }
+
+    public function getMesesDisponibles($ano): \Illuminate\Support\Collection
+    {
+        $mesMap = [
+            'ENERO' => 1, 'FEBRERO' => 2, 'MARZO' => 3, 'ABRIL' => 4, 'MAYO' => 5, 'JUNIO' => 6,
+            'JULIO' => 7, 'AGOSTO' => 8, 'SEPTIEMBRE' => 9, 'OCTUBRE' => 10, 'NOVIEMBRE' => 11, 'DICIEMBRE' => 12
+        ];
+        return \Illuminate\Support\Facades\Cache::remember("rg_distinct_meses_{$ano}", 1800, function() use ($ano, $mesMap) {
+            $raw = RegistroGlobal::where('ano', $ano)
+                ->whereNotNull('mes')
+                ->where('mes', '!=', '')
+                ->distinct()
+                ->pluck('mes')
+                ->toArray();
+            return collect($raw)->filter()->map(fn($m) => strtoupper(trim($m ?? '')))
+                ->unique()
+                ->sort(fn($a, $b) => ($mesMap[$a] ?? 0) <=> ($mesMap[$b] ?? 0))
+                ->values();
+        });
     }
 
     /**
@@ -140,5 +179,70 @@ trait InformesHelperTrait
         }
 
         return $currentMonth;
+    }
+
+    public function resolveColumnaProfesion($prof, $medico = '', bool $force = false): ?int
+    {
+        $prof = strtoupper(trim($prof ?? ''));
+        $medico = strtoupper(trim($medico ?? ''));
+
+        $mapping = [
+            'ENFERMERAS AUXILIARES' => 1,
+            'ENFERMERA AUXILIAR' => 1,
+            'LICENCIADA EN ENFERMERIA' => 2,
+            'LICENCIADAS EN ENFERMERIA' => 2,
+            'ENFERMERA PROFESIONAL' => 2,
+            'NUTRICION' => 2,
+            'NUTRICIÓN' => 2,
+            'LICENCIADA EN NUTRICION' => 2,
+            'LICENCIADAS EN NUTRICION' => 2,
+            'LICENCIADA EN NUTRICIÓN' => 2,
+            'LICENCIADAS EN NUTRICIÓN' => 2,
+            'NUTRICIONISTA' => 2,
+            'PSICOLOGIA' => 2,
+            'PSICOLOGÍA' => 2,
+            'PSICOLOGO' => 2,
+            'PSICÓLOGO' => 2,
+            'CONSEJERIA' => 2,
+            'CONSEJERÍA' => 2,
+            'SALUD MENTAL' => 2,
+            'MEDICO GENERAL' => 3,
+            'MEDICO ESPECIALISTA' => 4,
+            'MÉDICO ESPECIALISTA' => 4,
+            'PSIQUIATRA' => 4,
+            'PSIQUIATRIA' => 4,
+            'PSIQUIATRÍA' => 4,
+        ];
+        $omitir = ['TRABAJO SOCIAL', 'ODONTOLOGIA'];
+
+        // Si el nombre del médico o la profesión menciona especialista
+        if (str_contains($medico, 'GINECOL') || str_contains($medico, 'PEDIATR') || str_contains($medico, 'PSIQUIAT') || str_contains($medico, 'ESPECIALISTA')) {
+            return 4;
+        }
+
+        if ($prof === 'MÉDICO GENERAL' || $prof === 'MÉDICO ESPECIALISTA' || str_contains($prof, 'ESPECIALISTA')) {
+            return 4;
+        }
+
+        if ($prof === 'MEDICO GENERAL') {
+            return 3;
+        }
+
+        if (isset($mapping[$prof])) {
+            return $mapping[$prof];
+        }
+
+        if (str_contains($prof, 'AUXILIAR')) return 1;
+        if (str_contains($prof, 'ENFERMER') || str_contains($prof, 'NUTRICI') || str_contains($prof, 'PSICOLOG')) return 2;
+        if (str_contains($prof, 'ESPECIALISTA') || str_contains($prof, 'PSIQUIATR') || str_contains($prof, 'GINECOL') || str_contains($prof, 'PEDIATR')) return 4;
+        if (!$force && in_array($prof, $omitir)) return null;
+
+        return 4;
+    }
+
+    public function cleanDiag($str): string
+    {
+        $s = strtoupper(trim((string)$str));
+        return str_replace(['Á','É','Í','Ó','Ú','Ñ','Ü'], ['A','E','I','O','U','N','U'], $s);
     }
 }

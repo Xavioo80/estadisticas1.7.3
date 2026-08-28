@@ -19,6 +19,11 @@
       <i class="bi bi-plus-lg"></i>
     </a>
 
+    <!-- Quick Bloc de Notas & Tareas Button -->
+    <a href="{{ route('notas.index') }}" class="navbar-action-btn" title="Bloc de Notas & Gestor de Tareas" style="text-decoration: none;">
+      <i class="bi bi-journal-text" style="font-size: 1.15rem; color: var(--text-primary);"></i>
+    </a>
+
     <!-- Quick Theme Switcher Button -->
     <button type="button" class="theme-toggle-btn" data-toggle="theme" title="Alternar Modo Claro / Oscuro (Alt+Shift+D)">
       <i class="bi bi-sun-fill icon-sun"></i>

@@ -1,28 +1,34 @@
-<!-- Barra de Filtros y Acciones -->
-<div class="informe-filters-card mb-3 no-print" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md, 10px); padding: 0.75rem 1rem; box-shadow: var(--shadow-sm);">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-        <form id="filter-form" action="{{ route('informes.sm307') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 mb-0">
-            <input type="hidden" name="lado" id="lado-input" value="{{ $lado }}">
-            
-            <!-- Switch Anverso / Reverso -->
-            <div class="btn-group btn-group-toggle mr-2" style="border-radius: var(--radius-sm, 6px); overflow: hidden; border: 1px solid var(--border-color);">
+<!-- Barra de Filtros en Una Sola Fila Horizontal Estricta -->
+<div class="filter-container no-print mb-2"
+    style="background: var(--bg-surface) !important; border: 1px solid var(--border-color) !important; border-radius: var(--radius-md, 10px) !important; padding: 0.5rem 0.85rem !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; box-shadow: var(--shadow-sm) !important; width: 100% !important; overflow-x: auto !important;">
+    <form id="filter-form" action="{{ route('informes.sm307') }}" method="GET"
+        style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 8px !important; margin: 0 !important; width: 100% !important; min-width: 0 !important;">
+        <input type="hidden" name="lado" id="lado-input" value="{{ $lado }}">
+        
+        <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px !important; flex-shrink: 0 !important;">
+            <!-- Alternador Anverso / Reverso -->
+            <div style="display: inline-flex !important; flex-direction: row !important; align-items: center !important; background: var(--bg-subtle) !important; padding: 2px !important; border-radius: var(--radius-sm, 8px) !important; border: 1px solid var(--border-color) !important; flex-shrink: 0 !important;">
                 <button type="button"
                         onclick="document.getElementById('lado-input').value='obverso'; updateReport();"
-                        class="btn btn-sm px-3 {{ $lado == 'obverso' ? 'btn-primary font-weight-bold' : 'btn-subtle' }}"
-                        style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    Anversa
+                        class="btn-toggle-side px-3 py-1 text-[11px] font-bold rounded transition-all {{ $lado == 'obverso' ? 'btn-primary' : 'btn-subtle' }}"
+                        style="height: 28px !important; font-size: 0.75rem !important; font-weight: 700 !important; padding: 0 12px !important;">
+                    ANVERSA
                 </button>
                 <button type="button"
                         onclick="document.getElementById('lado-input').value='reverso'; updateReport();"
-                        class="btn btn-sm px-3 {{ $lado == 'reverso' ? 'btn-primary font-weight-bold' : 'btn-subtle' }}"
-                        style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    Reversa
+                        class="btn-toggle-side px-3 py-1 text-[11px] font-bold rounded transition-all {{ $lado == 'reverso' ? 'btn-primary' : 'btn-subtle' }}"
+                        style="height: 28px !important; font-size: 0.75rem !important; font-weight: 700 !important; padding: 0 12px !important;">
+                    REVERSA
                 </button>
             </div>
 
+            <!-- Separador -->
+            <div style="height: 22px !important; width: 1px !important; background: var(--border-color) !important; flex-shrink: 0 !important; margin: 0 2px !important;"></div>
+
             <!-- Año -->
-            <div class="filter-group">
-                <select name="ano" class="form-control form-control-sm ajax-filter font-weight-bold" style="min-width: 100px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px);">
+            <div style="width: 85px !important; min-width: 85px !important; flex-shrink: 0 !important;">
+                <select name="ano" class="filter-select ajax-filter"
+                    style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                     @foreach($anos as $a)
                         <option value="{{ $a }}" {{ (int)$a == (int)$ano ? 'selected' : '' }}>{{ $a }}</option>
                     @endforeach
@@ -30,8 +36,9 @@
             </div>
 
             <!-- Mes -->
-            <div class="filter-group">
-                <select name="mes" class="form-control form-control-sm ajax-filter font-weight-bold" style="min-width: 140px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px);">
+            <div style="width: 130px !important; min-width: 130px !important; flex-shrink: 0 !important;">
+                <select name="mes" class="filter-select ajax-filter"
+                    style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                     @foreach($meses as $m)
                         <option value="{{ $m }}" {{ strtoupper(trim($m)) == strtoupper(trim($mes)) ? 'selected' : '' }}>
                             {{ strtoupper($m) }}
@@ -41,8 +48,9 @@
             </div>
 
             <!-- Jornada -->
-            <div class="filter-group">
-                <select name="jornada" class="form-control form-control-sm ajax-filter font-weight-bold" style="min-width: 140px; height: 36px; background: var(--input-bg); border-color: var(--border-color); color: var(--text-primary); border-radius: var(--radius-sm, 6px);">
+            <div style="width: 165px !important; min-width: 150px !important; flex-shrink: 0 !important;">
+                <select name="jornada" class="filter-select ajax-filter" title="Jornada"
+                    style="width: 100% !important; height: 34px !important; font-weight: 700 !important; font-size: 0.82rem !important;">
                     <option value="TODAS">TODAS LAS JORNADAS</option>
                     @foreach($jornadas as $j)
                         <option value="{{ $j }}" {{ $j == $jornada ? 'selected' : '' }}>{{ $j }}</option>
@@ -50,28 +58,30 @@
                 </select>
             </div>
 
-            <div class="d-none d-lg-block ml-2 pl-2" style="border-left: 1px solid var(--border-color);">
-                <span class="badge badge-subtle font-weight-bold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
-                    SM3-07: SALUD MENTAL ({{ $lado == 'obverso' ? 'ANVERSA' : 'REVERSA' }})
-                </span>
-            </div>
-        </form>
+            <!-- Separador -->
+            <div style="height: 22px !important; width: 1px !important; background: var(--border-color) !important; flex-shrink: 0 !important; margin: 0 2px !important;"></div>
 
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" onclick="toggleFullScreen()" class="btn btn-subtle btn-sm" title="Pantalla Completa" style="font-weight: 600; height: 36px; padding: 0 0.75rem;">
-                <i class="bi bi-arrows-fullscreen mr-1" id="fullScreenIcon"></i> <span class="d-none d-md-inline">Pantalla Completa</span>
+            <span class="badge badge-subtle font-weight-bold" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); white-space: nowrap;">
+                SM3-07 ({{ $lado == 'obverso' ? 'ANVERSA' : 'REVERSA' }})
+            </span>
+        </div>
+
+        <!-- Acciones a la derecha -->
+        <div style="display: flex !important; flex-direction: row !important; align-items: center !important; flex-wrap: nowrap !important; gap: 6px !important; flex-shrink: 0 !important; margin-left: auto !important;">
+            <button type="button" onclick="toggleFullScreen()" class="btn-action-fullscreen" title="Pantalla Completa">
+                <i class="bi bi-arrows-fullscreen" id="fullScreenIcon"></i>
             </button>
-            <button type="button" onclick="window.print()" class="btn btn-subtle btn-sm" title="Imprimir informe" style="font-weight: 600; height: 36px; padding: 0 0.75rem;">
-                <i class="bi bi-printer mr-1"></i> <span class="d-none d-md-inline">Imprimir</span>
+            <button type="button" onclick="window.print()" class="btn-action-print" title="Imprimir">
+                <i class="bi bi-printer"></i>
             </button>
             <a href="{{ route('informes.sm307.export', request()->all()) }}"
-               class="btn btn-success btn-sm font-weight-bold"
+               class="btn btn-sm btn-subtle-success font-weight-bold"
                title="Exportar a Excel"
-               style="height: 36px; padding: 0 0.85rem; display: inline-flex; align-items: center; gap: 0.35rem; border-radius: var(--radius-sm, 6px);">
-                <i class="bi bi-file-earmark-excel"></i> <span>Exportar Excel</span>
+               style="height: 34px; padding: 0 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem;">
+                <i class="bi bi-file-earmark-excel"></i> <span class="d-none d-md-inline">Excel</span>
             </a>
         </div>
-    </div>
+    </form>
 </div>
 
 <style>

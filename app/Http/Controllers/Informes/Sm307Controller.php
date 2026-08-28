@@ -29,31 +29,9 @@ class Sm307Controller extends Controller
         $jornada = $request->input('jornada', 'TODAS') ?: 'TODAS';
         $lado = $request->input('lado', 'obverso');
 
-        $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
-
-        // Obtener meses reales de Registros Globales, ordenados cronológicamente
-        $mesesRaw = RegistroGlobal::distinct()->pluck('mes')->toArray();
-        $mesMap = [
-            'ENERO' => 1,
-            'FEBRERO' => 2,
-            'MARZO' => 3,
-            'ABRIL' => 4,
-            'MAYO' => 5,
-            'JUNIO' => 6,
-            'JULIO' => 7,
-            'AGOSTO' => 8,
-            'SEPTIEMBRE' => 9,
-            'OCTUBRE' => 10,
-            'NOVIEMBRE' => 11,
-            'DICIEMBRE' => 12
-        ];
-
-        $meses = collect($mesesRaw)->filter()->map(fn($m) => strtoupper(trim($m ?? '')))
-            ->unique()
-            ->sort(fn($a, $b) => ($mesMap[$a] ?? 0) <=> ($mesMap[$b] ?? 0))
-            ->values();
-
-        $jornadas = RegistroGlobal::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
+        $anos = $this->getAnosDisponibles();
+        $meses = $this->getMesesDisponibles($ano);
+        $jornadas = $this->getJornadasDisponibles();
 
         $diagCatalog = $this->getDiagCatalog($lado);
 
