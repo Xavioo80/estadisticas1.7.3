@@ -107,7 +107,7 @@
             grid-template-columns: 22% 56% 22%;
             align-items: center;
             width: 100%;
-            margin-bottom: 2px;
+            margin-bottom: 5px;
         }
 
         .header-title-box {
@@ -116,7 +116,7 @@
         }
 
         .header-title-box .inst-1 {
-            font-size: 15px;
+            font-size: 15.5px;
             font-weight: bold !important;
             text-decoration: underline !important;
             letter-spacing: 0.5px;
@@ -147,9 +147,10 @@
             font-size: 0.76rem;
             font-weight: normal;
             border-bottom: 1.8px solid #000;
-            padding-bottom: 3px;
-            margin-top: 3px;
-            margin-bottom: 3px;
+            padding-top: 2px;
+            padding-bottom: 4px;
+            margin-top: 6px;
+            margin-bottom: 5px;
         }
 
         .header-info-bar span.val {
@@ -158,13 +159,13 @@
             padding: 0 4px;
         }
 
-        /* ─── Tabla Oficial Rendimiento Médico (Toda la tabla sin negrita) ─── */
+        /* ─── Tabla Oficial Rendimiento Médico ─── */
         .table-wrap {
             flex: 0 0 auto;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            margin-top: 1px;
+            margin-top: 3px;
             margin-bottom: 0px !important;
         }
 
@@ -242,16 +243,17 @@
             border-bottom: 2.5px solid #000000 !important;
         }
 
-        /* Filas del Cuerpo (Sin Negrita) */
+        /* Filas del Cuerpo (Sin Negrita y Altura Reducida Proporcionalmente) */
         table.table-oficial tbody tr {
-            height: 22px !important;
-            max-height: 22px !important;
+            height: 20.5px !important;
+            max-height: 21px !important;
         }
 
         table.table-oficial tbody td {
-            font-size: 0.74rem !important;
+            font-size: 0.73rem !important;
             font-weight: normal !important;
             line-height: 1 !important;
+            padding: 0 1px !important;
         }
 
         table.table-oficial tbody td.col-name {
