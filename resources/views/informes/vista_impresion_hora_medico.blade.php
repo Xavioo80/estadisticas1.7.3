@@ -18,13 +18,14 @@
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            font-family: Arial, Helvetica, sans-serif !important;
         }
 
         html, body {
             margin: 0;
             padding: 0;
             background-color: #e2e8f0;
-            font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif;
+            font-family: Arial, Helvetica, sans-serif !important;
             color: #000000;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -58,6 +59,7 @@
                 padding: 0 !important;
                 width: 100% !important;
                 height: 100% !important;
+                font-family: Arial, Helvetica, sans-serif !important;
                 -webkit-font-smoothing: antialiased !important;
             }
             .print-sheet {
@@ -99,7 +101,7 @@
             }
         }
 
-        /* ─── Encabezado Oficial Full HD ─── */
+        /* ─── Encabezado Oficial Full HD (Negrita y Todo Subrayado) ─── */
         .header-grid {
             display: grid;
             grid-template-columns: 22% 56% 22%;
@@ -110,27 +112,30 @@
 
         .header-title-box {
             text-align: center;
-            line-height: 1.16;
+            line-height: 1.18;
         }
 
         .header-title-box .inst-1 {
-            font-size: 1.02rem;
-            font-weight: 900;
+            font-size: 15px;
+            font-weight: bold !important;
+            text-decoration: underline !important;
             letter-spacing: 0.5px;
         }
         .header-title-box .inst-2 {
-            font-size: 0.88rem;
-            font-weight: 800;
+            font-size: 13px;
+            font-weight: bold !important;
+            text-decoration: underline !important;
             letter-spacing: 0.2px;
         }
         .header-title-box .inst-3 {
-            font-size: 0.82rem;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: bold !important;
+            text-decoration: underline !important;
         }
         .header-title-box .inst-report {
-            font-size: 0.90rem;
-            font-weight: 900;
-            text-decoration: underline;
+            font-size: 13.5px;
+            font-weight: bold !important;
+            text-decoration: underline !important;
             margin-top: 1px;
             letter-spacing: 0.4px;
         }
@@ -140,7 +145,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 0.76rem;
-            font-weight: 800;
+            font-weight: normal;
             border-bottom: 1.8px solid #000;
             padding-bottom: 3px;
             margin-top: 3px;
@@ -148,12 +153,12 @@
         }
 
         .header-info-bar span.val {
-            font-weight: 900;
+            font-weight: bold;
             text-transform: uppercase;
             padding: 0 4px;
         }
 
-        /* ─── Tabla Oficial Rendimiento Médico (Full HD - Filas Más Altas) ─── */
+        /* ─── Tabla Oficial Rendimiento Médico (Toda la tabla sin negrita) ─── */
         .table-wrap {
             flex: 0 0 auto;
             display: flex;
@@ -170,6 +175,7 @@
             table-layout: fixed;
             margin: 0 !important;
             -webkit-font-smoothing: antialiased;
+            font-family: Arial, Helvetica, sans-serif !important;
         }
 
         table.table-oficial th,
@@ -181,38 +187,43 @@
             padding: 0 2px !important;
             overflow: hidden;
             white-space: nowrap;
+            font-weight: normal !important;
+            font-family: Arial, Helvetica, sans-serif !important;
         }
 
-        /* Encabezados */
+        /* Encabezados de la Tabla (Sin Negrita y tamaño reducido en 1px) */
         table.table-oficial thead th {
-            font-weight: 900;
+            font-weight: normal !important;
             background-color: #ffffff !important;
             color: #000000 !important;
         }
 
         table.table-oficial thead tr.row-main th {
             height: 21px !important;
-            font-size: 0.68rem !important;
-            letter-spacing: 0.3px;
+            font-size: 0.62rem !important;
+            letter-spacing: 0.2px;
+            font-weight: normal !important;
         }
 
         table.table-oficial thead tr.row-mid th {
             height: 19px !important;
-            font-size: 0.64rem !important;
-            letter-spacing: 0.2px;
+            font-size: 0.58rem !important;
+            letter-spacing: 0.1px;
+            font-weight: normal !important;
         }
 
         table.table-oficial thead tr.row-sub th {
             height: 75px !important;
             max-height: 76px !important;
+            font-weight: normal !important;
         }
 
-        /* Texto Vertical en Columnas */
+        /* Texto Vertical en Columnas (Sin Negrita y reducido 1px) */
         .v-text {
             writing-mode: vertical-rl !important;
             transform: rotate(180deg) !important;
-            font-size: 0.52rem !important;
-            font-weight: 900 !important;
+            font-size: 0.48rem !important;
+            font-weight: normal !important;
             line-height: 1.06 !important;
             letter-spacing: 0px !important;
             white-space: normal !important;
@@ -222,15 +233,15 @@
             max-height: 73px;
         }
 
-        /* Filas del Cuerpo Adaptadas para llegar hasta el borde de la página */
+        /* Filas del Cuerpo (Sin Negrita) */
         table.table-oficial tbody tr {
             height: 22px !important;
             max-height: 22px !important;
         }
 
         table.table-oficial tbody td {
-            font-size: 0.76rem !important;
-            font-weight: 700 !important;
+            font-size: 0.74rem !important;
+            font-weight: normal !important;
             line-height: 1 !important;
         }
 
@@ -238,12 +249,12 @@
             text-align: left !important;
             padding-left: 6px !important;
             padding-right: 2px !important;
-            font-size: 0.74rem !important;
-            font-weight: 800 !important;
+            font-size: 0.72rem !important;
+            font-weight: normal !important;
             text-transform: uppercase;
         }
 
-        /* Fila de Totales */
+        /* Fila de Totales (Sin Negrita) */
         table.table-oficial tr.total-row {
             height: 23px !important;
             background-color: #f1f5f9 !important;
@@ -251,8 +262,8 @@
         }
 
         table.table-oficial tr.total-row td {
-            font-size: 0.78rem !important;
-            font-weight: 900 !important;
+            font-size: 0.74rem !important;
+            font-weight: normal !important;
         }
 
         /* Tramado de rayado para celdas no aplicables */
