@@ -274,6 +274,7 @@ Route::prefix('notas')->name('notas.')->group(function () {
     Route::put('/{id}', [NotaController::class, 'update'])->name('update');
     Route::delete('/{id}', [NotaController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/toggle-checklist', [NotaController::class, 'toggleChecklist'])->name('toggle_checklist');
+    Route::post('/{id}/agregar-item', [NotaController::class, 'agregarItem'])->name('agregar_item');
 
     // Tareas
     Route::post('/tareas', [NotaController::class, 'storeTarea'])->name('tareas.store');

@@ -357,7 +357,7 @@ header p {
 }
 
 .table-container .table,
-table.table {
+:is(.informe-page-wrapper, .informe-container-centered, .informe-card-centered, #report-content-container, .filter-container) table.table {
   width: 100% !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -369,8 +369,8 @@ table.table {
 
 .table-container .table th,
 .table-container .table td,
-table.table th,
-table.table td {
+:is(.informe-page-wrapper, .informe-container-centered, .informe-card-centered, #report-content-container, .filter-container) table.table th,
+:is(.informe-page-wrapper, .informe-container-centered, .informe-card-centered, #report-content-container, .filter-container) table.table td {
   vertical-align: middle !important;
   text-align: center !important;
   border: 1px solid #374151 !important;
@@ -381,8 +381,9 @@ table.table td {
   background-color: var(--bg-surface) !important;
 }
 
-/* Solo los td de datos (números) — más grandes que el texto de CONCEPTO */
-table.table tbody td:not(.sticky-col-first) {
+/* Solo los td de datos (números) en informes — más grandes que el texto de CONCEPTO */
+.table-container table.table tbody td:not(.sticky-col-first),
+:is(.informe-page-wrapper, .informe-container-centered, .informe-card-centered, #report-content-container, .filter-container) table.table tbody td:not(.sticky-col-first) {
   font-size: 15px !important;
   font-weight: 600 !important;
 }
@@ -626,6 +627,58 @@ table.table td.col-morbilidad-empty {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
+}
+
+/* Celdas agrupadas por rangos de edad en columna Morbilidad */
+table.table td.col-morbilidad-group {
+  border-left: 2px solid var(--border-color) !important;
+  vertical-align: middle !important;
+  padding: 4px 6px !important;
+  text-align: center !important;
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+
+[data-theme="light"] table.table td.col-morbilidad-group {
+  background: rgba(16, 185, 129, 0.03) !important;
+}
+
+table.table td.col-morbilidad-total {
+  background: rgba(16, 185, 129, 0.08) !important;
+}
+
+.morb-summary-box {
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 6px;
+  padding: 5px 7px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+
+.morb-summary-box:hover {
+  border-color: #10b981;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
+.morb-group-header {
+  letter-spacing: 0.5px;
+  border-bottom: 1px dashed var(--border-color, #334155);
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+.morb-summary-box-compact {
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 5px;
+  padding: 3px 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.15s ease;
+}
+
+.morb-summary-box-compact:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
 }
 
 /* ─── EFECTOS DE INTERACCIÓN Y RESALTADO ─────────────────────────────────── */

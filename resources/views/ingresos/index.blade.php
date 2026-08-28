@@ -396,83 +396,71 @@
 
 
 @section('content')
-<!-- Header y Navegación Rápida -->
-<div class="page-header" style="margin-bottom: 0.55rem; flex-shrink: 0;">
-  <div>
-    <h1 class="page-title" style="font-size: 1.2rem; margin-bottom: 0; display: flex; align-items: center; gap: 0.45rem;">
-      <i class="bi bi-pencil-square text-primary" style="font-size: 1.2rem;"></i>
-      Ingresos AT-1
-    </h1>
-    <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem;">
-      <span style="font-weight: 700; font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-primary); background: var(--color-primary-light); padding: 0.1rem 0.4rem; border-radius: var(--radius-xs);">USTED ESTÁ AQUÍ</span>
-      <span>App</span>
-      <i class="bi bi-chevron-right" style="font-size: 0.62rem;"></i>
-      <span style="color: var(--text-primary); font-weight: 600;">Ingresos y Lotes de Atención</span>
+<!-- Header y Navegación Rápida con Cards de Información a la par del Título -->
+<div class="page-header" style="margin-bottom: 0.55rem; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+  <div style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
+    <!-- Título y Breadcrumb -->
+    <div>
+      <h1 class="page-title" style="font-size: 1.2rem; margin-bottom: 0; display: flex; align-items: center; gap: 0.45rem;">
+        <i class="bi bi-pencil-square text-primary" style="font-size: 1.2rem;"></i>
+        Ingresos AT-1
+      </h1>
+      <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem;">
+        <span style="font-weight: 700; font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-primary); background: var(--color-primary-light); padding: 0.1rem 0.4rem; border-radius: var(--radius-xs);">USTED ESTÁ AQUÍ</span>
+        <span>App</span>
+        <i class="bi bi-chevron-right" style="font-size: 0.62rem;"></i>
+        <span style="color: var(--text-primary); font-weight: 600;">Ingresos y Lotes de Atención</span>
+      </div>
+    </div>
+
+    <!-- Cards de Información a la par del Título -->
+    <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+      <!-- Total Registros -->
+      <div class="ingreso-stat-card" style="padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 0.55rem; border-radius: 8px;">
+        <div class="stat-icon-wrap icon-gradient-success" style="width: 28px; height: 28px; font-size: 0.9rem; border-radius: 6px;">
+          <i class="bi bi-file-earmark-medical-fill"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); line-height: 1;">Total Registros</div>
+          <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.1;">{{ number_format($estadisticas['total_registros'] ?? 0) }}</div>
+        </div>
+      </div>
+
+      <!-- Médicos Activos -->
+      <div class="ingreso-stat-card" style="padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 0.55rem; border-radius: 8px;">
+        <div class="stat-icon-wrap icon-gradient-primary" style="width: 28px; height: 28px; font-size: 0.9rem; border-radius: 6px;">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); line-height: 1;">Médicos Activos</div>
+          <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.1;">{{ number_format($estadisticas['total_medicos'] ?? 0) }}</div>
+        </div>
+      </div>
+
+      <!-- Registros Hoy -->
+      <div class="ingreso-stat-card" style="padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 0.55rem; border-radius: 8px;">
+        <div class="stat-icon-wrap icon-gradient-purple" style="width: 28px; height: 28px; font-size: 0.9rem; border-radius: 6px;">
+          <i class="bi bi-calendar2-check-fill"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.60rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); line-height: 1;">Registros Hoy</div>
+          <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); line-height: 1.1;">{{ number_format($estadisticas['registros_hoy'] ?? 0) }}</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="page-actions" style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-    <a href="{{ route('ingresos.create') }}" class="btn btn-primary btn-sm" style="height: 30px; padding: 0 0.75rem; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700;">
+
+  <!-- Botones y Acciones del Header -->
+  <div class="page-actions" style="display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
+    <a href="{{ route('ingresos.create') }}" class="btn btn-primary btn-sm" style="height: 32px; padding: 0 0.85rem; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700;">
       <i class="bi bi-plus-lg"></i> Nuevo Registro
     </a>
-    <a href="{{ route('registrosat1') }}" class="btn btn-subtle btn-sm" style="height: 30px; padding: 0 0.75rem; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
-      <i class="bi bi-table"></i> Registros AT1
+    <a href="{{ route('registrosat1') }}" class="btn btn-subtle btn-sm" style="height: 32px; width: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;" title="Ver Registros AT1 (Más información de los días de ingresos)">
+      <i class="bi bi-table" style="font-size: 0.95rem;"></i>
     </a>
-    <a href="{{ route('informesat1') }}" class="btn btn-subtle btn-sm" style="height: 30px; padding: 0 0.75rem; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
-      <i class="bi bi-file-earmark-bar-graph-fill text-primary"></i> Informes AT1
+    <a href="{{ route('informesat1') }}" class="btn btn-subtle btn-sm" style="height: 32px; width: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px;" title="Ver Informes AT1 (Consolidados e información de ingresos)">
+      <i class="bi bi-file-earmark-bar-graph-fill text-primary" style="font-size: 0.95rem;"></i>
     </a>
-  </div>
-</div>
-
-<!-- =========================================================================
-     1. TARJETAS DE RESUMEN INSTITUCIONAL
-     ========================================================================= -->
-<div class="ingresos-stat-grid">
-  <!-- Card: Total Registros -->
-  <div class="ingreso-stat-card">
-    <div>
-      <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.1rem;">
-        Total Registros
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); line-height: 1;">
-        {{ number_format($estadisticas['total_registros'] ?? 0) }}
-      </div>
-      <small style="font-size: 0.7rem; color: var(--text-muted);">En el período filtrado</small>
-    </div>
-    <div class="stat-icon-wrap icon-gradient-success">
-      <i class="bi bi-file-earmark-medical-fill"></i>
-    </div>
-  </div>
-
-  <!-- Card: Médicos Activos -->
-  <div class="ingreso-stat-card">
-    <div>
-      <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.1rem;">
-        Médicos Activos
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); line-height: 1;">
-        {{ number_format($estadisticas['total_medicos'] ?? 0) }}
-      </div>
-      <small style="font-size: 0.7rem; color: var(--text-muted);">Profesionales con carga</small>
-    </div>
-    <div class="stat-icon-wrap icon-gradient-primary">
-      <i class="bi bi-person-badge-fill"></i>
-    </div>
-  </div>
-
-  <!-- Card: Registros de Hoy -->
-  <div class="ingreso-stat-card">
-    <div>
-      <div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.1rem;">
-        Registros Hoy
-      </div>
-      <div style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); line-height: 1;">
-        {{ number_format($estadisticas['registros_hoy'] ?? 0) }}
-      </div>
-      <small style="font-size: 0.7rem; color: var(--text-muted);">Ingresados en la fecha</small>
-    </div>
-    <div class="stat-icon-wrap icon-gradient-purple">
-      <i class="bi bi-calendar2-check-fill"></i>
-    </div>
   </div>
 </div>
 

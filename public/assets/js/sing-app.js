@@ -353,6 +353,10 @@
   // DROPDOWNS
   // ==========================================================================
   function initDropdowns() {
+    // Si Bootstrap ya gestiona los dropdowns con jQuery, evitar conflicto de doble alternancia (toggle)
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.dropdown !== 'undefined') {
+      return;
+    }
     document.addEventListener('click', function (e) {
       const toggle = e.target.closest('[data-toggle="dropdown"]');
       const allDropdowns = document.querySelectorAll('.dropdown');

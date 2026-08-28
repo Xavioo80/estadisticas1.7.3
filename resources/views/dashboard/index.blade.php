@@ -496,7 +496,10 @@
                     </span>
                   </td>
                   <td style="text-align: center;">
-                    <a href="{{ route('registrosat1') }}" class="btn btn-subtle btn-sm btn-icon" style="width: 24px; height: 24px; font-size: 0.7rem;" title="Ver en tabla AT1">
+                    <a href="{{ route('ingresos.detalles-medico', ['fecha' => $reg->fecha, 'medico' => $reg->medico]) }}"
+                       class="btn btn-subtle btn-sm btn-icon"
+                       style="width: 24px; height: 24px; font-size: 0.7rem;"
+                       title="Ver atenciones de {{ $reg->medico }} — {{ $reg->fecha }}">
                       <i class="bi bi-arrow-up-right"></i>
                     </a>
                   </td>

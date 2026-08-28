@@ -593,7 +593,6 @@ class IngresoController extends Controller
     {
         $columns = [
             'ano', 'mes', 'numero', 'cm', 'medico', 'prof', 'fecha', 'se', 'exp',
-            'identidad', 'nombre_paciente', 'telefono', 'fecha_nacimiento', 'etnia',
             'sexo', 'edad', 'tipo',
             'rango', 'rango_2', 'rango_3', 'rango_4', 'rango_5', 'cond', 'cod_col', 'colonia',
             'cod_1', 'diagnostico_1', 'cond_1', 'sg',

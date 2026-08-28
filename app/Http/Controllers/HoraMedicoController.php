@@ -98,13 +98,21 @@ class HoraMedicoController extends Controller
         $latestAno = RegistroGlobal::whereNotNull('ano')->where('ano', '>', 1900)->orderBy('ano', 'desc')->value('ano');
         $ano = $request->input('ano', $latestAno ?: date('Y'));
         $mesNombre = $request->input('mes', '');
+        $numToMes = [
+            1 => 'ENERO', 2 => 'FEBRERO', 3 => 'MARZO', 4 => 'ABRIL',
+            5 => 'MAYO', 6 => 'JUNIO', 7 => 'JULIO', 8 => 'AGOSTO',
+            9 => 'SEPTIEMBRE', 10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE'
+        ];
+        if (is_numeric($mesNombre) && isset($numToMes[(int)$mesNombre])) {
+            $mesNombre = $numToMes[(int)$mesNombre];
+        }
         if (empty($mesNombre)) {
             $mesNombre = $this->resolverMesPorDefecto((string)$ano, true);
         }
         $jornada = $request->input('jornada', 'MATUTINA');
         $nombreBusqueda = $request->input('nombre');
 
-        $mesNum = $this->mesMap[$mesNombre] ?? date('n');
+        $mesNum = $this->mesMap[$mesNombre] ?? (is_numeric($request->input('mes')) ? (int)$request->input('mes') : date('n'));
 
         $fechaStart = Carbon::create($ano, $mesNum, 1);
         $totalDias = $fechaStart->daysInMonth;

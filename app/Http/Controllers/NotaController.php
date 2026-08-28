@@ -17,9 +17,17 @@ class NotaController extends Controller
      */
     public function index(Request $request)
     {
-        $tag = $request->get('tag');
-        $type = $request->get('type');
-        $search = $request->get('search');
+        // ── API: Devolver todas las notas para notificaciones y persistencia estática ──
+        if ($request->boolean('pinned_only') || ($request->ajax() && $request->has('pinned_only')) || $request->has('all_notes')) {
+            $notas = Nota::orderBy('pinned', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get(['id', 'titulo', 'contenido', 'color', 'tipo', 'checklist_items', 'pinned', 'updated_at']);
+            return response()->json(['notas_pinned' => $notas]);
+        }
+
+        $tag = $request->input('tag');
+        $type = $request->input('type');
+        $search = $request->input('search');
 
         $query = Nota::with('user', 'assignedUser')->orderBy('pinned', 'desc')->orderBy('created_at', 'desc');
 
@@ -62,11 +70,11 @@ class NotaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'titulo' => 'nullable|string|max:255',
+            'titulo'    => 'nullable|string|max:255',
             'contenido' => 'nullable|string',
-            'tipo' => 'required|in:nota,checklist,mensaje',
-            'etiqueta' => 'nullable|string|max:50',
-            'color' => 'nullable|string|max:20',
+            'tipo'      => 'required|in:nota,checklist,mensaje,lista_numerada,alerta',
+            'etiqueta'  => 'nullable|string|max:50',
+            'color'     => 'nullable|string|max:20',
         ]);
 
         $capturaUrl = null;
@@ -120,9 +128,9 @@ class NotaController extends Controller
             'tipo' => $request->tipo,
             'checklist_items' => $checklistItems,
             'etiqueta' => $request->etiqueta ?: 'General',
-            'color' => $request->color ?: '#4f46e5',
+            'color' => $request->color ?: '#eab308',
             'captura_url' => $capturaUrl,
-            'pinned' => $request->boolean('pinned'),
+            'pinned' => true,
         ]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -220,6 +228,22 @@ class NotaController extends Controller
         $nota->delete();
 
         return response()->json(['success' => true, 'message' => 'Nota eliminada.']);
+    }
+
+    /**
+     * Agrega un ítem a una nota de lista numerada.
+     */
+    public function agregarItem(Request $request, $id)
+    {
+        $nota = Nota::findOrFail($id);
+        $texto = $request->input('texto', '');
+
+        $items = $nota->checklist_items ?? [];
+        $items[] = ['text' => $texto, 'done' => false];
+        $nota->checklist_items = $items;
+        $nota->save();
+
+        return response()->json(['success' => true, 'index' => count($items) - 1]);
     }
 
     // ==========================================

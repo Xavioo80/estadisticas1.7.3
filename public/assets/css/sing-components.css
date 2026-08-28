@@ -1582,7 +1582,6 @@
   color: var(--text-primary) !important;
   border-bottom: 2px solid var(--modal-border, var(--border-color)) !important;
 }
-}
 
 .modal-body .table tbody tr:hover {
   background-color: var(--sidebar-item-hover) !important;

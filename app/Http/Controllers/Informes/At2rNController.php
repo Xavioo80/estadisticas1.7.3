@@ -351,6 +351,99 @@ class At2rNController extends Controller
             'Número de atenciones brindadas Subsiguientes de Enfermedad Renal Crónica' => ['val' => $morbRef['erc_subs'], 'key' => 'erc_subs'],
         ];
 
+        // ── Agrupación de Atenciones por Rangos de Edad en columna Morbilidad ──
+        $colSum = function($indices) use ($results) {
+            $cols = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+            foreach ($indices as $i) {
+                if (isset($results[$i])) {
+                    for ($c = 1; $c <= 4; $c++) {
+                        $cols[$c] += $results[$i][$c] ?? 0;
+                    }
+                }
+            }
+            return $cols;
+        };
+
+        // Menores de 5 años: rows 0, 2, 4 (Nuevas) y 1, 3, 5 (Subsiguientes)
+        $m5N_cols = $colSum([0, 2, 4]);
+        $m5S_cols = $colSum([1, 3, 5]);
+        $m5N = array_sum($m5N_cols);
+        $m5S = array_sum($m5S_cols);
+        $m5Tot = $m5N + $m5S;
+
+        // 5-9 años: row 6 (N), row 7 (S)
+        $r59N_cols = $colSum([6]);
+        $r59S_cols = $colSum([7]);
+        $r59N = array_sum($r59N_cols);
+        $r59S = array_sum($r59S_cols);
+        $r59Tot = $r59N + $r59S;
+
+        // 10-14 años: row 8 (N), row 9 (S)
+        $r1014N_cols = $colSum([8]);
+        $r1014S_cols = $colSum([9]);
+        $r1014N = array_sum($r1014N_cols);
+        $r1014S = array_sum($r1014S_cols);
+        $r1014Tot = $r1014N + $r1014S;
+
+        // 15-19 años: row 10 (N), row 11 (S)
+        $r1519N_cols = $colSum([10]);
+        $r1519S_cols = $colSum([11]);
+        $r1519N = array_sum($r1519N_cols);
+        $r1519S = array_sum($r1519S_cols);
+        $r1519Tot = $r1519N + $r1519S;
+
+        // 20-49 años: row 12 (N), row 13 (S)
+        $r2049N_cols = $colSum([12]);
+        $r2049S_cols = $colSum([13]);
+        $r2049N = array_sum($r2049N_cols);
+        $r2049S = array_sum($r2049S_cols);
+        $r2049Tot = $r2049N + $r2049S;
+
+        // 50-59 años: row 14 (N), row 15 (S)
+        $r5059N_cols = $colSum([14]);
+        $r5059S_cols = $colSum([15]);
+        $r5059N = array_sum($r5059N_cols);
+        $r5059S = array_sum($r5059S_cols);
+        $r5059Tot = $r5059N + $r5059S;
+
+        // 60 y más: row 16 (N), row 17 (S)
+        $r60N_cols = $colSum([16]);
+        $r60S_cols = $colSum([17]);
+        $r60N = array_sum($r60N_cols);
+        $r60S = array_sum($r60S_cols);
+        $r60Tot = $r60N + $r60S;
+
+        // Total Atendidos: row 18
+        $totAtendN = $m5N + $r59N + $r1014N + $r1519N + $r2049N + $r5059N + $r60N;
+        $totAtendS = $m5S + $r59S + $r1014S + $r1519S + $r2049S + $r5059S + $r60S;
+        $totAtendTot = $totAtendN + $totAtendS;
+
+        $fmtTooltip = function($nCols, $sCols) {
+            return "Nuevas: Aux: {$nCols[1]}, Prof: {$nCols[2]}, Méd: {$nCols[3]}, Esp: {$nCols[4]} | Subsig: Aux: {$sCols[1]}, Prof: {$sCols[2]}, Méd: {$sCols[3]}, Esp: {$sCols[4]}";
+        };
+
+        $morbGroupMap = [
+            0 => ['rowspan' => 6, 'title' => '< 5 AÑOS', 'nuevas' => $m5N, 'subs' => $m5S, 'total' => $m5Tot, 'is_menores5' => true, 'tooltip' => $fmtTooltip($m5N_cols, $m5S_cols)],
+            1 => ['skip' => true],
+            2 => ['skip' => true],
+            3 => ['skip' => true],
+            4 => ['skip' => true],
+            5 => ['skip' => true],
+            6 => ['rowspan' => 2, 'title' => '5 A 9 AÑOS', 'nuevas' => $r59N, 'subs' => $r59S, 'total' => $r59Tot, 'tooltip' => $fmtTooltip($r59N_cols, $r59S_cols)],
+            7 => ['skip' => true],
+            8 => ['rowspan' => 2, 'title' => '10 A 14 AÑOS', 'nuevas' => $r1014N, 'subs' => $r1014S, 'total' => $r1014Tot, 'tooltip' => $fmtTooltip($r1014N_cols, $r1014S_cols)],
+            9 => ['skip' => true],
+            10 => ['rowspan' => 2, 'title' => '15 A 19 AÑOS', 'nuevas' => $r1519N, 'subs' => $r1519S, 'total' => $r1519Tot, 'tooltip' => $fmtTooltip($r1519N_cols, $r1519S_cols)],
+            11 => ['skip' => true],
+            12 => ['rowspan' => 2, 'title' => '20 A 49 AÑOS', 'nuevas' => $r2049N, 'subs' => $r2049S, 'total' => $r2049Tot, 'tooltip' => $fmtTooltip($r2049N_cols, $r2049S_cols)],
+            13 => ['skip' => true],
+            14 => ['rowspan' => 2, 'title' => '50 A 59 AÑOS', 'nuevas' => $r5059N, 'subs' => $r5059S, 'total' => $r5059Tot, 'tooltip' => $fmtTooltip($r5059N_cols, $r5059S_cols)],
+            15 => ['skip' => true],
+            16 => ['rowspan' => 2, 'title' => '60 Y MÁS', 'nuevas' => $r60N, 'subs' => $r60S, 'total' => $r60Tot, 'tooltip' => $fmtTooltip($r60N_cols, $r60S_cols)],
+            17 => ['skip' => true],
+            18 => ['rowspan' => 1, 'title' => 'TOTAL ATENDIDOS', 'nuevas' => $totAtendN, 'subs' => $totAtendS, 'total' => $totAtendTot, 'is_total' => true],
+        ];
+
         // ── Formatear datos finales ────────────────────────────────────────
         $allRows = array_merge($ageRows, $progRows);
         $finalData = [];
@@ -367,6 +460,7 @@ class At2rNController extends Controller
                 'manual_key' => $row['manual_key'] ?? null,
                 'morbilidad_val' => isset($morbMap[$label]) ? $morbMap[$label]['val'] : null,
                 'morbilidad_key' => isset($morbMap[$label]) ? $morbMap[$label]['key'] : null,
+                'morb_group' => $morbGroupMap[$idx] ?? null,
             ];
         }
 

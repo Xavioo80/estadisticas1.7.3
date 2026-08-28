@@ -20,20 +20,36 @@
         transform: rotate(180deg) !important;
         white-space: normal !important;
         word-break: normal !important;
-        font-size: 0.65rem !important;
+        font-size: 0.54rem !important;
         font-weight: 700 !important;
         text-align: center !important;
         vertical-align: middle !important;
-        padding: 3px 2px !important;
-        letter-spacing: 0.2px !important;
-        line-height: 1.15 !important;
+        padding: 2px 1px !important;
+        letter-spacing: 0px !important;
+        line-height: 1.08 !important;
     }
 
-    #mainTable thead tr.header-row th {
-        font-size: 0.74rem !important;
+    #mainTable thead tr.header-row-main th {
+        height: 22px !important;
+        font-size: 0.70rem !important;
         font-weight: 800 !important;
-        padding: 4px 4px !important;
+        padding: 2px 4px !important;
         vertical-align: middle !important;
+    }
+
+    #mainTable thead tr.header-row-mid th {
+        height: 20px !important;
+        font-size: 0.66rem !important;
+        font-weight: 800 !important;
+        padding: 2px 4px !important;
+        vertical-align: middle !important;
+    }
+
+    #mainTable thead tr.header-row-sub th {
+        height: 82px !important;
+        max-height: 86px !important;
+        vertical-align: middle !important;
+        padding: 2px 1px !important;
     }
 
     #mainTable {
@@ -61,11 +77,15 @@
         border: 1px solid #475569 !important;
     }
 
+    #mainTable tbody tr {
+        height: 25px !important;
+    }
+
     #mainTable tbody td {
         vertical-align: middle !important;
-        font-size: 0.88rem !important;
+        font-size: 0.78rem !important;
         font-weight: 600 !important;
-        padding: 3px 4px !important;
+        padding: 1px 3px !important;
         border: 1px solid #94a3b8 !important;
         color: var(--text-primary) !important;
     }

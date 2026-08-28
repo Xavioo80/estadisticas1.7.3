@@ -14,9 +14,24 @@
   </div>
 
   <div class="navbar-right">
+    <!-- Acceso rápido: Ingresos AT-1 (index) -->
+    <a href="{{ route('ingresos.index') }}" class="navbar-action-btn" title="Ingresos AT-1" style="text-decoration:none; width:38px; height:38px; border-radius:var(--radius-sm,6px); display:inline-flex; align-items:center; justify-content:center;">
+      <i class="bi bi-file-earmark-medical-fill" style="font-size: 1.5rem; color: var(--text-primary); line-height: 1;"></i>
+    </a>
+
+    <!-- Acceso rápido: Registros AT1 -->
+    <a href="{{ route('registrosat1') }}" class="navbar-action-btn" title="Registros AT-1" style="text-decoration:none; width:38px; height:38px; border-radius:var(--radius-sm,6px); display:inline-flex; align-items:center; justify-content:center;">
+      <i class="bi bi-table" style="font-size: 1.48rem; color: var(--text-primary); line-height: 1;"></i>
+    </a>
+
+    <!-- Acceso rápido: Informes AT1 -->
+    <a href="{{ route('informesat1') }}" class="navbar-action-btn" title="Informes AT-1" style="text-decoration:none; width:38px; height:38px; border-radius:var(--radius-sm,6px); display:inline-flex; align-items:center; justify-content:center;">
+      <i class="bi bi-file-earmark-bar-graph-fill" style="font-size: 1.5rem; color: var(--color-primary); line-height: 1;"></i>
+    </a>
+
     <!-- Quick Add New Record Button (Green with Plus Icon) -->
     <a href="{{ route('ingresos.create') }}" class="btn-navbar-add-green" title="Nuevo Registro (AT-1)">
-      <i class="bi bi-plus-lg"></i>
+      <i class="bi bi-plus-lg" style="font-size: 1.35rem;"></i>
     </a>
 
     <!-- Quick Bloc de Notas & Tareas Button -->
@@ -30,44 +45,48 @@
       <i class="bi bi-moon-stars-fill icon-moon"></i>
     </button>
 
-    <!-- Notifications Dropdown -->
+    <!-- Notifications Dropdown (Campana del Header Principal) -->
     <div class="dropdown">
-      <button type="button" class="navbar-action-btn" data-toggle="dropdown" title="Notificaciones">
-        <i class="bi bi-bell"></i>
-        <span class="badge-dot"></span>
+      <button type="button" class="navbar-action-btn" id="navbar-bell-btn" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false" title="Notificaciones y Notas adhesivas" style="position: relative;">
+        <i class="bi bi-bell" style="font-size: 1.35rem;"></i>
+        <span class="navbar-bell-badge" id="navbar-bell-count" style="display: none;">0</span>
       </button>
-      <div class="dropdown-menu" style="min-width: 320px; right: 0;">
-        <div class="dropdown-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <span>Notificaciones</span>
-          <span class="badge badge-soft-primary">3 Nuevas</span>
+      <div class="dropdown-menu dropdown-menu-right" id="navbar-bell-dropdown">
+        <!-- Header con diseño premium -->
+        <div class="fsn-bell-header">
+          <div class="d-flex align-items-center gap-2">
+            <div class="fsn-bell-icon-box">
+              <i class="bi bi-bell-fill"></i>
+            </div>
+            <div>
+              <div class="fsn-bell-title">Notificaciones & Notas</div>
+              <small class="text-muted" style="font-size: 0.70rem; display: block; line-height: 1;">Alertas y notas fijadas</small>
+            </div>
+          </div>
+          <span class="fsn-pill-count" id="navbar-bell-badge-text">0 Activas</span>
         </div>
-        <a href="#" class="dropdown-item" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);" onclick="SingApp.toast({title: 'Servidor', message: 'Carga de CPU normalizada al 28%', type: 'success'}); return false;">
-          <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-success-light); color: var(--color-success); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="bi bi-hdd-network"></i>
+        
+        <!-- Lista dinámica de tarjetas de notas fijadas / alertas -->
+        <div id="navbar-pinned-notes-list" class="fsn-bell-list">
+          <div class="fsn-bell-empty" id="navbar-bell-empty">
+            <div class="fsn-empty-icon">
+              <i class="bi bi-check2-circle"></i>
+            </div>
+            <div class="font-weight-bold mb-1" style="font-size: 0.84rem; color: var(--text-primary);">¡Todo al día!</div>
+            <small class="text-muted" style="font-size: 0.72rem;">No tienes alertas ni notas fijadas en este momento</small>
           </div>
-          <div>
-            <div style="font-size: 0.85rem; font-weight: 600;">Servidor restablecido</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Hace 5 minutos</div>
-          </div>
-        </a>
-        <a href="#" class="dropdown-item" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);" onclick="SingApp.toast({title: 'Nueva Venta', message: 'Factura #INV-9402 pagada ($450.00)', type: 'primary'}); return false;">
-          <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="bi bi-credit-card-2-front"></i>
-          </div>
-          <div>
-            <div style="font-size: 0.85rem; font-weight: 600;">Nueva venta confirmada</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Hace 24 minutos</div>
-          </div>
-        </a>
-        <a href="#" class="dropdown-item" style="padding: 0.75rem 1rem;" onclick="SingApp.toast({title: 'Alerta', message: 'Copia de seguridad semanal completada', type: 'info'}); return false;">
-          <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--color-warning-light); color: var(--color-warning); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i class="bi bi-cloud-arrow-up"></i>
-          </div>
-          <div>
-            <div style="font-size: 0.85rem; font-weight: 600;">Backup completado</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Hace 2 horas</div>
-          </div>
-        </a>
+        </div>
+
+        <!-- Footer estilizado con acciones directas -->
+        <div class="fsn-bell-footer">
+          <button type="button" class="fsn-btn-restore" id="btn-restore-all-notes" onclick="window.mostrarNotasFlotantes();" style="display: none;">
+            <i class="bi bi-window-stack mr-1"></i> Mostrar todas
+          </button>
+          <a href="{{ route('notas.index') }}" class="fsn-link-board ml-auto">
+            <span>Ver Tablero</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
       </div>
     </div>
 

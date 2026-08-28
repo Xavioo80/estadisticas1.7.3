@@ -8,7 +8,7 @@
                     <th colspan="2" class="text-primary">ENFERMERA</th>
                     <th colspan="2" class="text-danger">MÉDICO</th>
                     <th rowspan="2" class="align-middle bg-primary-soft" style="width: 85px;">TOTAL</th>
-                    <th rowspan="2" class="align-middle text-emerald-400 no-print col-morbilidad-head" style="width: 110px; border-left: 2px solid var(--border-color); font-size: 11px; font-weight: 800; background: rgba(16, 185, 129, 0.12);" title="Total en el informe de Morbilidad (< 5 años)">MORBILIDAD</th>
+                    <th rowspan="2" class="align-middle text-emerald-400 no-print col-morbilidad-head" style="width: 145px; min-width: 140px; border-left: 2px solid var(--border-color); font-size: 11px; font-weight: 800; background: rgba(16, 185, 129, 0.12);" title="Resumen por Rangos de Edad / Auditoría Morbilidad">MORBILIDAD</th>
                 </tr>
                 <tr>
                     <th style="width: 100px; min-width: 100px;">AUXILIARES</th>
@@ -41,7 +41,8 @@
                                 elseif ($isPuerperio) $rowClass = 'row-puerperio';
                                 elseif ($isNino) $rowClass = 'row-nino';
 
-                                $morbVal = $row['morbilidad_val'] ?? null;
+                                $morbVal   = $row['morbilidad_val'] ?? null;
+                                $morbGroup = $row['morb_group'] ?? null;
                             @endphp
                             <tr class="{{ $rowClass }}">
                                 <td class="sticky-col-first {{ $rowClass ? $rowClass.'-sticky' : '' }}">
@@ -59,7 +60,57 @@
                                     <td class="cell-clickable" data-row-idx="{{ $loop->index }}" data-col-idx="4" title="Ver desglose">{{ $row['cols'][4] ?: '0' }}</td>
                                 @endif
                                 <td class="col-total manual-total">{{ $row['total'] ?: '0' }}</td>
-                                @if($morbVal !== null)
+                                @if($morbGroup)
+                                    @if(!($morbGroup['skip'] ?? false))
+                                        @if($morbGroup['is_menores5'] ?? false)
+                                            <td rowspan="{{ $morbGroup['rowspan'] }}" class="col-morbilidad-group no-print" title="{{ $morbGroup['tooltip'] ?? '' }}">
+                                                <div class="morb-summary-box">
+                                                    <div class="morb-group-header font-bold text-emerald-400" style="font-size: 0.73rem;">
+                                                        <i class="bi bi-people-fill me-1"></i> {{ $morbGroup['title'] }}
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mb-1 px-1" style="font-size: 0.70rem;">
+                                                        <span class="text-muted">Nuevas:</span>
+                                                        <span class="font-bold text-success">{{ number_format($morbGroup['nuevas']) }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mb-1 px-1" style="font-size: 0.70rem;">
+                                                        <span class="text-muted">Subsig:</span>
+                                                        <span class="font-bold text-info">{{ number_format($morbGroup['subs']) }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center pt-1 px-1 border-top" style="font-size: 0.75rem; font-weight: 800; border-top: 1px solid var(--border-color) !important; margin-top: 2px;">
+                                                        <span style="color: var(--text-primary);">TOTAL:</span>
+                                                        <span class="text-emerald-400 font-black" style="font-size: 0.90rem;">{{ number_format($morbGroup['total']) }}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        @elseif($morbGroup['is_total'] ?? false)
+                                            <td rowspan="{{ $morbGroup['rowspan'] }}" class="col-morbilidad-group col-morbilidad-total no-print">
+                                                <div class="morb-summary-box-compact" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4);">
+                                                    <div class="d-flex justify-content-between align-items-center px-1" style="font-size: 0.72rem;">
+                                                        <span class="text-emerald-400 font-black">TOTAL:</span>
+                                                        <span class="text-emerald-400 font-black" style="font-size: 0.88rem;">{{ number_format($morbGroup['total']) }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center px-1 text-muted" style="font-size: 0.63rem; margin-top: 1px;">
+                                                        <span>N: <strong class="text-success">{{ number_format($morbGroup['nuevas']) }}</strong></span>
+                                                        <span>S: <strong class="text-info">{{ number_format($morbGroup['subs']) }}</strong></span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        @else
+                                            <td rowspan="{{ $morbGroup['rowspan'] }}" class="col-morbilidad-group no-print" title="{{ $morbGroup['tooltip'] ?? '' }}">
+                                                <div class="morb-summary-box-compact">
+                                                    <div class="d-flex justify-content-between align-items-center px-1" style="font-size: 0.68rem; line-height: 1.2;">
+                                                        <span class="font-bold text-muted" style="font-size: 0.65rem;">{{ $morbGroup['title'] }}</span>
+                                                        <span class="font-black text-emerald-400" style="font-size: 0.82rem;">{{ number_format($morbGroup['total']) }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center px-1 text-muted" style="font-size: 0.64rem; line-height: 1.1; margin-top: 2px;">
+                                                        <span>N: <strong class="text-success">{{ number_format($morbGroup['nuevas']) }}</strong></span>
+                                                        <span>S: <strong class="text-info">{{ number_format($morbGroup['subs']) }}</strong></span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        @endif
+                                    @endif
+                                @elseif($morbVal !== null)
                                     @php
                                         $isMatch = ($morbVal == $row['total']);
                                         $morbKey = $row['morbilidad_key'] ?? '';

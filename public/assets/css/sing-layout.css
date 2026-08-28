@@ -638,6 +638,287 @@ body {
   border: 2px solid var(--bg-surface);
 }
 
+.navbar-bell-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 2px solid var(--bg-surface);
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.45);
+}
+
+/* ==========================================================================
+   BELL NOTIFICATION DROPDOWN - 60 FPS ULTRA SMOOTH & PREMIUM DESIGN
+   Fixed immediately to the left with zero jump/flicker
+   ========================================================================== */
+#navbar-bell-dropdown {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  width: 360px !important;
+  max-width: calc(100vw - 20px) !important;
+  border-radius: 16px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22), 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  transform-origin: top right !important;
+  will-change: transform, opacity !important;
+}
+
+.dropdown.show #navbar-bell-dropdown {
+  display: block !important;
+  animation: bellDropdown60fps 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes bellDropdown60fps {
+  0% {
+    opacity: 0;
+    transform: scale(0.93) translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fsn-bell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fsn-bell-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .fsn-bell-icon-box {
+  background: rgba(59, 130, 246, 0.22);
+  color: #60a5fa;
+}
+
+.fsn-bell-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.fsn-pill-count {
+  font-size: 0.70rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="dark"] .fsn-pill-count {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.fsn-bell-list {
+  max-height: 310px;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fsn-bell-card {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.fsn-bell-card:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-primary, #3b82f6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.fsn-card-accent {
+  width: 4px;
+  flex-shrink: 0;
+}
+
+.fsn-card-content {
+  flex: 1 1 0%;
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+.fsn-card-title {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 175px;
+}
+
+.fsn-type-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.fsn-card-snippet {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fsn-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.fsn-status-badge.is-open {
+  color: #10b981;
+}
+
+.fsn-status-badge.is-closed {
+  color: #f59e0b;
+}
+
+.fsn-status-badge .fsn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.fsn-status-badge.is-open .fsn-dot {
+  background: #10b981;
+  box-shadow: 0 0 4px #10b981;
+}
+
+.fsn-status-badge.is-closed .fsn-dot {
+  background: #f59e0b;
+}
+
+.fsn-action-btn {
+  font-size: 0.70rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: color 0.15s ease;
+}
+
+.fsn-bell-card:hover .fsn-action-btn {
+  color: var(--color-primary, #3b82f6);
+}
+
+.fsn-bell-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.fsn-empty-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.fsn-bell-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border-color);
+}
+
+.fsn-btn-restore {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-primary, #3b82f6);
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 6px;
+  padding: 3px 8px;
+  transition: all 0.15s ease;
+}
+
+.fsn-btn-restore:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.fsn-link-board {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-primary, #3b82f6);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.fsn-link-board:hover {
+  transform: translateX(2px);
+  color: var(--color-primary, #2563eb);
+}
+
 /* Dropdowns */
 .dropdown {
   position: relative;

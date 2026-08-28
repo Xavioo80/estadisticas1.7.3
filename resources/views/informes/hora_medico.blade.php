@@ -20,13 +20,13 @@
             transform: rotate(180deg) !important;
             white-space: normal !important;
             word-break: normal !important;
-            font-size: 0.65rem !important;
+            font-size: 0.54rem !important;
             font-weight: 700 !important;
             text-align: center !important;
             vertical-align: middle !important;
-            padding: 3px 2px !important;
-            letter-spacing: 0.2px !important;
-            line-height: 1.15 !important;
+            padding: 2px 1px !important;
+            letter-spacing: 0px !important;
+            line-height: 1.08 !important;
         }
 
         #mainTable thead tr.header-row-main th {
@@ -46,10 +46,10 @@
         }
 
         #mainTable thead tr.header-row-sub th {
-            height: 94px !important;
-            max-height: 98px !important;
+            height: 84px !important;
+            max-height: 88px !important;
             vertical-align: middle !important;
-            padding: 3px 2px !important;
+            padding: 2px 1px !important;
         }
 
         #mainTable {
@@ -75,9 +75,9 @@
 
         #mainTable tbody td {
             vertical-align: middle !important;
-            font-size: 0.88rem !important;
+            font-size: 0.86rem !important;
             font-weight: 600 !important;
-            padding: 3px 4px !important;
+            padding: 2px 3px !important;
             border: 1px solid #94a3b8 !important;
             color: var(--text-primary) !important;
         }
@@ -87,9 +87,20 @@
             border: 1px solid #475569 !important;
         }
 
+        #mainTable th.sticky-col-2,
+        #mainTable td.sticky-col-2,
+        #mainTable .sticky-col-2 {
+            text-align: left !important;
+            padding-left: 10px !important;
+            padding-right: 6px !important;
+        }
+
         #mainTable tbody td.sticky-col-2 {
             font-size: 0.80rem !important;
             font-weight: 700 !important;
+            text-align: left !important;
+            padding-left: 10px !important;
+            padding-right: 6px !important;
         }
 
         /* ─── Botón de Acción en Fila (Diseño y Color Premium) ─── */

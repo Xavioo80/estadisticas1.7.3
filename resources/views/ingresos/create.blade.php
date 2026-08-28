@@ -11,19 +11,30 @@
     background-color: var(--bg-body) !important;
     color: var(--text-primary) !important;
   }
+  .app-footer {
+    display: none !important;
+  }
   .app-content {
-    padding: 0.5rem 1rem !important;
+    padding: 0.35rem 0.5rem 0.25rem !important;
+    height: calc(100vh - var(--navbar-height, 56px)) !important;
+    max-height: calc(100vh - var(--navbar-height, 56px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+  body {
+    overflow: hidden !important;
   }
 </style>
 @endpush
 
 @section('content')
-<div class="py-2" style="width: 100%; height: 100%;">
-    <div style="width:100%; max-width:100%; padding: 0 4px;">
-        <div ng-app="TablaDemo" ng-cloak ng-controller="TablaCtrl">
-            <div class="page-fade-in">
+<div class="d-flex flex-column flex-grow-1" style="width: 100%; height: 100%; min-height: 0;">
+    <div class="d-flex flex-column flex-grow-1" style="width: 100%; max-width: 100%; height: 100%; min-height: 0; padding: 0;">
+        <div ng-app="TablaDemo" ng-cloak ng-controller="TablaCtrl" class="d-flex flex-column flex-grow-1" style="height: 100%; min-height: 0;">
+            <div class="page-fade-in d-flex flex-column flex-grow-1" style="height: 100%; min-height: 0;">
                 <!-- Header dentro del scope de Angular -->
-                <div class="content-header p-0 mb-2 pt-1">
+                <div class="content-header p-0 mb-1 pt-0" style="flex-shrink: 0;">
                     <div class="container-fluid px-0">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="d-flex align-items-center gap-2">
@@ -84,105 +95,183 @@
                     </div>
                 </div>
 
-                <div class="container-fluid px-0">
-
-
-                    <div class="card shadow" style="height: calc(100vh - 215px); background-color: var(--bg-surface) !important; border: 1px solid var(--border-color) !important;">
-                        <div class="card-body p-0 flex-1 overflow-hidden position-relative" style="background-color: var(--bg-surface) !important;">
+                <div class="container-fluid px-0 d-flex flex-column flex-grow-1" style="min-height: 0; flex: 1 1 0%;">
+                    <div class="card shadow d-flex flex-column flex-grow-1 mb-0" style="height: 100%; min-height: 0; background-color: var(--bg-surface) !important; border: 1px solid var(--border-color) !important;">
+                        <div class="card-body p-0 flex-grow-1 position-relative overflow-hidden" style="min-height: 0; background-color: var(--bg-surface) !important;">
                             <div class="table-responsive position-absolute top-0 start-0 end-0 bottom-0" style="background-color: var(--bg-surface) !important; overflow: auto !important;">
-                                <table class="table table-bordered table-hover table-sm mb-0"
+                                <table class="table table-bordered table-hover table-sm mb-0 table-ingresos spreadsheet-table"
                                     style="table-layout: fixed; width: max-content !important; min-width: 100% !important; background-color: var(--bg-surface) !important;">
                                     <thead class="thead-dark-custom shadow-sm">
                                         <tr>
                                             <th class="text-center sticky-col text-white"
-                                                style="width: 40px; min-width: 40px;">#</th>
+                                                style="width: 32px; min-width: 32px; max-width: 32px;">#</th>
                                             @foreach($columns as $col)
                                                 @php
-                                                    $width = '100px'; // Default
+                                                    $width = '80px';
+                                                    $align = 'text-left';
+                                                    $title = strtoupper(str_replace('_', ' ', $col));
 
-                                                    // Lógica de anchos específicos
                                                     switch ($col) {
                                                         case 'numero':
-                                                            $width = '60px';
+                                                            $width = '52px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'ano':
-                                                            $width = '50px';
+                                                            $width = '48px';
+                                                            $title = 'AÑO';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'mes':
-                                                            $width = '80px';
-                                                            break; // Nombre mes
+                                                            $width = '75px';
+                                                            $align = 'text-center';
+                                                            break;
                                                         case 'cm':
-                                                            $width = '50px';
+                                                            $width = '42px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'medico':
-                                                            $width = '250px';
-                                                            break; // ~40 caracteres
+                                                            $width = '210px';
+                                                            $align = 'text-left';
+                                                            break;
                                                         case 'prof':
-                                                            $width = '120px';
+                                                            $width = '125px';
+                                                            $align = 'text-left';
                                                             break;
                                                         case 'fecha':
-                                                            $width = '90px';
+                                                            $width = '85px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'se':
-                                                            $width = '40px';
+                                                            $width = '36px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'exp':
-                                                            $width = '80px';
+                                                            $width = '65px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'sexo':
-                                                            $width = '40px';
+                                                            $width = '42px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'edad':
-                                                            $width = '40px';
+                                                            $width = '42px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'tipo':
-                                                            $width = '40px';
+                                                            $width = '42px';
+                                                            $align = 'text-center';
+                                                            break;
+                                                        case 'rango':
+                                                            $width = '125px';
+                                                            $align = 'text-left';
+                                                            break;
+                                                        case 'rango_2':
+                                                        case 'rango_5':
+                                                            $width = '120px';
+                                                            $align = 'text-left';
+                                                            break;
+                                                        case 'rango_3':
+                                                            $width = '95px';
+                                                            $align = 'text-left';
+                                                            break;
+                                                        case 'rango_4':
+                                                            $width = '90px';
+                                                            $align = 'text-left';
                                                             break;
                                                         case 'cond':
-                                                            $width = '60px';
+                                                            $width = '45px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'cod_col':
                                                             $width = '60px';
+                                                            $align = 'text-center';
                                                             break;
                                                         case 'colonia':
-                                                            $width = '200px';
+                                                            $width = '160px';
+                                                            $align = 'text-left';
                                                             break;
                                                         case 'sg':
-                                                            $width = '40px';
+                                                            $width = '38px';
+                                                            $align = 'text-center';
+                                                            break;
+                                                        case 'referido_a':
+                                                        case 'referido_de':
+                                                            $width = '95px';
+                                                            $align = 'text-left';
+                                                            break;
+                                                        case 'pg_emb':
+                                                            $width = '80px';
+                                                            $align = 'text-center';
+                                                            break;
+                                                        case 'jornada':
+                                                            $width = '75px';
+                                                            $align = 'text-center';
+                                                            break;
+                                                        case 'sm':
+                                                            $width = '42px';
+                                                            $align = 'text-center';
                                                             break;
                                                         default:
-                                                            // Patrones para columnas repetitivas
-                                                            if (strpos($col, 'cod_') === 0 && $col !== 'cod_col')
-                                                                $width = '50px'; // cod_1, cod_2...
-                                                            else if (strpos($col, 'diagnostico_') === 0)
-                                                                $width = '250px'; // diagnosticos largas
-                                                            else if (strpos($col, 'cond_') === 0)
-                                                                $width = '40px'; // cond_1...
+                                                            if (strpos($col, 'cod_') === 0 && $col !== 'cod_col') {
+                                                                $width = '50px';
+                                                                $align = 'text-center';
+                                                            } else if (strpos($col, 'diagnostico_') === 0) {
+                                                                $width = '200px';
+                                                                $align = 'text-left';
+                                                            } else if (strpos($col, 'cond_') === 0) {
+                                                                $width = '45px';
+                                                                $align = 'text-center';
+                                                            }
                                                     }
                                                 @endphp
-                                                <th class="text-uppercase text-xs text-truncate text-white"
-                                                    style="width: {{ $width }}; min-width: {{ $width }}; max-width: {{ $width }}; border-bottom: 2px solid #495057;"
-                                                    title="{{ str_replace('_', ' ', $col) }}">
-                                                    {{ str_replace('_', ' ', $col) }}
+                                                <th class="text-uppercase {{ $align }} text-truncate text-white"
+                                                    style="width: {{ $width }}; min-width: {{ $width }}; max-width: {{ $width }};"
+                                                    title="{{ $title }}">
+                                                    {{ $title }}
                                                 </th>
                                             @endforeach
-                                            <th class="text-center" style="width: 50px; min-width: 50px;"></th>
+                                            <th class="text-center" style="width: 32px; min-width: 32px; max-width: 32px;">✕</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="item in lista">
-                                            <td class="text-center font-weight-bold text-xs sticky-col"
-                                                ng-class="{'active-row': $index === filaSeleccionada}">
-                                                @{{$index + 1}}
-                                            </td>
+                                            <td class="text-center font-weight-bold sticky-col"
+                                                ng-class="{'active-row': $index === filaSeleccionada}"
+                                                ng-bind="$index + 1"></td>
                                             @foreach($columns as $col)
-                                                 <td editable-td row="@{{$index}}" field="{{ $col }}" class="text-xs"></td>
+                                                @php
+                                                    $align = 'text-left';
+                                                    switch ($col) {
+                                                        case 'numero':
+                                                        case 'ano':
+                                                        case 'mes':
+                                                        case 'cm':
+                                                        case 'fecha':
+                                                        case 'se':
+                                                        case 'exp':
+                                                        case 'sexo':
+                                                        case 'edad':
+                                                        case 'tipo':
+                                                        case 'cond':
+                                                        case 'cod_col':
+                                                        case 'sg':
+                                                        case 'pg_emb':
+                                                        case 'jornada':
+                                                        case 'sm':
+                                                            $align = 'text-center';
+                                                            break;
+                                                        default:
+                                                            if (strpos($col, 'cod_') === 0 && $col !== 'cod_col') $align = 'text-center';
+                                                            else if (strpos($col, 'cond_') === 0) $align = 'text-center';
+                                                    }
+                                                @endphp
+                                                 <td editable-td row="@{{$index}}" field="{{ $col }}" class="{{ $align }}"></td>
                                             @endforeach
                                             <td class="text-center p-0" style="vertical-align: middle;">
-                                                <button class="btn btn-xs btn-danger" ng-click="eliminar($index)"
+                                                <button class="btn btn-xs btn-outline-danger p-0 d-inline-flex align-items-center justify-content-center" ng-click="eliminar($index)"
                                                     title="Eliminar fila"
-                                                    style="width: 16px; height: 16px; padding: 0; font-size: 0.55rem; line-height: 16px;">
-                                                    <i class="fas fa-trash"></i>
+                                                    style="width: 18px; height: 18px; font-size: 0.60rem;">
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </td>
                                         </tr>
@@ -190,7 +279,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="card-footer border-top" style="background-color: var(--bg-surface) !important; border-color: var(--border-color) !important;">
+                        <div class="card-footer py-1 px-2 border-top" style="flex-shrink: 0; background-color: var(--bg-surface) !important; border-color: var(--border-color) !important;">
                             <div class="btn-group">
                                 <button class="btn btn-sm btn-success px-3" ng-click="agregar()">
                                     <i class="fas fa-plus mr-1"></i> Agregar Fila
@@ -626,7 +715,9 @@
         }
 
         /* Compactación y espaciado lateral para tabla spreadsheet */
-        .table {
+        /* Compactación y espaciado lateral para tabla spreadsheet de Ingresos */
+        .table-ingresos,
+        table.table.table-ingresos {
             border-collapse: separate !important;
             border-spacing: 0 !important;
             border: 1px solid var(--border-color, #cbd5e1) !important;
@@ -635,19 +726,55 @@
             width: max-content !important;
             min-width: 100% !important;
             table-layout: fixed !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            font-size: 0.78rem !important;
         }
 
-        .table th,
-        .table td {
-            padding: 0 5px !important;
-            vertical-align: middle;
-            white-space: nowrap;
-            height: 24px;
+        .table-ingresos th,
+        table.table.table-ingresos th {
+            padding: 0 4px !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+            height: 24px !important;
+            line-height: 24px !important;
             border: 1px solid var(--border-color, #e2e8f0) !important;
-            color: var(--text-primary, #1e293b);
+            color: var(--text-primary, #1e293b) !important;
+            font-size: 0.70rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.02em;
+        }
+
+        .table-ingresos td,
+        table.table.table-ingresos td,
+        table.table.table-ingresos tbody td,
+        table.table.table-ingresos tbody td:not(.sticky-col-first),
+        table.table.table-ingresos td[contenteditable="true"] {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding: 0 5px !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+            height: 20px !important;
+            min-height: 20px !important;
+            line-height: 20px !important;
+            border: 1px solid var(--border-color, #e2e8f0) !important;
+            color: var(--text-primary, #1e293b) !important;
+            font-size: 0.78rem !important;
+            font-weight: 500 !important;
+            background-color: var(--bg-surface, #ffffff);
+            letter-spacing: normal !important;
+        }
+
+        table.table.table-ingresos tbody tr {
+            height: 20px !important;
+            min-height: 20px !important;
         }
 
         /* Inmovilizar primera columna (#) */
+        table.table.table-ingresos .sticky-col,
+        .table-ingresos .sticky-col,
         .sticky-col {
             position: sticky;
             left: 0;
@@ -656,9 +783,19 @@
             color: var(--text-primary, #1e293b) !important;
             border-left: 1px solid var(--border-color, #cbd5e1) !important;
             border-right: 2px solid var(--border-color, #cbd5e1) !important;
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            width: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            padding: 0 !important;
+            height: 20px !important;
+            line-height: 20px !important;
         }
 
         /* Clase para fila activa en columna sticky */
+        table.table.table-ingresos .sticky-col.active-row,
         .sticky-col.active-row {
             background-color: var(--color-primary, #4d7cfe) !important;
             color: #ffffff !important;
@@ -667,6 +804,7 @@
         }
 
         /* La celda de la esquina (# en el header) */
+        table.table.table-ingresos thead th.sticky-col,
         thead th.sticky-col {
             z-index: 11 !important;
             position: sticky;
@@ -675,34 +813,47 @@
             border-top: 1px solid var(--border-color, #454d55) !important;
             background-color: var(--bg-subtle, #1e293b) !important;
             color: var(--text-primary, #ffffff) !important;
+            font-size: 0.70rem !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            height: 24px !important;
+            line-height: 24px !important;
         }
 
         .text-xs {
             font-size: 0.75rem !important;
         }
 
-        table tbody tr:hover {
+        table.table.table-ingresos tbody tr:hover {
             background-color: var(--sidebar-item-hover, rgba(77, 124, 254, 0.12)) !important;
         }
 
         /* Celdas editables */
-        td[contenteditable="true"] {
+        table.table.table-ingresos td[contenteditable="true"] {
             outline: none;
-            min-height: 20px;
+            min-height: 20px !important;
+            height: 20px !important;
+            line-height: 20px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
             padding: 0 5px !important;
-            border: 1px solid var(--border-color, #e2e8f0);
-            transition: background 0.2s;
+            border: 1px solid var(--border-color, #e2e8f0) !important;
+            transition: background 0.15s;
             cursor: cell;
-            background-color: var(--bg-surface, #ffffff);
-            color: var(--text-primary, #1e293b);
+            background-color: var(--bg-surface, #ffffff) !important;
+            color: var(--text-primary, #1e293b) !important;
+            font-size: 0.78rem !important;
+            font-weight: 500 !important;
         }
 
-        td[contenteditable="true"].edit-mode,
-        td[contenteditable="true"]:focus:not(.nav-mode) {
+        table.table.table-ingresos td[contenteditable="true"].edit-mode,
+        table.table.table-ingresos td[contenteditable="true"]:focus:not(.nav-mode) {
             cursor: text !important;
         }
 
-        td[contenteditable="true"]:focus {
+        table.table.table-ingresos td[contenteditable="true"]:focus {
             background-color: var(--bg-surface, #ffffff) !important;
             color: var(--text-primary, #1e293b) !important;
             box-shadow: inset 0 0 0 2px var(--color-primary, #4d7cfe);
@@ -711,26 +862,32 @@
             position: relative;
         }
 
-        td {
+        table.table.table-ingresos td {
             cursor: cell;
             outline: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-align: left !important;
-            padding: 0 8px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding: 0 5px !important;
             vertical-align: middle !important;
-            height: 20px;
-            line-height: 20px;
+            height: 20px !important;
+            min-height: 20px !important;
+            line-height: 20px !important;
+            font-size: 0.78rem !important;
+            font-weight: 500 !important;
         }
 
-        td.edit-mode {
+        table.table.table-ingresos td.edit-mode {
             cursor: text;
         }
 
-        td.nav-mode,
-        td:focus,
-        td[contenteditable="true"]:focus {
+        table.table.table-ingresos td.nav-mode,
+        table.table.table-ingresos td:focus,
+        table.table.table-ingresos td[contenteditable="true"]:focus {
             overflow: visible !important;
             white-space: normal !important;
             background-color: var(--bg-surface, #ffffff) !important;
@@ -741,6 +898,8 @@
             outline-offset: -1px;
             box-shadow: 0 1px 4px rgba(77, 124, 254, 0.25) !important;
             min-width: max-content;
+            font-size: 0.78rem !important;
+            font-weight: 500 !important;
         }
 
         .nav-mode {
@@ -752,15 +911,63 @@
             color: white;
         }
 
+        table.table.table-ingresos thead th,
         .thead-dark-custom th {
             border: 1px solid var(--border-color, #334155) !important;
-            padding: 0 5px !important;
-            height: 24px;
+            padding: 0 4px !important;
+            height: 26px !important;
+            line-height: 26px !important;
             top: 0;
             position: sticky;
             background-color: var(--bg-subtle, #1e293b) !important;
             color: var(--text-primary, #ffffff) !important;
-            font-size: 0.7rem !important;
+            font-size: 0.70rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.02em;
+            vertical-align: middle !important;
+        }
+
+        /* Soporte Tema Oscuro y Claro según AGENTS.md */
+        [data-theme="dark"] table.table.table-ingresos {
+            border-color: var(--border-color, #334155) !important;
+            background-color: var(--bg-surface, #111c44) !important;
+            color: var(--text-primary, #f1f5f9) !important;
+        }
+
+        [data-theme="dark"] table.table.table-ingresos th,
+        [data-theme="dark"] table.table.table-ingresos td,
+        [data-theme="dark"] table.table.table-ingresos tbody td,
+        [data-theme="dark"] table.table.table-ingresos td[contenteditable="true"] {
+            border-color: var(--border-color, #1e293b) !important;
+            background-color: var(--bg-surface, #111c44) !important;
+            color: var(--text-primary, #f1f5f9) !important;
+        }
+
+        [data-theme="dark"] table.table.table-ingresos .sticky-col {
+            background-color: var(--bg-subtle, #0b1437) !important;
+            color: var(--text-primary, #f1f5f9) !important;
+            border-color: var(--border-color, #334155) !important;
+        }
+
+        [data-theme="light"] table.table.table-ingresos {
+            border-color: var(--border-color, #cbd5e1) !important;
+            background-color: var(--bg-surface, #ffffff) !important;
+            color: var(--text-primary, #1e293b) !important;
+        }
+
+        [data-theme="light"] table.table.table-ingresos th,
+        [data-theme="light"] table.table.table-ingresos td,
+        [data-theme="light"] table.table.table-ingresos tbody td,
+        [data-theme="light"] table.table.table-ingresos td[contenteditable="true"] {
+            border-color: var(--border-color, #e2e8f0) !important;
+            background-color: var(--bg-surface, #ffffff) !important;
+            color: var(--text-primary, #1e293b) !important;
+        }
+
+        [data-theme="light"] table.table.table-ingresos .sticky-col {
+            background-color: var(--bg-subtle, #f8f9fa) !important;
+            color: var(--text-primary, #1e293b) !important;
+            border-color: var(--border-color, #cbd5e1) !important;
         }
 
         /* Card Container & Footer */
@@ -1342,155 +1549,12 @@
     <!-- Incluir modales de búsqueda -->
 
     <script>
-        // --- INYECCIÓN MANUAL DEL SIDEBAR DERECHO ---
-        document.addEventListener('DOMContentLoaded', function () {
-            var sidebarHtml = `
-            <div class="p-3">
-                <h5 class="mb-2">Configuración de Tabla</h5>
-                <hr class="mb-3">
-                <div class="mb-3">
-                    <label class="mb-1">Tamaño de Fuente</label>
-                    <select id="configFontSize" class="form-control form-control-sm">
-                        <option value="10px">Extra Pequeña (10px)</option>
-                        <option value="12px" selected>Pequeña (12px)</option>
-                        <option value="14px">Normal (14px)</option>
-                        <option value="16px">Grande (16px)</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="mb-1">Altura de Filas (Padding V)</label>
-                    <input type="range" class="custom-range" id="configRowHeight" min="0" max="16" step="1" value="0">
-                    <small class="text-muted d-block text-right"><span id="lblRowHeight">0</span>px</small>
-                </div>
-                <div class="mb-3">
-                    <label class="mb-1">Espacio Lateral (Padding H)</label>
-                    <input type="range" class="custom-range" id="configCellPadding" min="0" max="30" step="1" value="5">
-                    <small class="text-muted d-block text-right"><span id="lblCellPadding">5</span>px</small>
-                </div>
-                <hr>
-                <button class="btn btn-sm btn-outline-secondary btn-block" onclick="resetConfigTabla()">
-                    Restaurar Valores
-                </button>
-            </div>`;
-
-            // Intentar inyectar en el contenido
-            var $target = $('.control-sidebar-content');
-            if ($target.length === 0) $target = $('.control-sidebar');
-
-            if ($target.length > 0) {
-                // Limpiar cualquier contenido previo (como temas de AdminLTE) si queremos exclusividad
-                // O mejor, inyectarlo.
-                $target.html(sidebarHtml);
-
-                // --- FIX VISUAL: Forzar altura completa ---
-                $target.css({
-                    'height': '100vh',
-                    'min-height': '100%',
-                    'overflow-y': 'auto',
-                    'padding-bottom': '50px' // Espacio extra abajo
-                });
-                // Asegurar que el padre también llegue hasta abajo
-                $('.control-sidebar').css({
-                    'bottom': '0',
-                    'top': '57px', // Altura del navbar aprox
-                    'height': 'calc(100vh - 57px)',
-                    'position': 'fixed'
-                });
-
-                // Reintentar por si AdminLTE sobreescribe al cargar
-                setTimeout(function () {
-                    if ($target.html().trim() === '' || $target.html().indexOf('Configuración de Tabla') === -1) {
-                        $target.html(sidebarHtml);
-                        initTableConfig(); // Re-bind events
-                    }
-                    // Re-aplicar estilos
-                    $target.css('height', '100vh');
-                    $('.control-sidebar').css('height', 'calc(100vh - 57px)');
-                }, 800);
-            }
-
-            // Inicializar controles después de inyectar
-            setTimeout(initTableConfig, 100);
-        });
-
-        function initTableConfig() {
-            var confFontSize = document.getElementById('configFontSize');
-            // Si no existe aún, salir
-            if (!confFontSize) return;
-
-            var confRowHeight = document.getElementById('configRowHeight');
-            var confCellPadding = document.getElementById('configCellPadding');
-            var lblRowHeight = document.getElementById('lblRowHeight');
-            var lblCellPadding = document.getElementById('lblCellPadding');
-
-            var styleTag = document.getElementById('dynamic-table-styles');
-            if (!styleTag) {
-                styleTag = document.createElement('style');
-                styleTag.id = 'dynamic-table-styles';
-                document.head.appendChild(styleTag);
-            }
-
-            function updateTableStyles() {
-                var fs = confFontSize.value;
-                var pv = confRowHeight.value + 'px';
-                var ph = confCellPadding.value + 'px';
-
-                if (lblRowHeight) lblRowHeight.textContent = confRowHeight.value;
-                if (lblCellPadding) lblCellPadding.textContent = confCellPadding.value;
-
-                var css = `
-                    /* 1. Fuente afecta solo al contenido (td) y controles, NO a encabezados (th) */
-                    .table td, .table td input, .table td select, .text-xs, .form-control-sm { font-size: ${fs} !important; }
-                    
-                    /* 2. Padding y altura */
-                    .table th, .table td { padding-top: ${pv} !important; padding-bottom: ${pv} !important; padding-left: ${ph} !important; padding-right: ${ph} !important; }
-                    .table input.form-control-sm { height: auto !important; padding: ${pv} ${ph} !important; }
-
-                    /* 3. Permitir que la tabla se ensanche dinámicamente */
-                    .table { table-layout: auto !important; }
-                    .table th, .table td { 
-                        white-space: nowrap; 
-                        max-width: none !important; 
-                        width: auto !important; 
-                        min-width: 40px; /* Un mínimo base */
-                    }
-                `;
-                styleTag.innerHTML = css;
-
-                var config = { fontSize: fs, rowHeight: confRowHeight.value, cellPadding: confCellPadding.value };
-                localStorage.setItem('tablaConfig', JSON.stringify(config));
-            }
-
-            var saved = localStorage.getItem('tablaConfig');
-            if (saved) {
-                try {
-                    var c = JSON.parse(saved);
-                    if (c.fontSize && confFontSize) confFontSize.value = c.fontSize;
-                    if (c.rowHeight && confRowHeight) confRowHeight.value = c.rowHeight;
-                    if (c.cellPadding && confCellPadding) confCellPadding.value = c.cellPadding;
-                } catch (e) { }
-            }
-
-            if (confFontSize) {
-                // Remover listeners anteriores para evitar duplicados
-                confFontSize.removeEventListener('change', updateTableStyles);
-                confRowHeight.removeEventListener('input', updateTableStyles);
-                confCellPadding.removeEventListener('input', updateTableStyles);
-
-                confFontSize.addEventListener('change', updateTableStyles);
-                confRowHeight.addEventListener('input', updateTableStyles);
-                confCellPadding.addEventListener('input', updateTableStyles);
-                updateTableStyles();
-            }
-
-            window.resetConfigTabla = function () {
-                confFontSize.value = '12px';
-                confRowHeight.value = '0';
-                confCellPadding.value = '5';
-                updateTableStyles();
-            };
-
-        }
+        // Limpiar configuración heredada de tabla en localStorage si existía
+        try {
+            localStorage.removeItem('tablaConfig');
+            var oldDynamicStyles = document.getElementById('dynamic-table-styles');
+            if (oldDynamicStyles) oldDynamicStyles.remove();
+        } catch(e) {}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
@@ -3160,23 +3224,42 @@
 
                     // Navegación: un click o focus selecciona la celda (Modo Navegación)
                     element.bind('focus', function () {
-                        // Actualizar fila visualmente resaltada
-                        // Usamos safeApply o chequeamos phase, pero en evento DOM puro, $apply es necesario
-                        if (!scope.$$phase) {
-                            scope.$apply(function () {
-                                if (scope.setFilaSeleccionada) scope.setFilaSeleccionada(attrs.row);
-                                else if (scope.$parent && scope.$parent.setFilaSeleccionada) scope.$parent.setFilaSeleccionada(attrs.row);
-                            });
+                        // Resaltar visualmente la fila en el DOM de forma instantánea sin bloquear con $apply
+                        var tr = element[0].closest('tr');
+                        if (tr && tr.parentElement) {
+                            var prevActive = tr.parentElement.querySelector('.sticky-col.active-row');
+                            if (prevActive) prevActive.classList.remove('active-row');
+                            var currentSticky = tr.querySelector('.sticky-col');
+                            if (currentSticky) currentSticky.classList.add('active-row');
                         }
 
+                        // Sincronizar scope.filaSeleccionada de forma debounced para no saturar el digest loop de Angular
+                        if (window._syncFilaTimeout) clearTimeout(window._syncFilaTimeout);
+                        window._syncFilaTimeout = setTimeout(function () {
+                            if (scope.setFilaSeleccionada) {
+                                scope.setFilaSeleccionada(attrs.row);
+                            } else if (scope.$parent && scope.$parent.setFilaSeleccionada) {
+                                scope.$parent.setFilaSeleccionada(attrs.row);
+                            }
+                        }, 120);
+
                         element.addClass('nav-mode').removeClass('edit-mode');
-                        setTimeout(function () {
-                            var sel = window.getSelection();
-                            var range = document.createRange();
-                            range.selectNodeContents(element[0]);
-                            sel.removeAllRanges();
-                            sel.addRange(range);
-                        }, 0);
+
+                        // Solo seleccionar texto si no estamos desplazándonos a alta velocidad con flechas
+                        if (!window._isArrowNavigating) {
+                            if (window._selTimer) clearTimeout(window._selTimer);
+                            window._selTimer = setTimeout(function () {
+                                if (document.activeElement === element[0]) {
+                                    try {
+                                        var sel = window.getSelection();
+                                        var range = document.createRange();
+                                        range.selectNodeContents(element[0]);
+                                        sel.removeAllRanges();
+                                        sel.addRange(range);
+                                    } catch (err) {}
+                                }
+                            }, 10);
+                        }
                     });
 
                     // Doble click entra en Modo Edición (como Excel)
@@ -3237,31 +3320,112 @@
                         }
                     });
 
-                    // Validación en tiempo real (bloquear teclas)
+                    // Manejador único unificado de teclado: Navegación + Control + Validación
                     element.bind('keydown', function (e) {
-                        // Permitir teclas de control: Backspace(8), Tab(9), Enter(13), Esc(27), Flechas(37-40), Delete(46)
-                        // También permitir Ctrl+C, Ctrl+V, Ctrl+A (detectado genéricamente por e.ctrlKey)
                         var k = e.which || e.keyCode;
-                        if ([8, 9, 13, 27, 37, 38, 39, 40, 46].indexOf(k) !== -1 || e.ctrlKey || e.metaKey || e.altKey) {
-                            return; // Dejar pasar controles y navegación
+                        var $this = $(this);
+                        var isNav = $this.hasClass('nav-mode');
+
+                        // --- 1. NAVEGACIÓN CON FLECHAS DIRECCIONALES ---
+                        if (k >= 37 && k <= 40) {
+                            // Protección contra saturación por repetición continua (throttle a ~40ms)
+                            var now = Date.now();
+                            if (window._lastNavTime && (now - window._lastNavTime < 40)) {
+                                e.preventDefault();
+                                return;
+                            }
+                            window._lastNavTime = now;
+                            window._isArrowNavigating = true;
+                            if (window._navIdleTimer) clearTimeout(window._navIdleTimer);
+                            window._navIdleTimer = setTimeout(function () {
+                                window._isArrowNavigating = false;
+                            }, 100);
+
+                            var colIdx = $this.index();
+                            var $target = null;
+
+                            if (k === 37) { // Flecha Izquierda
+                                if (isNav || (window.getSelection && window.getSelection().anchorOffset === 0) || e.ctrlKey) {
+                                    e.preventDefault();
+                                    $target = $this.prevAll('td[editable-td]').first();
+                                    if (!$target.length) {
+                                        var prevRow = $this.closest('tr').prev('tr');
+                                        if (prevRow.length) $target = prevRow.find('td[editable-td]').last();
+                                    }
+                                }
+                            } else if (k === 38) { // Flecha Arriba
+                                e.preventDefault();
+                                var prevRow = $this.closest('tr').prev('tr');
+                                if (prevRow.length) {
+                                    $target = prevRow.children('td').eq(colIdx);
+                                    if (!$target.length || $target.attr('editable-td') === undefined) {
+                                        $target = prevRow.find('td[editable-td]').first();
+                                    }
+                                }
+                            } else if (k === 39) { // Flecha Derecha
+                                var textLen = $this.text().trim().length;
+                                var selOffset = (window.getSelection && window.getSelection().anchorOffset !== undefined) ? window.getSelection().anchorOffset : 0;
+                                if (isNav || selOffset >= textLen || e.ctrlKey) {
+                                    e.preventDefault();
+                                    $target = $this.nextAll('td[editable-td]').first();
+                                    if (!$target.length) {
+                                        var nextRow = $this.closest('tr').next('tr');
+                                        if (nextRow.length) $target = nextRow.find('td[editable-td]').first();
+                                    }
+                                }
+                            } else if (k === 40) { // Flecha Abajo
+                                e.preventDefault();
+                                var nextRow = $this.closest('tr').next('tr');
+                                if (nextRow.length) {
+                                    $target = nextRow.children('td').eq(colIdx);
+                                    if (!$target.length || $target.attr('editable-td') === undefined) {
+                                        $target = nextRow.find('td[editable-td]').first();
+                                    }
+                                }
+                            }
+
+                            if ($target && $target.length) {
+                                $target[0].focus();
+                            }
+                            return;
                         }
 
-                        var char = e.key.toUpperCase();
+                        // --- 2. TECLA ENTER ---
+                        if (k === 13) {
+                            e.preventDefault();
+                            if (isNav) {
+                                $this.dblclick(); // Entrar a editar
+                            } else {
+                                $this.blur();
+                                var nextRow = $this.closest('tr').next('tr');
+                                if (nextRow.length) {
+                                    var cell = nextRow.children('td').eq($this.index());
+                                    if (cell.length) cell[0].focus();
+                                }
+                            }
+                            return;
+                        }
 
-                        // Validar según el campo
+                        // --- 3. TECLAS DE CONTROL Y ATAJOS ---
+                        // Backspace(8), Tab(9), Esc(27), Delete(46), atajos con Ctrl/Meta/Alt
+                        if ([8, 9, 27, 46].indexOf(k) !== -1 || e.ctrlKey || e.metaKey || e.altKey) {
+                            return;
+                        }
+
+                        // --- 4. VALIDACIÓN EN TIEMPO REAL SEGÚN EL CAMPO ---
+                        var char = e.key ? e.key.toUpperCase() : '';
                         var isValid = true;
 
                         if (attrs.field === 'sexo') {
                             if (char !== 'H' && char !== 'M') isValid = false;
                         }
                         else if (attrs.field === 'se') {
-                            // Solo números (0-9)
                             if (!/^[0-9]$/.test(e.key)) isValid = false;
                         }
                         else if (attrs.field === 'tipo') {
                             if (char !== 'A' && char !== 'M' && char !== 'D') isValid = false;
                         }
-                        else if (attrs.field.indexOf('cond') === 0) {
+                        else if (attrs.field && attrs.field.indexOf('cond') === 0) {
                             if (char !== 'N' && char !== 'S') isValid = false;
                         }
                         else if (attrs.field === 'edad') {
@@ -3270,48 +3434,6 @@
 
                         if (!isValid) {
                             e.preventDefault();
-                        }
-                    });
-
-                    // Navegación con flechas y Enter (Existente, pero aseguramos que coexista)
-                    element.bind('keydown', function (e) {
-                        var $this = $(this);
-                        var code = e.which;
-                        var isNav = $this.hasClass('nav-mode');
-
-                        // Enter: En Nav mode entra a editar. En Edit mode guarda y baja.
-                        // Enter: En Nav mode entra a editar. En Edit mode guarda y baja.
-                        if (code === 13) {
-                            e.preventDefault();
-                            if (isNav) {
-                                $this.dblclick(); // Entrar a editar
-                            } else {
-                                $this.blur();
-                                var nextRow = $this.closest('tr').next();
-                                if (nextRow.length) setTimeout(function () { nextRow.find('td').eq($this.index()).focus(); }, 20);
-                            }
-                        }
-                        // Flechas
-                        else if (code === 37) { // Izquierda
-                            if (isNav || window.getSelection().anchorOffset === 0 || e.ctrlKey) {
-                                var prev = $this.prev('td[editable-td]');
-                                if (prev.length) { e.preventDefault(); prev.focus(); }
-                            }
-                        } else if (code === 38) { // Arriba
-                            e.preventDefault();
-                            var prevRow = $this.closest('tr').prev();
-                            if (prevRow.length) prevRow.find('td').eq($this.index()).focus();
-                        }
-                        else if (code === 39) { // Derecha
-                            if (isNav || window.getSelection().anchorOffset === $this.text().trim().length || e.ctrlKey) {
-                                var next = $this.next('td[editable-td]');
-                                if (next.length) { e.preventDefault(); next.focus(); }
-                            }
-                        }
-                        else if (code === 40) { // Abajo
-                            e.preventDefault();
-                            var nextRow = $this.closest('tr').next();
-                            if (nextRow.length) nextRow.find('td').eq($this.index()).focus();
                         }
                     });
                 }

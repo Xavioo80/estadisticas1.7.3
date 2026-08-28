@@ -1,0 +1,904 @@
+/* ==========================================================================
+   WINDOWS STICKY NOTES DASHBOARD (NOTAS RÁPIDAS) - SING THEME
+   Adaptado para Modo Oscuro (data-theme="dark") y Modo Claro (data-theme="light")
+   ========================================================================== */
+
+.sticky-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 80px);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+/* ── Top Bar Windows Hub ─────────────────────────────────────────────────── */
+.sticky-hub-header {
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sticky-hub-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sticky-hub-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  box-shadow: 0 4px 10px rgba(234, 179, 8, 0.35);
+  flex-shrink: 0;
+}
+
+.sticky-hub-text h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary, #f8fafc);
+}
+
+.sticky-hub-text p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* Controles de Búsqueda y Filtros */
+.sticky-hub-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sticky-search-box {
+  position: relative;
+  min-width: 240px;
+}
+
+.sticky-search-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.sticky-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #334155);
+  background: var(--input-bg, #0f172a);
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+}
+
+.sticky-search-input:focus {
+  outline: none;
+  border-color: #eab308;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2);
+}
+
+/* Botón Nuevo Nota Estilo Windows */
+.btn-new-sticky {
+  background: linear-gradient(135deg, #eab308 0%, #d97706 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 8px;
+  height: 38px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 8px rgba(234, 179, 8, 0.35);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-new-sticky:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(234, 179, 8, 0.45);
+}
+
+.btn-new-sticky:active {
+  transform: translateY(0);
+}
+
+/* Pestañas de modo (Sticky Notes vs Gestor de Tareas) */
+.sticky-view-tabs {
+  display: inline-flex;
+  background: var(--input-bg, #0f172a);
+  border: 1px solid var(--border-color, #334155);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.sticky-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sticky-tab-btn.active {
+  background: var(--bg-surface, #1e293b);
+  color: var(--text-primary, #f8fafc);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Barra de Filtros Rápida (Colores y Etiquetas) ───────────────────────── */
+.sticky-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.25rem;
+}
+
+.sticky-color-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-filter-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.color-filter-dot:hover {
+  transform: scale(1.15);
+}
+
+.color-filter-dot.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--border-color, #334155), 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.sticky-tags-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sticky-tag-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg-surface, #1e293b);
+  color: var(--text-secondary, #cbd5e1);
+  border: 1px solid var(--border-color, #334155);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.sticky-tag-pill:hover,
+.sticky-tag-pill.active {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border-color: #eab308;
+}
+
+/* ── Tablero de Notas Grid (Responsive Masonry) ──────────────────────────── */
+.sticky-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ==========================================================================
+   TARJETA STICKY NOTE ESTILO WINDOWS
+   ========================================================================== */
+.sticky-note-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--sticky-border);
+  background: var(--sticky-bg);
+  color: var(--sticky-text);
+  min-height: 240px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.sticky-note-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18), 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.sticky-note-card.is-pinned {
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.2), 0 0 0 2px #eab308;
+}
+
+/* ── 1. Top Header Bar (Windows Titlebar) ─────────────────────────────────── */
+.sticky-header {
+  height: 38px;
+  background: var(--sticky-header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: #ffffff;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.sticky-btn-add {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sticky-btn-add:hover {
+  background: rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+}
+
+.sticky-title-container {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+}
+
+.sticky-header input.sticky-title-input,
+[data-theme="dark"] .sticky-header input.sticky-title-input,
+[data-theme="light"] .sticky-header input.sticky-title-input,
+.sticky-title-input {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  text-overflow: ellipsis !important;
+  outline: none !important;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.sticky-header input.sticky-title-input::placeholder,
+.sticky-title-input::placeholder {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.sticky-header input.sticky-title-input:focus,
+[data-theme="dark"] .sticky-header input.sticky-title-input:focus,
+[data-theme="light"] .sticky-header input.sticky-title-input:focus,
+.sticky-title-input:focus {
+  outline: none !important;
+  border: none !important;
+  background: rgba(0, 0, 0, 0.18) !important;
+  box-shadow: none !important;
+}
+
+.sticky-pin-icon {
+  font-size: 0.85rem;
+  color: #fef08a;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.sticky-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sticky-btn-menu,
+.sticky-btn-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sticky-btn-menu:hover {
+  background: rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+}
+
+.sticky-btn-close:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.sticky-btn-pin {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sticky-btn-pin:hover {
+  background: rgba(0, 0, 0, 0.18);
+  color: #fef08a;
+  transform: scale(1.1);
+}
+
+.sticky-btn-pin.is-pinned {
+  color: #fef08a;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* ── 2. Sticky Body ──────────────────────────────────────────────────────── */
+.sticky-body {
+  padding: 14px 16px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 380px;
+}
+
+.sticky-editable-content {
+  flex: 1 1 auto;
+  min-height: 120px;
+  outline: none;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--sticky-text);
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.sticky-editable-content:empty:before {
+  content: attr(placeholder);
+  color: var(--sticky-placeholder);
+  cursor: text;
+}
+
+/* Checklist Items */
+.sticky-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sticky-checklist-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.sticky-check-input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: var(--sticky-header-bg);
+}
+
+.sticky-check-text {
+  flex: 1 1 0%;
+  color: var(--sticky-text);
+  word-break: break-word;
+  transition: all 0.15s ease;
+}
+
+.sticky-check-text.is-done {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.sticky-check-del {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.85rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  padding: 0 4px;
+}
+
+.sticky-checklist-row:hover .sticky-check-del {
+  opacity: 1;
+}
+
+.sticky-add-item-row {
+  margin-top: 4px;
+}
+
+.sticky-add-item-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--sticky-border);
+  padding: 4px 0;
+  font-size: 0.82rem;
+  color: var(--sticky-text);
+  outline: none;
+}
+
+.sticky-add-item-input::placeholder {
+  color: var(--sticky-placeholder);
+}
+
+/* Captura Adjunta */
+.sticky-image-attachment {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+  border: 1px solid var(--sticky-border);
+}
+
+.sticky-image-attachment img {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+}
+
+.sticky-del-img {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  border: none;
+  color: #ffffff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* ── 3. Bottom Formatting Toolbar (Windows Style) ─────────────────────────── */
+.sticky-toolbar {
+  height: 38px;
+  border-top: 1px solid var(--sticky-toolbar-border);
+  background: var(--sticky-toolbar-bg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.sticky-format-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.format-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: var(--sticky-toolbar-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.format-btn:hover {
+  background: rgba(128, 128, 128, 0.18);
+  color: var(--sticky-text);
+}
+
+.format-btn:active {
+  transform: scale(0.92);
+}
+
+.sticky-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--sticky-meta-text);
+}
+
+.save-status {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.sticky-time {
+  font-family: monospace;
+}
+
+/* ── 4. Dog-ear Folded Corner (Iconic Sticky Effect) ─────────────────────── */
+.sticky-dogear {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 12px 12px;
+  border-color: transparent transparent var(--sticky-dogear-bg) transparent;
+  pointer-events: none;
+}
+
+/* ── Menú de Paleta Circular (Windows 3-dots popup) ───────────────────────── */
+.sticky-color-menu {
+  background: var(--bg-surface, #1e293b) !important;
+  border: 1px solid var(--border-color, #334155) !important;
+  border-radius: 10px !important;
+  padding: 10px !important;
+  min-width: 190px !important;
+  z-index: 1050;
+}
+
+.sticky-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding-bottom: 8px;
+}
+
+.color-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: inline-block;
+}
+
+.color-circle:hover {
+  transform: scale(1.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.color-circle.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px #eab308;
+}
+
+/* Paleta de Colores Windows Sticky Notes */
+.bg-sticky-yellow   { background: #eab308; }
+.bg-sticky-green    { background: #22c55e; }
+.bg-sticky-pink     { background: #ec4899; }
+.bg-sticky-purple   { background: #a855f7; }
+.bg-sticky-blue     { background: #3b82f6; }
+.bg-sticky-charcoal { background: #64748b; }
+
+/* ==========================================================================
+   VARIABLES DE COLOR POR TEMA (DARK MODE & LIGHT MODE)
+   ========================================================================== */
+
+/* ── MODO OSCURO (Default data-theme="dark") ────────────────────────────── */
+[data-theme="dark"] .sticky-yellow,
+.sticky-yellow {
+  --sticky-header-bg: #ca8a04;
+  --sticky-bg: #232018;
+  --sticky-border: #423616;
+  --sticky-text: #fef08a;
+  --sticky-placeholder: #a18a4d;
+  --sticky-toolbar-bg: #1d1b14;
+  --sticky-toolbar-border: #382d12;
+  --sticky-toolbar-btn: #d4b868;
+  --sticky-meta-text: #85703a;
+  --sticky-dogear-bg: #382d12;
+}
+
+[data-theme="dark"] .sticky-green,
+.sticky-green {
+  --sticky-header-bg: #16a34a;
+  --sticky-bg: #16241b;
+  --sticky-border: #1b4528;
+  --sticky-text: #bbf7d0;
+  --sticky-placeholder: #528b67;
+  --sticky-toolbar-bg: #121c16;
+  --sticky-toolbar-border: #183b23;
+  --sticky-toolbar-btn: #75b58d;
+  --sticky-meta-text: #416e52;
+  --sticky-dogear-bg: #183b23;
+}
+
+[data-theme="dark"] .sticky-pink,
+.sticky-pink {
+  --sticky-header-bg: #db2777;
+  --sticky-bg: #261621;
+  --sticky-border: #4d1c3a;
+  --sticky-text: #fbcfe8;
+  --sticky-placeholder: #9b4f7a;
+  --sticky-toolbar-bg: #1e111a;
+  --sticky-toolbar-border: #3d142d;
+  --sticky-toolbar-btn: #c971a1;
+  --sticky-meta-text: #78395e;
+  --sticky-dogear-bg: #3d142d;
+}
+
+[data-theme="dark"] .sticky-purple,
+.sticky-purple {
+  --sticky-header-bg: #9333ea;
+  --sticky-bg: #22162b;
+  --sticky-border: #461c6b;
+  --sticky-text: #e9d5ff;
+  --sticky-placeholder: #8b55be;
+  --sticky-toolbar-bg: #1a1022;
+  --sticky-toolbar-border: #381457;
+  --sticky-toolbar-btn: #b984eb;
+  --sticky-meta-text: #6c3f96;
+  --sticky-dogear-bg: #381457;
+}
+
+[data-theme="dark"] .sticky-blue,
+.sticky-blue {
+  --sticky-header-bg: #2563eb;
+  --sticky-bg: #151e2f;
+  --sticky-border: #1c3963;
+  --sticky-text: #bfdbfe;
+  --sticky-placeholder: #5778ac;
+  --sticky-toolbar-bg: #111724;
+  --sticky-toolbar-border: #182d4d;
+  --sticky-toolbar-btn: #7ba6e6;
+  --sticky-meta-text: #46628c;
+  --sticky-dogear-bg: #182d4d;
+}
+
+[data-theme="dark"] .sticky-charcoal,
+.sticky-charcoal {
+  --sticky-header-bg: #475569;
+  --sticky-bg: #1e293b;
+  --sticky-border: #334155;
+  --sticky-text: #f1f5f9;
+  --sticky-placeholder: #64748b;
+  --sticky-toolbar-bg: #172030;
+  --sticky-toolbar-border: #283548;
+  --sticky-toolbar-btn: #94a3b8;
+  --sticky-meta-text: #64748b;
+  --sticky-dogear-bg: #283548;
+}
+
+/* ── MODO CLARO (data-theme="light") ─────────────────────────────────────── */
+[data-theme="light"] .sticky-yellow {
+  --sticky-header-bg: #eab308;
+  --sticky-bg: #fef9c3;
+  --sticky-border: #facc15;
+  --sticky-text: #422006;
+  --sticky-placeholder: #a16207;
+  --sticky-toolbar-bg: #fef08a;
+  --sticky-toolbar-border: #fde047;
+  --sticky-toolbar-btn: #713f12;
+  --sticky-meta-text: #854d0e;
+  --sticky-dogear-bg: #eab308;
+}
+
+[data-theme="light"] .sticky-green {
+  --sticky-header-bg: #22c55e;
+  --sticky-bg: #dcfce7;
+  --sticky-border: #86efac;
+  --sticky-text: #052e16;
+  --sticky-placeholder: #15803d;
+  --sticky-toolbar-bg: #bbf7d0;
+  --sticky-toolbar-border: #86efac;
+  --sticky-toolbar-btn: #14532d;
+  --sticky-meta-text: #166534;
+  --sticky-dogear-bg: #22c55e;
+}
+
+[data-theme="light"] .sticky-pink {
+  --sticky-header-bg: #ec4899;
+  --sticky-bg: #fce7f3;
+  --sticky-border: #f472b6;
+  --sticky-text: #500724;
+  --sticky-placeholder: #be185d;
+  --sticky-toolbar-bg: #fbcfe8;
+  --sticky-toolbar-border: #f472b6;
+  --sticky-toolbar-btn: #831843;
+  --sticky-meta-text: #9d174d;
+  --sticky-dogear-bg: #ec4899;
+}
+
+[data-theme="light"] .sticky-purple {
+  --sticky-header-bg: #a855f7;
+  --sticky-bg: #f3e8ff;
+  --sticky-border: #c084fc;
+  --sticky-text: #2e1065;
+  --sticky-placeholder: #7e22ce;
+  --sticky-toolbar-bg: #e9d5ff;
+  --sticky-toolbar-border: #c084fc;
+  --sticky-toolbar-btn: #581c87;
+  --sticky-meta-text: #6b21a8;
+  --sticky-dogear-bg: #a855f7;
+}
+
+[data-theme="light"] .sticky-blue {
+  --sticky-header-bg: #3b82f6;
+  --sticky-bg: #dbeafe;
+  --sticky-border: #93c5fd;
+  --sticky-text: #172554;
+  --sticky-placeholder: #1d4ed8;
+  --sticky-toolbar-bg: #bfdbfe;
+  --sticky-toolbar-border: #93c5fd;
+  --sticky-toolbar-btn: #1e3a8a;
+  --sticky-meta-text: #1e40af;
+  --sticky-dogear-bg: #3b82f6;
+}
+
+[data-theme="light"] .sticky-charcoal {
+  --sticky-header-bg: #64748b;
+  --sticky-bg: #f1f5f9;
+  --sticky-border: #cbd5e1;
+  --sticky-text: #0f172a;
+  --sticky-placeholder: #475569;
+  --sticky-toolbar-bg: #e2e8f0;
+  --sticky-toolbar-border: #cbd5e1;
+  --sticky-toolbar-btn: #334155;
+  --sticky-meta-text: #475569;
+  --sticky-dogear-bg: #64748b;
+}
+
+/* ── Estado Vacío (Empty State) ─────────────────────────────────────────── */
+.sticky-empty-state {
+  grid-column: 1 / -1;
+  padding: 4rem 1rem;
+  text-align: center;
+  background: var(--bg-surface, #1e293b);
+  border: 2px dashed var(--border-color, #334155);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.sticky-empty-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  background: rgba(234, 179, 8, 0.12);
+  color: #eab308;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+/* ── LISTA NUMERADA (sticky rosa) ────────────────────────────────────────── */
+.sticky-numbered-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sticky-numbered-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 3px 2px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+.sticky-numbered-row:hover { background: rgba(0,0,0,0.04); }
+
+.sticky-num-index {
+  font-weight: 800;
+  min-width: 18px;
+  text-align: right;
+  color: var(--sticky-meta-text);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sticky-num-text {
+  flex: 1 1 0%;
+  color: var(--sticky-text);
+  word-break: break-word;
+}
+
+/* ── BADGE DE TIPO (toolbar inferior) ───────────────────────────────────── */
+.sticky-tipo-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sticky-meta-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* ── NOTA ALERTA / PÚRPURA ───────────────────────────────────────────────── */
+.sticky-note-card.is-alerta {
+  box-shadow: 0 0 0 2px #a855f7, var(--shadow-md);
+  animation: alerta-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes alerta-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px #a855f7, var(--shadow-md); }
+  50%       { box-shadow: 0 0 0 5px rgba(168,85,247,0.35), var(--shadow-md); }
+}
+
+/* Leyenda de color-tipo en la paleta */
+.sticky-color-menu .sticky-palette-grid .color-circle[title]::after {
+  display: none; /* desactivar tooltips en favor de title nativo */
+}
