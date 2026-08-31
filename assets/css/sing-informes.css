@@ -1586,16 +1586,17 @@ body:has(.atenciones-page-wrapper) .app-footer {
 #atencionesTable {
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  font-size: 0.8rem !important;
+  font-size: 0.86rem !important;
 }
 
 #atencionesTable thead th {
   background: var(--bg-surface) !important;
   color: var(--text-muted) !important;
-  font-size: 0.72rem !important;
+  font-size: 0.74rem !important;
   font-weight: 700 !important;
   border-color: var(--border-color) !important;
-  padding: 3px 2px !important;
+  padding: 4px 2px !important;
+  text-align: center !important;
   vertical-align: middle !important;
   position: sticky !important;
   top: 0 !important;
@@ -1611,6 +1612,14 @@ body:has(.atenciones-page-wrapper) .app-footer {
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
 }
 
+#atencionesTable tbody td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-size: 0.86rem !important;
+  font-weight: 400 !important;
+  padding: 3px 2px !important;
+}
+
 #atencionesTable tbody td.sticky-col-first {
   left: 0 !important;
   position: sticky !important;
@@ -1618,6 +1627,7 @@ body:has(.atenciones-page-wrapper) .app-footer {
   background: var(--bg-surface) !important;
   border-right: 2px solid var(--border-color) !important;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08) !important;
+  text-align: left !important;
 }
 
 #atencionesTable tr.atenciones-total-row td.sticky-col-first {
@@ -1634,11 +1644,11 @@ body:has(.atenciones-page-wrapper) .app-footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .vertical-text-wrapper .day-num {
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 800;
   display: block;
 }
@@ -1655,6 +1665,8 @@ body:has(.atenciones-page-wrapper) .app-footer {
 .cell-weekend {
   background: rgba(16, 185, 129, 0.07) !important;
   color: #10b981 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .bg-weekend-header {
@@ -1688,7 +1700,10 @@ body:has(.atenciones-page-wrapper) .app-footer {
 .cell-week-subtotal {
   background: rgba(59, 130, 246, 0.06) !important;
   color: #93c5fd !important;
-  font-weight: 700 !important;
+  font-weight: 500 !important;
+  font-size: 0.86rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
   border-left: 2px solid var(--border-color) !important;
   border-right: 2px solid var(--border-color) !important;
 }
@@ -1702,8 +1717,10 @@ body:has(.atenciones-page-wrapper) .app-footer {
 .col-mes-total {
   background: rgba(77, 124, 254, 0.15) !important;
   color: #93c5fd !important;
-  font-weight: 800 !important;
-  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
   border-left: 2px solid var(--border-color) !important;
 }
 
@@ -1722,8 +1739,8 @@ body:has(.atenciones-page-wrapper) .app-footer {
 }
 
 .doctor-name-text {
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.82rem;
+  font-weight: 500;
   color: var(--text-primary);
   text-align: left;
   white-space: nowrap;
@@ -1763,7 +1780,9 @@ tfoot.atenciones-tfoot td {
   bottom: 0 !important;
   z-index: 25 !important;
   font-weight: 800 !important;
-  font-size: 0.82rem !important;
+  font-size: 0.86rem !important;
+  text-align: center !important;
+  vertical-align: middle !important;
   border-top: 2px solid var(--color-primary, #3b82f6) !important;
   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08) !important;
 }
@@ -1802,6 +1821,7 @@ tfoot.atenciones-tfoot td.sticky-col-first {
   z-index: 45 !important;
   border-right: 2px solid var(--border-color) !important;
   box-shadow: 2px -2px 6px rgba(0, 0, 0, 0.1) !important;
+  text-align: right !important;
 }
 
 [data-theme="dark"] .atenciones-total-row td.sticky-col-first,
@@ -1822,17 +1842,24 @@ tfoot.atenciones-tfoot .col-mes-total {
   background: var(--color-primary, #3b82f6) !important;
   color: #ffffff !important;
   z-index: 26 !important;
+  font-weight: 800 !important;
+  font-size: 0.92rem !important;
 }
 
 /* Celdas con datos vs vacías */
 .cell-atencion-val {
-  font-weight: 700;
+  font-weight: 500;
+  font-size: 0.88rem;
   color: var(--text-primary);
+  display: inline-block;
 }
 
 .cell-atencion-empty {
   color: var(--text-muted);
-  opacity: 0.4;
+  opacity: 0.45;
+  font-size: 0.90rem;
+  font-weight: 400;
+  display: inline-block;
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -149,6 +149,21 @@
                                                             $width = '65px';
                                                             $align = 'text-center';
                                                             break;
+                                                        case 'identidad':
+                                                            $width = '130px';
+                                                            $title = 'DNI';
+                                                            $align = 'text-center';
+                                                            break;
+                                                        case 'nombre_paciente':
+                                                            $width = '220px';
+                                                            $title = 'NOMBRE PACIENTE';
+                                                            $align = 'text-left';
+                                                            break;
+                                                        case 'fecha_nacimiento':
+                                                            $width = '100px';
+                                                            $title = 'F. NACIMIENTO';
+                                                            $align = 'text-center';
+                                                            break;
                                                         case 'sexo':
                                                             $width = '42px';
                                                             $align = 'text-center';
@@ -249,6 +264,8 @@
                                                         case 'fecha':
                                                         case 'se':
                                                         case 'exp':
+                                                        case 'identidad':
+                                                        case 'fecha_nacimiento':
                                                         case 'sexo':
                                                         case 'edad':
                                                         case 'tipo':
@@ -287,6 +304,10 @@
                                 <button type="button" class="btn btn-sm btn-warning px-3 text-dark font-weight-bold" data-toggle="modal"
                                     data-target="#modalIngresoMasivo">
                                     <i class="fas fa-layer-group mr-1"></i> Ingresar Datos
+                                </button>
+                                <button type="button" class="btn btn-sm btn-info px-3 text-white font-weight-bold" data-toggle="modal"
+                                    data-target="#modalImportarExcel" title="Importar registros clínicos desde archivo Excel">
+                                    <i class="fas fa-file-excel mr-1"></i> Importar Excel
                                 </button>
                                 <button type="button" class="btn btn-sm btn-danger px-3" ng-click="limpiarTabla()">
                                     <i class="fas fa-trash-alt mr-1"></i> Limpiar Tabla
@@ -353,7 +374,6 @@
                             </div>
                             <div class="modal-body p-2">
                                 <!-- Fila 1: Datos Generales -->
-                                <!-- Fila 1: Datos Generales -->
                                 <div class="row no-gutters mb-1">
                                     <div class="col-md-1 px-1">
                                         <label class="text-primary font-weight-bold text-xs mb-0">Cant.</label>
@@ -398,6 +418,25 @@
                                         <input type="text"
                                             class="form-control form-control-sm text-uppercase text-center"
                                             ng-model="modalData.cond" placeholder="C">
+                                    </div>
+                                </div>
+
+                                <!-- Fila Paciente: DNI, Nombre, F. Nacimiento -->
+                                <div class="row no-gutters mb-1">
+                                    <div class="px-1" style="flex: 0 0 150px; max-width: 150px;">
+                                        <label class="text-info font-weight-bold text-xs mb-0"><i class="fas fa-id-card mr-1"></i>DNI / Identidad</label>
+                                        <input type="text" class="form-control form-control-sm text-center"
+                                            ng-model="modalData.identidad" placeholder="0000-0000-00000" ng-blur="consultarIdentidadModal()">
+                                    </div>
+                                    <div class="col px-1">
+                                        <label class="text-info font-weight-bold text-xs mb-0"><i class="fas fa-user mr-1"></i>Nombre del Paciente</label>
+                                        <input type="text" class="form-control form-control-sm text-uppercase"
+                                            ng-model="modalData.nombre_paciente" placeholder="NOMBRE COMPLETO DEL PACIENTE">
+                                    </div>
+                                    <div class="px-1" style="flex: 0 0 120px; max-width: 120px;">
+                                        <label class="text-info font-weight-bold text-xs mb-0"><i class="fas fa-birthday-cake mr-1"></i>F. Nacimiento</label>
+                                        <input type="text" class="form-control form-control-sm text-center"
+                                            ng-model="modalData.fecha_nacimiento" placeholder="dd/mm/aaaa" ng-blur="calcularEdadDesdeNacimientoModal()">
                                     </div>
                                 </div>
 
@@ -499,6 +538,9 @@
                 </div>
                 <!-- Incluir modales de búsqueda (DENTRO del scope de Angular) -->
                 @include('partials.modales-buscadores')
+
+                <!-- Modal Importar Excel e Histórico Clínico -->
+                @include('ingresos.modal-importar-excel')
 
                 <!-- Modal para adolescentes (AngularJS) -->
                 <div class="modal fade shadow-lg" id="modalAdolescentes" data-backdrop="static" tabindex="-1"
@@ -1612,6 +1654,7 @@
             var defaultModalData = {
                 cantidad: 1,
                 fecha: '', cm: '', medico: '',
+                identidad: '', nombre_paciente: '', fecha_nacimiento: '',
                 sexo: '', edad: '', tipo: '', cond: '',
                 cod_col: '', colonia: '',
                 referido_a: '', referido_de: '', pg_emb: ''
@@ -1895,6 +1938,36 @@
                 $scope.lista = []; // Iniciar completamente vacía
             }
 
+            // Inyectar registros importados de Excel a la tabla principal
+            $scope.cargarRegistrosImportados = function(filas) {
+                if (!filas || !filas.length) return;
+                
+                if (!$scope.lista || $scope.lista.length === 0) {
+                    $scope.lista = angular.copy(filas);
+                } else {
+                    filas.forEach(function(f) {
+                        $scope.lista.push(angular.copy(f));
+                    });
+                }
+
+                // Recalcular PG_EMB, SM, rangos y forzar actualización
+                $scope.lista.forEach(function(row) {
+                    $scope.calcularRangos(row);
+                    $scope.calcularPgEmbYSm(row);
+                });
+
+                $scope.marcarModificado();
+            };
+
+            window.cargarRegistrosImportadosATabla = function(filas) {
+                var scope = angular.element(document.querySelector('[ng-controller="TablaCtrl"]')).scope();
+                if (scope) {
+                    scope.$apply(function() {
+                        scope.cargarRegistrosImportados(filas);
+                    });
+                }
+            };
+
             // Watcher para mantener 'numero' actualizado y GUARDAR EN LOCALSTORAGE
             $scope.$watch('lista', function (newVal) {
                 if (newVal) {
@@ -2136,6 +2209,114 @@
                 $('#modalBuscadorReferencias').modal('hide');
             };
 
+            // Consulta de Identidad para Modal de Ingreso Masivo
+            $scope.consultarIdentidadModal = function () {
+                var dni = ($scope.modalData.identidad || '').trim();
+                if (!dni) {
+                    $scope.modalData.identidad = '';
+                    $scope.modalData.nombre_paciente = '';
+                    $scope.modalData.fecha_nacimiento = '';
+                    $scope.modalData.sexo = '';
+                    $scope.modalData.edad = '';
+                    $scope.modalData.tipo = '';
+                    $scope.modalData.rango = '';
+                    $scope.modalData.rango_2 = '';
+                    $scope.modalData.rango_3 = '';
+                    $scope.modalData.rango_4 = '';
+                    $scope.modalData.rango_5 = '';
+                    return;
+                }
+                if (dni.length < 8) return;
+                var clean = dni.replace(/\D/g, '');
+                if (clean.length === 13) {
+                    $scope.modalData.identidad = clean.substr(0,4) + '-' + clean.substr(4,4) + '-' + clean.substr(8,5);
+                    dni = $scope.modalData.identidad;
+                }
+
+                $.ajax({
+                    url: '{{ route("ingresos.buscar-identidad") }}',
+                    type: 'GET',
+                    data: { identidad: dni },
+                    success: function (res) {
+                        if (res && res.success) {
+                            $scope.$apply(function () {
+                                if (res.nombre_paciente) $scope.modalData.nombre_paciente = res.nombre_paciente.toUpperCase();
+                                if (res.fecha_nacimiento) {
+                                    var fn = res.fecha_nacimiento;
+                                    if (fn.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                        var p = fn.split('-');
+                                        fn = p[2] + '/' + p[1] + '/' + p[0];
+                                    }
+                                    $scope.modalData.fecha_nacimiento = fn;
+                                }
+                                if (res.sexo) {
+                                    var sx = res.sexo.toUpperCase();
+                                    if (sx === 'FEMENINO' || sx === 'MUJER' || sx === 'F' || sx === 'M') sx = 'M';
+                                    else if (sx === 'MASCULINO' || sx === 'HOMBRE' || sx === 'H' || sx === 'V') sx = 'H';
+                                    $scope.modalData.sexo = sx;
+                                }
+                                if (res.edad !== undefined && res.edad !== null && res.edad !== '') $scope.modalData.edad = res.edad.toString();
+                                if (res.tipo) $scope.modalData.tipo = res.tipo.toUpperCase();
+                                if (res.colonia && !$scope.modalData.colonia) $scope.modalData.colonia = res.colonia.toUpperCase();
+
+                                $scope.calcularConversion($scope.modalData);
+                                $scope.calcularRangos($scope.modalData);
+                            });
+
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                            Toast.fire({
+                                icon: 'success',
+                                title: (res.origen === 'snvs' ? '⚡ SNVS: ' : '✅ ') + (res.nombre_paciente || 'Paciente encontrado')
+                            });
+                        }
+                    }
+                });
+            };
+
+            // Cálculo de edad desde fecha de nacimiento en Modal
+            $scope.calcularEdadDesdeNacimientoModal = function () {
+                var text = ($scope.modalData.fecha_nacimiento || '').trim();
+                if (!text || text.length < 8) return;
+                var parts = text.split(/[\/\-\.]/);
+                if (parts.length === 3) {
+                    var day = parseInt(parts[0], 10);
+                    var month = parseInt(parts[1], 10) - 1;
+                    var year = parseInt(parts[2], 10);
+                    if (year < 100) year += (year > 30 ? 1900 : 2000);
+                    var bDate = new Date(year, month, day);
+                    if (!isNaN(bDate.getTime())) {
+                        var today = new Date();
+                        var ageYears = today.getFullYear() - bDate.getFullYear();
+                        var mDiff = today.getMonth() - bDate.getMonth();
+                        if (mDiff < 0 || (mDiff === 0 && today.getDate() < bDate.getDate())) {
+                            ageYears--;
+                        }
+                        if (ageYears >= 1) {
+                            $scope.modalData.edad = ageYears.toString();
+                            $scope.modalData.tipo = 'A';
+                        } else {
+                            var months = (today.getFullYear() - bDate.getFullYear()) * 12 + (today.getMonth() - bDate.getMonth());
+                            if (today.getDate() < bDate.getDate()) months--;
+                            if (months >= 1) {
+                                $scope.modalData.edad = months.toString();
+                                $scope.modalData.tipo = 'M';
+                            } else {
+                                var diffTime = Math.abs(today - bDate);
+                                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                $scope.modalData.edad = diffDays.toString();
+                                $scope.modalData.tipo = 'D';
+                            }
+                        }
+                        $scope.calcularRangos($scope.modalData);
+                    }
+                }
+            };
+
             // Atajos de teclado globales
             document.addEventListener('keydown', function (e) {
                 // Alt+M para Médicos
@@ -2182,6 +2363,12 @@
                         var parts = fila.fecha.split('/');
                         if (parts.length === 3) {
                             fila.fecha = parts[2] + '-' + parts[1] + '-' + parts[0];
+                        }
+                    }
+                    if (fila.fecha_nacimiento && typeof fila.fecha_nacimiento === 'string' && fila.fecha_nacimiento.indexOf('/') > -1) {
+                        var pfn = fila.fecha_nacimiento.split('/');
+                        if (pfn.length === 3) {
+                            fila.fecha_nacimiento = pfn[2] + '-' + pfn[1] + '-' + pfn[0];
                         }
                     }
                     return fila;
@@ -2756,46 +2943,73 @@
                 });
 
                 if (filasConErrores.length > 0) {
-                    // Construir HTML de errores con un diseño más moderno y compacto
-                    var html = '<div class="text-left custom-scrollbar" style="max-height: 45vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">' +
-                        '<table class="table table-sm table-borderless m-0" style="table-layout: fixed; width: 100%; border-collapse: separate; border-spacing: 0 8px;">' +
-                        '<tbody>';
+                    var totalErrores = filasConErrores.reduce(function(acc, item) { return acc + item.errores.length; }, 0);
+
+                    var html = '<div class="text-left custom-scrollbar pr-1" style="max-height: 48vh; overflow-y: auto; overflow-x: hidden;">' +
+                        '<div class="d-flex flex-column gap-2">';
 
                     filasConErrores.forEach(function (item) {
                         var erroresHtml = item.errores.map(function (err) {
-                            return '<div class="d-flex align-items-center mb-1 py-1 px-2 rounded" style="background: #fff5f5; border-left: 3px solid #f87171;">' +
-                                '<div style="flex: 1; min-width: 0; font-size: 11px; color: #b91c1c; text-align: left; line-height: 1.3; padding-right: 15px; word-break: break-word;">' + err.msg + '</div>' +
-                                '<div class="ml-2 d-flex" style="flex-shrink: 0;">' +
-                                '<button type="button" class="btn btn-sm btn-link p-0 text-primary mr-2" onclick="window.enfocarError(' + item.index + ', \'' + err.field + '\')" title="Ver en tabla"><i class="fas fa-search-plus" style="font-size: 14px;"></i></button>' +
-                                '<button type="button" class="btn btn-sm btn-link p-0 text-danger" onclick="window.borrarDatoErroneo(' + item.index + ', \'' + err.field + '\')" title="Borrar"><i class="fas fa-times-circle" style="font-size: 14px;"></i></button>' +
+                            return '<div class="d-flex align-items-center justify-content-between p-2 mb-1 rounded" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.22); border-left: 3px solid #ef4444;">' +
+                                '<div class="d-flex align-items-center" style="flex: 1; min-width: 0;">' +
+                                    '<i class="fas fa-exclamation-circle text-danger mr-2" style="font-size: 13px; flex-shrink: 0;"></i>' +
+                                    '<span style="font-size: 0.82rem; color: var(--text-primary, #1e293b); font-weight: 500; line-height: 1.35; word-break: break-word;">' + err.msg + '</span>' +
                                 '</div>' +
-                                '</div>';
+                                '<div class="d-flex align-items-center gap-1 ml-2" style="flex-shrink: 0;">' +
+                                    '<button type="button" class="btn btn-xs btn-outline-primary px-2 py-1 font-weight-bold" onclick="window.enfocarError(' + item.index + ', \'' + (err.field || '') + '\')" title="Ubicar y enfocar celda en la tabla">' +
+                                        '<i class="fas fa-crosshairs mr-1"></i> Ir a Celda' +
+                                    '</button>' +
+                                    '<button type="button" class="btn btn-xs btn-outline-danger px-2 py-1 font-weight-bold" onclick="window.borrarDatoErroneo(' + item.index + ', \'' + (err.field || '') + '\', this)" title="Limpiar valor erróneo">' +
+                                        '<i class="fas fa-trash-alt mr-1"></i> Limpiar' +
+                                    '</button>' +
+                                '</div>' +
+                            '</div>';
                         }).join('');
 
-                        html += '<tr style="background: #f8fafc; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">' +
-                            '<td style="width: 40px; text-align: center; vertical-align: top; padding-top: 10px; font-weight: 800; color: #64748b; font-size: 12px; border-radius: 8px 0 0 8px;">' + item.fila + '</td>' +
-                            '<td style="padding: 6px 10px 6px 0; border-radius: 0 8px 8px 0;">' + erroresHtml + '</td>' +
-                            '</tr>';
+                        html += '<div class="p-2 mb-2 rounded-lg" style="background: var(--bg-surface, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 1px 3px rgba(0,0,0,0.04);">' +
+                            '<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom" style="border-color: var(--border-color, #e2e8f0) !important;">' +
+                                '<span class="badge badge-secondary px-2 py-1 font-weight-bold" style="background: var(--bg-subtle, #f1f5f9); color: var(--text-muted, #64748b); border: 1px solid var(--border-color, #cbd5e1); font-size: 0.75rem;">' +
+                                    '<i class="fas fa-list-ol mr-1"></i> FILA #' + item.fila +
+                                '</span>' +
+                                '<span class="text-xs text-danger font-weight-bold">' +
+                                    item.errores.length + ' ' + (item.errores.length === 1 ? 'observación' : 'observaciones') +
+                                '</span>' +
+                            '</div>' +
+                            '<div>' + erroresHtml + '</div>' +
+                        '</div>';
                     });
 
-                    html += '</tbody></table></div>' +
-                        '<div class="mt-2 p-2 rounded-lg bg-amber-50 border border-amber-100">' +
-                        '<p class="m-0 text-amber-800 font-bold text-sm"><i class="fas fa-exclamation-triangle mt-1 mr-2" style="float: left;"></i>Se detectaron datos que no cumplen las reglas de condicionamiento.<br>¿Desea forzar el guardado o prefiere corregirlos?</p>' +
+                    html += '</div></div>' +
+                        '<div class="mt-3 p-3 rounded-lg text-left" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25);">' +
+                            '<div class="d-flex align-items-center mb-1">' +
+                                '<i class="fas fa-shield-alt text-warning mr-2 font-size-16"></i>' +
+                                '<span class="font-weight-bold text-warning" style="font-size: 0.85rem;">Condicionamientos pendientes de resolución</span>' +
+                            '</div>' +
+                            '<p class="m-0" style="color: var(--text-muted, #64748b); font-size: 0.8rem; line-height: 1.4;">' +
+                                'Se detectaron datos que no cumplen las reglas de consistencia clínica del AT-1. Puede regresar a la tabla interactiva para corregirlos o proceder a forzar el guardado bajo su responsabilidad.' +
+                            '</p>' +
                         '</div>';
 
                     Swal.fire({
-                        title: '<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: -20px;"><i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 24px;"></i><span style="font-size: 18px; color: #1e293b; font-weight: 800; text-transform: uppercase;">Errores de Validación</span></div>',
+                        title: '<div class="d-flex align-items-center justify-content-center gap-2 mb-2">' +
+                            '<div class="d-inline-flex align-items-center justify-content-center rounded-circle mr-2" style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">' +
+                                '<i class="fas fa-exclamation-triangle font-size-18"></i>' +
+                            '</div>' +
+                            '<span style="font-size: 1.15rem; color: var(--text-primary, #1e293b); font-weight: 800; letter-spacing: 0.3px;">OBSERVACIONES DE VALIDACIÓN (' + totalErrores + ')</span>' +
+                        '</div>',
                         html: html,
                         showCancelButton: true,
-                        confirmButtonText: '<i class="fas fa-save mr-2"></i> GUARDAR DE TODOS MODOS',
-                        cancelButtonText: 'VOLVER A CORREGIR',
-                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: '<i class="fas fa-save mr-1"></i> GUARDAR DE TODOS MODOS',
+                        cancelButtonText: '<i class="fas fa-undo mr-1"></i> VOLVER A CORREGIR',
+                        confirmButtonColor: '#ef4444',
                         cancelButtonColor: '#64748b',
-                        width: '850px',
+                        width: '780px',
+                        background: 'var(--bg-surface, #ffffff)',
+                        color: 'var(--text-primary, #1e293b)',
                         customClass: {
-                            popup: 'rounded-xl shadow-2xl',
-                            confirmButton: 'font-bold px-4 py-2 uppercase text-xs',
-                            cancelButton: 'font-bold px-4 py-2 uppercase text-xs'
+                            popup: 'rounded-xl shadow-2xl border',
+                            confirmButton: 'font-bold px-4 py-2 uppercase text-xs rounded-lg shadow-sm',
+                            cancelButton: 'font-bold px-4 py-2 uppercase text-xs rounded-lg'
                         }
                     }).then(function (result) {
                         if (result.isConfirmed) {
@@ -2853,6 +3067,59 @@
             };
 
         }]);
+
+        // Helpers interactivos para el modal de errores de validación
+        window.enfocarError = function(rowIndex, fieldName) {
+            Swal.close();
+            setTimeout(function() {
+                var scope = angular.element(document.querySelector('[ng-controller="TablaCtrl"]')).scope();
+                if (scope) {
+                    scope.$apply(function() {
+                        scope.filaSeleccionada = rowIndex;
+                    });
+                }
+                var trs = document.querySelectorAll('#tableDemo tbody tr');
+                if (trs && trs[rowIndex]) {
+                    var tr = trs[rowIndex];
+                    tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    tr.style.transition = 'all 0.3s ease';
+                    tr.style.background = 'rgba(245, 158, 11, 0.25)';
+                    setTimeout(function() {
+                        tr.style.background = '';
+                    }, 2200);
+
+                    if (fieldName) {
+                        var targetCell = tr.querySelector('[ng-model*="' + fieldName + '"]') || tr.querySelector('.' + fieldName);
+                        if (targetCell && typeof targetCell.focus === 'function') {
+                            targetCell.focus();
+                        }
+                    }
+                }
+            }, 250);
+        };
+
+        window.borrarDatoErroneo = function(rowIndex, fieldName, btnElement) {
+            var scope = angular.element(document.querySelector('[ng-controller="TablaCtrl"]')).scope();
+            if (scope && scope.lista && scope.lista[rowIndex]) {
+                scope.$apply(function() {
+                    if (fieldName) {
+                        scope.lista[rowIndex][fieldName] = '';
+                    }
+                    scope.marcarModificado();
+                });
+                if (btnElement) {
+                    var container = btnElement.closest('.d-flex.align-items-center.justify-content-between');
+                    if (container) {
+                        container.style.opacity = '0.5';
+                        container.style.pointerEvents = 'none';
+                        var textSpan = container.querySelector('span');
+                        if (textSpan) {
+                            textSpan.innerHTML = '<span class="text-success font-weight-bold"><i class="fas fa-check-circle mr-1"></i> Dato limpiado</span>';
+                        }
+                    }
+                }
+            }
+        };
 
         // Inicializar Flatpickr en el modal cuando se muestra
         $(document).ready(function () {
@@ -3088,6 +3355,132 @@
 
                                         var dateObj = new Date(year, month, day, 12, 0, 0);
                                         scope.lista[attrs.row]['se'] = getEpidemiologicalWeek(dateObj);
+                                    }
+                                }
+
+                                // Auto-consultar Identidad (DNI) en BD local y SNVS/SESAL
+                                if (attrs.field === 'identidad') {
+                                    var dni = text.trim();
+                                    if (!dni) {
+                                        // Al borrar el DNI, limpiar todos los datos del paciente asociados
+                                        scope.lista[attrs.row]['identidad'] = '';
+                                        scope.lista[attrs.row]['nombre_paciente'] = '';
+                                        scope.lista[attrs.row]['fecha_nacimiento'] = '';
+                                        scope.lista[attrs.row]['sexo'] = '';
+                                        scope.lista[attrs.row]['edad'] = '';
+                                        scope.lista[attrs.row]['tipo'] = '';
+                                        scope.lista[attrs.row]['rango'] = '';
+                                        scope.lista[attrs.row]['rango_2'] = '';
+                                        scope.lista[attrs.row]['rango_3'] = '';
+                                        scope.lista[attrs.row]['rango_4'] = '';
+                                        scope.lista[attrs.row]['rango_5'] = '';
+                                        scope.marcarModificado();
+                                    } else if (dni.length >= 8) {
+                                        var cleanDni = dni.replace(/\D/g, '');
+                                        if (cleanDni.length === 13) {
+                                            var formatted = cleanDni.substr(0,4) + '-' + cleanDni.substr(4,4) + '-' + cleanDni.substr(8,5);
+                                            scope.lista[attrs.row]['identidad'] = formatted;
+                                            element.text(formatted);
+                                            dni = formatted;
+                                        }
+
+                                        $.ajax({
+                                            url: '{{ route("ingresos.buscar-identidad") }}',
+                                            type: 'GET',
+                                            data: { identidad: dni },
+                                            success: function (res) {
+                                                if (res && res.success) {
+                                                    scope.$apply(function () {
+                                                        if (res.nombre_paciente) {
+                                                            scope.lista[attrs.row]['nombre_paciente'] = res.nombre_paciente.toUpperCase();
+                                                        }
+                                                        if (res.fecha_nacimiento) {
+                                                            var fn = res.fecha_nacimiento;
+                                                            if (fn.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                                                var p = fn.split('-');
+                                                                fn = p[2] + '/' + p[1] + '/' + p[0];
+                                                            }
+                                                            scope.lista[attrs.row]['fecha_nacimiento'] = fn;
+                                                        }
+                                                        if (res.sexo) {
+                                                            var sx = res.sexo.toUpperCase();
+                                                            if (sx === 'FEMENINO' || sx === 'MUJER' || sx === 'F' || sx === 'M') sx = 'M';
+                                                            else if (sx === 'MASCULINO' || sx === 'HOMBRE' || sx === 'H' || sx === 'V') sx = 'H';
+                                                            scope.lista[attrs.row]['sexo'] = sx;
+                                                        }
+                                                        if (res.edad !== undefined && res.edad !== null && res.edad !== '') {
+                                                            scope.lista[attrs.row]['edad'] = res.edad.toString();
+                                                        }
+                                                        if (res.tipo) {
+                                                            scope.lista[attrs.row]['tipo'] = res.tipo.toUpperCase();
+                                                        }
+                                                        if (res.colonia && (!scope.lista[attrs.row]['colonia'] || scope.lista[attrs.row]['colonia'] === '')) {
+                                                            scope.lista[attrs.row]['colonia'] = res.colonia.toUpperCase();
+                                                        }
+
+                                                        scope.calcularConversion(scope.lista[attrs.row]);
+                                                        scope.calcularRangos(scope.lista[attrs.row]);
+                                                        scope.calcularPgEmbYSm(scope.lista[attrs.row]);
+                                                        scope.marcarModificado();
+                                                    });
+
+                                                    const Toast = Swal.mixin({
+                                                        toast: true,
+                                                        position: 'top-end',
+                                                        showConfirmButton: false,
+                                                        timer: 2500
+                                                    });
+                                                    Toast.fire({
+                                                        icon: 'success',
+                                                        title: (res.origen === 'snvs' ? '⚡ SNVS: ' : '✅ ') + (res.nombre_paciente || 'Paciente encontrado')
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+
+                                // Auto-calcular Edad y Rangos desde Fecha de Nacimiento
+                                if (attrs.field === 'fecha_nacimiento' && text.length >= 8) {
+                                    var parts = text.split(/[\/\-\.]/);
+                                    if (parts.length === 3) {
+                                        var day = parseInt(parts[0], 10);
+                                        var month = parseInt(parts[1], 10) - 1;
+                                        var year = parseInt(parts[2], 10);
+                                        if (year < 100) year += (year > 30 ? 1900 : 2000);
+
+                                        var finalStr = ('0' + day).slice(-2) + '/' + ('0' + (month + 1)).slice(-2) + '/' + year;
+                                        if (scope.lista[attrs.row][attrs.field] !== finalStr) {
+                                            scope.lista[attrs.row][attrs.field] = finalStr;
+                                            element.text(finalStr);
+                                        }
+
+                                        var bDate = new Date(year, month, day);
+                                        if (!isNaN(bDate.getTime())) {
+                                            var today = new Date();
+                                            var ageYears = today.getFullYear() - bDate.getFullYear();
+                                            var mDiff = today.getMonth() - bDate.getMonth();
+                                            if (mDiff < 0 || (mDiff === 0 && today.getDate() < bDate.getDate())) {
+                                                ageYears--;
+                                            }
+                                            if (ageYears >= 1) {
+                                                scope.lista[attrs.row]['edad'] = ageYears.toString();
+                                                scope.lista[attrs.row]['tipo'] = 'A';
+                                            } else {
+                                                var months = (today.getFullYear() - bDate.getFullYear()) * 12 + (today.getMonth() - bDate.getMonth());
+                                                if (today.getDate() < bDate.getDate()) months--;
+                                                if (months >= 1) {
+                                                    scope.lista[attrs.row]['edad'] = months.toString();
+                                                    scope.lista[attrs.row]['tipo'] = 'M';
+                                                } else {
+                                                    var diffTime = Math.abs(today - bDate);
+                                                    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                                    scope.lista[attrs.row]['edad'] = diffDays.toString();
+                                                    scope.lista[attrs.row]['tipo'] = 'D';
+                                                }
+                                            }
+                                            scope.calcularRangos(scope.lista[attrs.row]);
+                                        }
                                     }
                                 }
 

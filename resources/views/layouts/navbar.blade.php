@@ -6,6 +6,12 @@
       <i class="bi bi-list"></i>
     </button>
 
+    <!-- Botón Alerta Not a la izquierda del buscador -->
+    <a href="{{ route('alertas.index') }}" class="btn-navbar-alerta-not" title="Alerta Not - Portal y Herramientas Integradas">
+      <i class="bi bi-bell-fill"></i>
+      <span>Alerta Not</span>
+    </a>
+
     <!-- Search Bar -->
     <div class="navbar-search">
       <i class="bi bi-search"></i>
@@ -38,6 +44,11 @@
     <a href="{{ route('notas.index') }}" class="navbar-action-btn" title="Bloc de Notas & Gestor de Tareas" style="text-decoration: none;">
       <i class="bi bi-journal-text" style="font-size: 1.15rem; color: var(--text-primary);"></i>
     </a>
+
+    <!-- Acceso rápido: Correo Gmail en Ventana Popup -->
+    <button type="button" class="navbar-action-btn btn-navbar-gmail" onclick="abrirPopupGmail()" title="Correo Gmail (estadisticacissanmiguel@gmail.com)" style="border:none; background:transparent; width:38px; height:38px; border-radius:var(--radius-sm,6px); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+      <i class="bi bi-envelope-at-fill" style="font-size: 1.35rem; color: #ea4335; line-height: 1;"></i>
+    </button>
 
     <!-- Quick Theme Switcher Button -->
     <button type="button" class="theme-toggle-btn" data-toggle="theme" title="Alternar Modo Claro / Oscuro (Alt+Shift+D)">

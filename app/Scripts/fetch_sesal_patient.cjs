@@ -116,6 +116,7 @@ async function getExecutablePath() {
             clearVal('cphMain_frmlPaciente_dtFechaNacimiento_I');
             clearVal('cphMain_frmlPaciente_cmbGenero_I');
             clearVal('cphMain_frmlPaciente_txtTelefono_I');
+            clearVal('cphMain_frmlPaciente_txtDireccion_I');
         });
 
         // Asignar Identidad
@@ -135,8 +136,43 @@ async function getExecutablePath() {
             { timeout: 4000 }
         ).catch(() => {});
 
+        // En caso de que salga un cuadro de información (ej. Historial ENO), quitarlo dando click afuera o con Escape
+        try {
+            await page.keyboard.press('Escape');
+            await page.mouse.click(20, 20);
+            await page.evaluate(() => {
+                if (window.ASPxClientControl && ASPxClientControl.GetControlCollection) {
+                    try {
+                        ASPxClientControl.GetControlCollection().ForEachControl(c => {
+                            if (c && typeof c.Hide === 'function' && typeof c.IsVisible === 'function' && c.IsVisible()) {
+                                c.Hide();
+                            }
+                        });
+                    } catch(e) {}
+                }
+                const bg = document.querySelector('.dxpc-modalBackground, .modal-backdrop, .dxpcDropDownModalBackground, [class*="modalBackground"]');
+                if (bg) bg.click();
+            });
+        } catch(e) {}
+
         const data = await page.evaluate(() => {
             const v = id => { const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
+            const txt = id => { const e = document.getElementById(id); return e ? (e.textContent || '').trim() : ''; };
+
+            let rawEdad = txt('cphMain_frmlPaciente_lblEdad');
+            let edadNum = '';
+            let edadTipo = 'A';
+            if (rawEdad) {
+                const match = rawEdad.match(/(\d+)\s*(AÑO|AÑOS|MES|MESES|DIA|DIAS|DÍAS)?/i);
+                if (match) {
+                    edadNum = match[1];
+                    const unit = (match[2] || '').toUpperCase();
+                    if (unit.startsWith('M')) edadTipo = 'M';
+                    else if (unit.startsWith('D')) edadTipo = 'D';
+                    else edadTipo = 'A';
+                }
+            }
+
             return {
                 identidad:        v('cphMain_frmlPaciente_txtNoIdentidad_I'),
                 nombres:          v('cphMain_frmlPaciente_txtNombres_I'),
@@ -144,6 +180,12 @@ async function getExecutablePath() {
                 fecha_nacimiento: v('cphMain_frmlPaciente_dtFechaNacimiento_I'),
                 genero:           v('cphMain_frmlPaciente_cmbGenero_I'),
                 telefono:         v('cphMain_frmlPaciente_txtTelefono_I'),
+                edad:             edadNum,
+                tipo:             edadTipo,
+                departamento:     v('cphMain_frmlPaciente_cmbDepartamento_I'),
+                municipio:        v('cphMain_frmlPaciente_cmbMunicipio_I'),
+                direccion:        v('cphMain_frmlPaciente_txtDireccion_I'),
+                colonia:          v('cphMain_frmlPaciente_txtDireccion_I')
             };
         });
 

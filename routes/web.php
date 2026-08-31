@@ -38,6 +38,7 @@ Route::prefix('ingresos')->name('ingresos.')->group(function () {
     Route::get('/medicos', [IngresoController::class, 'medicosPorProfesion'])->name('medicos-por-profesion');
     Route::get('/medicos-fecha', [IngresoController::class, 'medicosPorFecha'])->name('medicos-por-fecha');
     Route::get('/jornadas-medico', [IngresoController::class, 'jornadasPorMedico'])->name('jornadas-por-medico');
+    Route::match(['GET', 'POST'], '/buscar-identidad', [IngresoController::class, 'buscarIdentidad'])->name('buscar-identidad');
     Route::post('/eliminar-grupo', [IngresoController::class, 'eliminarGrupo'])->name('eliminar-grupo');
     Route::get('/detalles-medico/{fecha}/{medico}', [IngresoController::class, 'detallesMedico'])->name('detalles-medico');
     Route::get('/datatable', [IngresoController::class, 'datatable'])->name('datatable');
@@ -45,6 +46,24 @@ Route::prefix('ingresos')->name('ingresos.')->group(function () {
     Route::delete('/{ingreso}', [IngresoController::class, 'destroy'])->name('destroy');
     Route::get('/detalles-fecha/{fecha}', [IngresoController::class, 'detallesFecha'])->name('detalles-fecha');
     Route::post('/update-batch', [IngresoController::class, 'batchUpdate'])->name('update-batch');
+
+    // Módulo: Importación Profesional de Excel e Histórico Clínico
+    Route::prefix('importar')->name('importar.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ImportacionExcelController::class, 'index'])->name('index');
+        Route::get('/catalogos', [\App\Http\Controllers\ImportacionExcelController::class, 'catalogos'])->name('catalogos');
+        Route::post('/analizar', [\App\Http\Controllers\ImportacionExcelController::class, 'analizar'])->name('analizar');
+        Route::post('/filtrar', [\App\Http\Controllers\ImportacionExcelController::class, 'filtrar'])->name('filtrar');
+        Route::get('/previsualizar', [\App\Http\Controllers\ImportacionExcelController::class, 'previsualizar'])->name('previsualizar');
+        Route::post('/corregir', [\App\Http\Controllers\ImportacionExcelController::class, 'corregir'])->name('corregir');
+        Route::post('/confirmar', [\App\Http\Controllers\ImportacionExcelController::class, 'confirmar'])->name('confirmar');
+
+        // CRUD individual y Seguimiento Clínico por Identidad/DNI
+        Route::get('/paciente-historial', [\App\Http\Controllers\ImportacionExcelController::class, 'historialPaciente'])->name('paciente-historial');
+        Route::post('/sincronizar-pacientes', [\App\Http\Controllers\ImportacionExcelController::class, 'sincronizarPacientesBd'])->name('sincronizar-pacientes');
+        Route::get('/registro/{id}', [\App\Http\Controllers\ImportacionExcelController::class, 'showRegistro'])->name('registro.show');
+        Route::post('/registro/{id}/editar', [\App\Http\Controllers\ImportacionExcelController::class, 'updateRegistro'])->name('registro.update');
+        Route::delete('/registro/{id}', [\App\Http\Controllers\ImportacionExcelController::class, 'destroyRegistro'])->name('registro.destroy');
+    });
 });
 Route::get('/forms', [IngresoController::class, 'index'])->name('forms');
 
@@ -281,3 +300,13 @@ Route::prefix('notas')->name('notas.')->group(function () {
     Route::put('/tareas/{id}', [NotaController::class, 'updateTarea'])->name('tareas.update');
     Route::delete('/tareas/{id}', [NotaController::class, 'destroyTarea'])->name('tareas.destroy');
 });
+
+// Módulo: Alerta Not (Páginas y Servicios Externos Integrados)
+use App\Http\Controllers\AlertaNotController;
+Route::prefix('alerta-not')->name('alertas.')->group(function () {
+    Route::get('/', [AlertaNotController::class, 'index'])->name('index');
+    Route::post('/', [AlertaNotController::class, 'store'])->name('store');
+    Route::put('/{id}', [AlertaNotController::class, 'update'])->name('update');
+    Route::delete('/{id}', [AlertaNotController::class, 'destroy'])->name('destroy');
+});
+

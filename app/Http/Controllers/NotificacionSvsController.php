@@ -255,17 +255,25 @@ class NotificacionSvsController extends Controller
         $expsInformes = $informes->pluck('exp')->filter()->values()->all();
         $dnisInformes = $informes->pluck('identidad')->filter()->values()->all();
         $dnisRegGlobal = $registrosGlobalesMap->pluck('identidad')->filter()->values()->all();
+        $expsRegGlobal = $registrosGlobalesMap->pluck('exp')->filter()->values()->all();
 
-        $todosLosDocs = array_merge($dnisSaved, $expsInformes, $dnisInformes, $dnisRegGlobal);
+        $todosLosExps = array_unique(array_filter(array_merge($expsInformes, $expsRegGlobal)));
+        $todosLosDocs = array_merge($dnisSaved, $dnisInformes, $dnisRegGlobal);
         $dnisLimpios = array_unique(array_filter(array_map(function($d) { return preg_replace('/\D/', '', $d); }, $todosLosDocs)));
 
         // Pre-cargar mapa de pacientes de la tabla local `pacientes` por DNI o DNI limpio
-        $pacientesMap = !empty($dnisLimpios) ? Paciente::where(function($q) use ($dnisLimpios, $todosLosDocs) {
+        $pacientesPorDniMap = !empty($dnisLimpios) ? Paciente::where(function($q) use ($dnisLimpios, $todosLosDocs) {
             $q->whereIn('dni_limpio', $dnisLimpios)
               ->orWhereIn('dni', $todosLosDocs);
         })->get()->keyBy(function($p) {
             return $p->dni_limpio ?: preg_replace('/\D/', '', $p->dni);
         }) : collect();
+
+        // Pre-cargar mapa de pacientes por Expediente / Historia Clínica
+        $pacientesPorExpMap = !empty($todosLosExps) ? Paciente::whereIn('expediente', $todosLosExps)->get()->keyBy('expediente') : collect();
+
+        // Pre-cargar mapa de importacion_registros por Expediente
+        $importacionesPorExpMap = !empty($todosLosExps) ? \App\Models\ImportacionRegistro::whereIn('expediente', $todosLosExps)->get()->keyBy('expediente') : collect();
 
         $rows = [];
         foreach ($informes as $inf) {
@@ -287,16 +295,35 @@ class NotificacionSvsController extends Controller
             $candidatosDocs = array_filter([
                 $saved ? $saved->no_documento : null,
                 $inf->identidad ?? null,
-                $regGlobal ? $regGlobal->identidad : null,
-                $inf->exp ?? null
+                $regGlobal ? $regGlobal->identidad : null
             ]);
 
             $pacienteLocal = null;
             foreach ($candidatosDocs as $doc) {
                 $clean = preg_replace('/\D/', '', $doc);
-                if (!empty($clean) && $pacientesMap->has($clean)) {
-                    $pacienteLocal = $pacientesMap->get($clean);
+                if (!empty($clean) && strlen($clean) >= 8 && $pacientesPorDniMap->has($clean)) {
+                    $pacienteLocal = $pacientesPorDniMap->get($clean);
                     break;
+                }
+            }
+
+            if (!$pacienteLocal) {
+                $expCandidate = trim((string)($inf->exp ?: ($regGlobal ? $regGlobal->exp : '')));
+                if (!empty($expCandidate) && $pacientesPorExpMap->has($expCandidate)) {
+                    $pacienteLocal = $pacientesPorExpMap->get($expCandidate);
+                } elseif (!empty($expCandidate) && $importacionesPorExpMap->has($expCandidate)) {
+                    $ir = $importacionesPorExpMap->get($expCandidate);
+                    $pacienteLocal = (object)[
+                        'nombre_completo' => $ir->nombre_paciente,
+                        'dni' => $ir->numero_identidad,
+                        'fecha_nacimiento' => $ir->fecha_nacimiento ? $ir->fecha_nacimiento->format('Y-m-d') : null,
+                        'edad' => $ir->edad,
+                        'sexo' => $ir->sexo,
+                        'telefono' => null,
+                        'colonia' => $ir->colonia_normalizada ?: $ir->colonia,
+                        'departamento' => $ir->departamento ?: 'FRANCISCO MORAZAN',
+                        'municipio' => $ir->municipio ?: 'DISTRITO CENTRAL',
+                    ];
                 }
             }
 
@@ -401,18 +428,23 @@ class NotificacionSvsController extends Controller
         }
 
         $enfermedadesList = self::$enfermedadesSVS;
+        $totalCasos = count($rows);
+        $totalNotificados = count(array_filter($rows, fn($r) => $r->estado_notificacion === 'Notificado'));
+        $totalPendientes = $totalCasos - $totalNotificados;
+        $totalDiarreas = count(array_filter($rows, fn($r) => str_contains(strtoupper($r->enfermedad_svs), 'DIARREA') || str_contains(strtoupper($r->enfermedad_svs), 'DISENTERIA')));
+        $totalDengue = count(array_filter($rows, fn($r) => str_contains(strtoupper($r->enfermedad_svs), 'DENGUE') || str_contains(strtoupper($r->enfermedad_svs), 'CHIKUNGUNYA') || str_contains(strtoupper($r->enfermedad_svs), 'ZIKA')));
+
+        $compactData = compact(
+            'anos', 'meses', 'semanas', 'ano', 'mes', 'se',
+            'enfermedadFiltro', 'search', 'rows', 'enfermedadesList',
+            'totalCasos', 'totalNotificados', 'totalPendientes', 'totalDiarreas', 'totalDengue'
+        );
 
         if ($request->ajax()) {
-            return view('informes.notificacion_svs_content', compact(
-                'anos', 'meses', 'semanas', 'ano', 'mes', 'se',
-                'enfermedadFiltro', 'search', 'rows', 'enfermedadesList'
-            ));
+            return view('informes.notificacion_svs_content', $compactData);
         }
 
-        return view('informes.notificacion_svs', compact(
-            'anos', 'meses', 'semanas', 'ano', 'mes', 'se',
-            'enfermedadFiltro', 'search', 'rows', 'enfermedadesList'
-        ));
+        return view('informes.notificacion_svs', $compactData);
     }
 
     public function updateDisease(Request $request)
@@ -800,41 +832,45 @@ class NotificacionSvsController extends Controller
 
     public function toggleNotificado(Request $request)
     {
-        $informeId = $request->input('informe_id');
-        $notificado = filter_var($request->input('notificado'), FILTER_VALIDATE_BOOLEAN);
+        try {
+            $informeId = (string)$request->input('informe_id');
+            $notificado = filter_var($request->input('notificado'), FILTER_VALIDATE_BOOLEAN);
 
-        $inf = Informe::find($informeId);
-        if (!$inf) {
-            return response()->json(['success' => false, 'message' => 'Registro no encontrado'], 404);
+            $inf = Informe::find($informeId);
+            $estado = $notificado ? 'Notificado' : 'Pendiente';
+
+            $notif = NotificacionSvs::updateOrCreate(
+                ['informe_id' => $informeId],
+                [
+                    'registro_id' => $inf ? $inf->registro_id : null,
+                    'ano' => $inf ? $inf->ano : (int)date('Y'),
+                    'mes' => $inf ? $inf->mes : 'AGOSTO',
+                    'se' => $inf ? $inf->se : 30,
+                    'fecha_consulta' => $inf ? $inf->fecha : null,
+                    'expediente' => $inf ? $inf->exp : null,
+                    'edad' => $inf ? $inf->edad : null,
+                    'tipo_edad' => $inf ? $inf->tipo : null,
+                    'sexo' => $inf ? $inf->sexo : null,
+                    'colonia' => $inf ? $inf->colonia : null,
+                    'medico' => $inf ? $inf->medico : null,
+                    'diagnostico_consignado' => $inf ? $inf->diagnostico : null,
+                    'estado_notificacion' => $estado,
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return response()->json([
+                'success' => true, 
+                'message' => $notificado ? 'Caso marcado como NOTIFICADO' : 'Caso marcado como PENDIENTE',
+                'estado' => $estado
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error en toggleNotificado: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar estado: ' . $e->getMessage()
+            ], 500);
         }
-
-        $estado = $notificado ? 'Notificado' : 'Pendiente';
-
-        $notif = NotificacionSvs::updateOrCreate(
-            ['informe_id' => $inf->id],
-            [
-                'registro_id' => $inf->registro_id,
-                'ano' => $inf->ano,
-                'mes' => $inf->mes,
-                'se' => $inf->se,
-                'fecha_consulta' => $inf->fecha,
-                'expediente' => $inf->exp,
-                'edad' => $inf->edad,
-                'tipo_edad' => $inf->tipo,
-                'sexo' => $inf->sexo,
-                'colonia' => $inf->colonia,
-                'medico' => $inf->medico,
-                'diagnostico_consignado' => $inf->diagnostico,
-                'estado_notificacion' => $estado,
-                'user_id' => auth()->id(),
-            ]
-        );
-
-        return response()->json([
-            'success' => true, 
-            'message' => $notificado ? 'Caso marcado como NOTIFICADO' : 'Caso marcado como PENDIENTE',
-            'estado' => $estado
-        ]);
     }
 
     public function updateTelefono(Request $request)

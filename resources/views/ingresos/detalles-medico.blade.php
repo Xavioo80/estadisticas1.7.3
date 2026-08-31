@@ -525,46 +525,65 @@
                 });
 
                 if (filasConErrores.length > 0) {
-                    var html = '<div class="text-left custom-scrollbar" style="max-height: 45vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">' +
-                        '<table class="table table-sm table-borderless m-0" style="table-layout: fixed; width: 100%; border-collapse: separate; border-spacing: 0 8px;">' +
-                        '<tbody>';
+                    var totalErrores = filasConErrores.reduce(function(acc, item) { return acc + item.errores.length; }, 0);
+
+                    var html = '<div class="text-left custom-scrollbar pr-1" style="max-height: 48vh; overflow-y: auto; overflow-x: hidden;">' +
+                        '<div class="d-flex flex-column gap-2">';
 
                     filasConErrores.forEach(function (item) {
                         var erroresHtml = item.errores.map(function (err) {
-                            return '<div class="d-flex align-items-center mb-1 py-1 px-2 rounded" style="background: #fff5f5; border-left: 3px solid #f87171;">' +
-                                '<div style="flex: 1; min-width: 0; font-size: 11px; color: #b91c1c; text-align: left; line-height: 1.3; padding-right: 15px; word-break: break-word;"><span class="text-danger mr-1">●</span>' + err.msg + '</div>' +
-                                '<div class="ml-2 d-flex" style="flex-shrink: 0;">' +
-                                '<button type="button" class="btn btn-sm btn-link p-0 text-primary mr-2" onclick="window.enfocarError(' + item.index + ', \'' + err.field + '\')" title="Ver en tabla"><i class="fas fa-search-plus" style="font-size: 14px;"></i></button>' +
-                                '<button type="button" class="btn btn-sm btn-link p-0 text-danger" onclick="window.borrarDatoErroneo(' + item.index + ', \'' + err.field + '\')" title="Borrar"><i class="fas fa-times-circle" style="font-size: 14px;"></i></button>' +
+                            return '<div class="d-flex align-items-center justify-content-between p-2 mb-1 rounded" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.22); border-left: 3px solid #ef4444;">' +
+                                '<div class="d-flex align-items-center" style="flex: 1; min-width: 0;">' +
+                                    '<i class="fas fa-exclamation-circle text-danger mr-2" style="font-size: 13px; flex-shrink: 0;"></i>' +
+                                    '<span style="font-size: 0.82rem; color: var(--text-primary, #1e293b); font-weight: 500; line-height: 1.35; word-break: break-word;">' + err.msg + '</span>' +
                                 '</div>' +
-                                '</div>';
+                            '</div>';
                         }).join('');
 
-                        html += '<tr style="background: #f8fafc; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">' +
-                            '<td style="width: 50px; text-align: center; vertical-align: top; padding-top: 10px; font-weight: 800; color: #64748b; font-size: 13px; border-radius: 8px 0 0 8px;">Fila<br><span style="font-size: 16px; color: #0f172a;">' + item.fila + '</span></td>' +
-                            '<td style="padding: 6px 10px 6px 0; border-radius: 0 8px 8px 0;">' + erroresHtml + '</td>' +
-                            '</tr>';
+                        html += '<div class="p-2 mb-2 rounded-lg" style="background: var(--bg-surface, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 1px 3px rgba(0,0,0,0.04);">' +
+                            '<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom" style="border-color: var(--border-color, #e2e8f0) !important;">' +
+                                '<span class="badge badge-secondary px-2 py-1 font-weight-bold" style="background: var(--bg-subtle, #f1f5f9); color: var(--text-muted, #64748b); border: 1px solid var(--border-color, #cbd5e1); font-size: 0.75rem;">' +
+                                    '<i class="fas fa-list-ol mr-1"></i> FILA #' + item.fila +
+                                '</span>' +
+                                '<span class="text-xs text-danger font-weight-bold">' +
+                                    item.errores.length + ' ' + (item.errores.length === 1 ? 'observación' : 'observaciones') +
+                                '</span>' +
+                            '</div>' +
+                            '<div>' + erroresHtml + '</div>' +
+                        '</div>';
                     });
 
-                    html += '</tbody></table></div>' +
-                        '<div class="mt-2 p-2 rounded bg-light border">' +
-                        '<p class="m-0 text-secondary font-weight-bold text-sm"><i class="fas fa-exclamation-triangle text-warning mt-1 mr-2" style="float: left;"></i>Se detectaron datos que no cumplen las reglas.<br>¿Desea forzar el guardado o prefiere corregirlos?</p>' +
+                    html += '</div></div>' +
+                        '<div class="mt-3 p-3 rounded-lg text-left" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25);">' +
+                            '<div class="d-flex align-items-center mb-1">' +
+                                '<i class="fas fa-shield-alt text-warning mr-2 font-size-16"></i>' +
+                                '<span class="font-weight-bold text-warning" style="font-size: 0.85rem;">Condicionamientos pendientes de resolución</span>' +
+                            '</div>' +
+                            '<p class="m-0" style="color: var(--text-muted, #64748b); font-size: 0.8rem; line-height: 1.4;">' +
+                                'Se detectaron datos que no cumplen las reglas de consistencia clínica del AT-1. Puede regresar a la tabla para corregirlos o proceder a forzar el guardado.' +
+                            '</p>' +
                         '</div>';
 
                     Swal.fire({
-                        title: '<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: -20px;"><i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 24px;"></i><span style="font-size: 18px; color: #1e293b; font-weight: bold; text-transform: uppercase;">Errores de Validación</span></div>',
+                        title: '<div class="d-flex align-items-center justify-content-center gap-2 mb-2">' +
+                            '<div class="d-inline-flex align-items-center justify-content-center rounded-circle mr-2" style="width: 36px; height: 36px; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">' +
+                                '<i class="fas fa-exclamation-triangle font-size-18"></i>' +
+                            '</div>' +
+                            '<span style="font-size: 1.15rem; color: var(--text-primary, #1e293b); font-weight: 800; letter-spacing: 0.3px;">OBSERVACIONES DE VALIDACIÓN (' + totalErrores + ')</span>' +
+                        '</div>',
                         html: html,
-                        width: '850px',
+                        width: '780px',
                         showCancelButton: true,
-                        confirmButtonText: '<i class="fas fa-save mr-2"></i> Forzar Guardado',
-                        cancelButtonText: 'Volver para Corregir',
-                        confirmButtonColor: '#f43f5e',
+                        confirmButtonText: '<i class="fas fa-save mr-1"></i> GUARDAR DE TODOS MODOS',
+                        cancelButtonText: '<i class="fas fa-undo mr-1"></i> VOLVER A CORREGIR',
+                        confirmButtonColor: '#ef4444',
                         cancelButtonColor: '#64748b',
-                        reverseButtons: true,
+                        background: 'var(--bg-surface, #ffffff)',
+                        color: 'var(--text-primary, #1e293b)',
                         customClass: {
-                            popup: 'rounded shadow',
-                            confirmButton: 'font-weight-bold px-4 py-2 text-xs',
-                            cancelButton: 'font-weight-bold px-4 py-2 text-xs'
+                            popup: 'rounded-xl shadow-2xl border',
+                            confirmButton: 'font-weight-bold px-4 py-2 text-xs rounded-lg shadow-sm',
+                            cancelButton: 'font-weight-bold px-4 py-2 text-xs rounded-lg'
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {

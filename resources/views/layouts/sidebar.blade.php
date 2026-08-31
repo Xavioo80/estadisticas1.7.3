@@ -78,10 +78,18 @@
       </a>
     </li>
 
-    <li class="sidebar-item {{ (request()->routeIs('ingresos.*') || request()->routeIs('ingresos') || request()->routeIs('forms')) ? 'active' : '' }}" data-tooltip="Ingresos AT-1">
+    <li class="sidebar-item {{ (request()->routeIs('ingresos.index') || request()->routeIs('ingresos.create') || (request()->routeIs('ingresos.*') && !request()->routeIs('ingresos.importar.*')) || request()->routeIs('forms')) ? 'active' : '' }}" data-tooltip="Ingresos AT-1">
       <a href="{{ route('ingresos.index') }}" class="sidebar-link">
         <i class="bi bi-pencil-square nav-icon"></i>
         <span class="nav-label">Ingresos AT-1</span>
+      </a>
+    </li>
+
+    <li class="sidebar-item {{ (request()->routeIs('ingresos.importar.*') || request()->is('ingresos/importar*')) ? 'active' : '' }}" data-tooltip="Registros Excel">
+      <a href="{{ route('ingresos.importar.index') }}" class="sidebar-link">
+        <i class="bi bi-file-earmark-excel nav-icon text-success"></i>
+        <span class="nav-label">Registros Excel</span>
+        <span class="badge badge-soft-success nav-badge">Excel</span>
       </a>
     </li>
 

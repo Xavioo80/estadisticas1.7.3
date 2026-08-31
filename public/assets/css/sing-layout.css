@@ -538,6 +538,44 @@ body {
   width: 300px;
 }
 
+/* Botón Alerta Not en Navbar */
+.btn-navbar-alerta-not {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 36px;
+  padding: 0 0.85rem;
+  border-radius: var(--radius-sm, 6px);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-navbar-alerta-not:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+  color: #ffffff !important;
+}
+
+.btn-navbar-alerta-not i {
+  font-size: 0.95rem;
+  animation: bellRing 3s ease infinite;
+}
+
+@keyframes bellRing {
+  0%, 80%, 100% { transform: rotate(0); }
+  85% { transform: rotate(15deg); }
+  90% { transform: rotate(-15deg); }
+  95% { transform: rotate(8deg); }
+}
+
 /* Quick Add New Record Button (Green with Plus Icon) */
 .btn-navbar-add-green {
   width: 38px;

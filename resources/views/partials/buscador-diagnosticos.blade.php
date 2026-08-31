@@ -138,13 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const contadorDiv = document.getElementById('contadorResultados');
         
         // Actualizar contador
-        contadorDiv.textContent = `${diagnosticos.length} diagnóstico(s) encontrado(s)`;
+        contadorDiv.textContent = `${diagnosticos.length} diagnóstico(s) encontrado(s) — Haga clic en una fila para seleccionarlo`;
         
         if (diagnosticos.length === 0) {
             resultadosDiv.innerHTML = `
                 <tr>
-                    <td colspan="4" class="text-center text-info">
-                        <i class="fas fa-search"></i> No se encontraron diagnósticos
+                    <td colspan="4" class="text-center text-info py-3">
+                        <i class="fas fa-search mr-1"></i> No se encontraron diagnósticos
                     </td>
                 </tr>
             `;
@@ -163,15 +163,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (query) {
                 const regex = new RegExp(`(${query})`, 'gi');
-                codigoMostrar = codigoMostrar.replace(regex, '<span class="highlight">$1</span>');
-                patologiaMostrar = patologiaMostrar.replace(regex, '<span class="highlight">$1</span>');
-                categoriaMostrar = categoriaMostrar.replace(regex, '<span class="highlight">$1</span>');
+                codigoMostrar = String(codigoMostrar).replace(regex, '<span class="highlight">$1</span>');
+                patologiaMostrar = String(patologiaMostrar).replace(regex, '<span class="highlight">$1</span>');
+                categoriaMostrar = String(categoriaMostrar).replace(regex, '<span class="highlight">$1</span>');
             }
             
+            const dxDataEscaped = JSON.stringify(diagnostico).replace(/"/g, '&quot;');
+
             html += `
-                <tr>
-                    <td><strong>${codigoMostrar}</strong></td>
-                    <td>${patologiaMostrar}</td>
+                <tr style="cursor: pointer;" onclick="seleccionarDiagnosticoGlobalModal(${dxDataEscaped})" class="selectable-dx-row" title="Clic para seleccionar: [${diagnostico.codigo}] ${diagnostico.patologia}">
+                    <td><span class="badge badge-primary font-weight-bold" style="font-size: 0.82rem;">${codigoMostrar}</span></td>
+                    <td class="font-weight-bold text-dark">${patologiaMostrar}</td>
                     <td><span class="badge badge-secondary">${categoriaMostrar}</span></td>
                     <td class="text-muted small">${diagnostico.secundario || 'N/A'}</td>
                 </tr>
@@ -180,6 +182,23 @@ document.addEventListener('DOMContentLoaded', function() {
         
         resultadosDiv.innerHTML = html;
     }
+
+    // Manejar selección de diagnóstico desde el modal global
+    window.seleccionarDiagnosticoGlobalModal = function(diagnostico) {
+        if (typeof window.onDiagnosticoSeleccionadoCallback === 'function') {
+            window.onDiagnosticoSeleccionadoCallback(diagnostico);
+            window.onDiagnosticoSeleccionadoCallback = null;
+        } else if (typeof window.seleccionarDiagnosticoItem === 'function') {
+            window.seleccionarDiagnosticoItem(diagnostico.codigo, diagnostico.patologia, diagnostico.id);
+        }
+
+        $('#modalBuscadorDiagnosticos').modal('hide');
+        setTimeout(function() {
+            if ($('#modalCorregirFila').hasClass('show') || $('#modalImportarExcel').hasClass('show')) {
+                $('body').addClass('modal-open');
+            }
+        }, 350);
+    };
     
     // Función para realizar la búsqueda (ahora filtra localmente)
     function buscarDiagnosticos() {
@@ -196,9 +215,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Filtrar diagnósticos localmente
         if (window.todosLosDiagnosticos) {
             const diagnosticosFiltrados = window.todosLosDiagnosticos.filter(diagnostico => {
-                return diagnostico.codigo.toLowerCase().includes(query) || 
-                       diagnostico.patologia.toLowerCase().includes(query) ||
-                       (diagnostico.categoria && diagnostico.categoria.toLowerCase().includes(query));
+                return String(diagnostico.codigo).toLowerCase().includes(query) || 
+                       String(diagnostico.patologia).toLowerCase().includes(query) ||
+                       (diagnostico.categoria && String(diagnostico.categoria).toLowerCase().includes(query));
             });
             
             mostrarDiagnosticos(diagnosticosFiltrados);
@@ -208,6 +227,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función simplificada para cerrar modal (solo consulta)
     function cerrarModal() {
         $('#modalBuscadorDiagnosticos').modal('hide');
+        setTimeout(function() {
+            if ($('#modalCorregirFila').hasClass('show') || $('#modalImportarExcel').hasClass('show')) {
+                $('body').addClass('modal-open');
+            }
+        }, 350);
     }
     
     // Event listeners
@@ -232,20 +256,24 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(timeoutBusqueda);
         timeoutBusqueda = setTimeout(() => {
             buscarDiagnosticos();
-        }, 300); // Reducido el tiempo de debounce para mejor experiencia
+        }, 200);
     });
 });
 </script>
 
 <style>
+#modalBuscadorDiagnosticos {
+    z-index: 10050 !important;
+}
+#modalBuscadorDiagnosticos .modal-dialog {
+    max-width: 850px;
+    z-index: 10055 !important;
+}
+
 .sticky-top {
     position: sticky;
     top: 0;
     z-index: 10;
-}
-
-#modalBuscadorDiagnosticos .modal-dialog {
-    max-width: 800px;
 }
 
 #contadorResultados {
@@ -265,12 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
     font-weight: bold;
 }
 
-/* Estilo para filas de solo lectura */
-#tablaDiagnosticos tbody tr {
-    background-color: #f8f9fa;
-}
-
-#tablaDiagnosticos tbody tr:nth-child(even) {
-    background-color: #e9ecef;
+/* Estilo para filas interactivas */
+.selectable-dx-row:hover {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    transition: background-color 0.15s ease-in-out;
 }
 </style>

@@ -288,6 +288,47 @@
 <script src="{{ asset('assets/js/sing-theme.js') }}?v={{ @filemtime(public_path('assets/js/sing-theme.js')) }}"></script>
 <script src="{{ asset('assets/js/sing-app.js') }}?v={{ @filemtime(public_path('assets/js/sing-app.js')) }}"></script>
 <script src="{{ asset('assets/js/sing-charts.js') }}?v={{ @filemtime(public_path('assets/js/sing-charts.js')) }}"></script>
+<script>
+window.abrirPopupGmail = function(url) {
+    url = url || 'https://mail.google.com/mail/u/?authuser=estadisticacissanmiguel@gmail.com';
+    
+    var w = 1150;
+    var h = 750;
+    
+    // Obtener la posición y tamaño exacto de la ventana actual del navegador
+    var curScreenLeft = (window.screenLeft !== undefined) ? window.screenLeft : (window.screenX || 0);
+    var curScreenTop = (window.screenTop !== undefined) ? window.screenTop : (window.screenY || 0);
+    var curWidth = window.outerWidth || window.innerWidth || screen.availWidth || 1920;
+    var curHeight = window.outerHeight || window.innerHeight || screen.availHeight || 1080;
+    
+    // Ajustar si la ventana es menor
+    if (w > curWidth) w = curWidth - 40;
+    if (h > curHeight) h = curHeight - 40;
+    
+    // Coordenadas relativas a la ventana del usuario
+    var left = Math.round(curScreenLeft + (curWidth - w) / 2);
+    var top = Math.round(curScreenTop + (curHeight - h) / 2);
+    
+    var features = 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',scrollbars=yes,resizable=yes,status=no,toolbar=no,menubar=no,location=no';
+    var popupName = 'GmailSanMiguelPopup_' + Date.now();
+    
+    // Abrir ventana en contexto local para permitir moveTo/resizeTo sin bloqueo de origen cruzado
+    var popup = window.open('about:blank', popupName, features);
+    
+    if (popup) {
+        try {
+            popup.resizeTo(w, h);
+            popup.moveTo(left, top);
+        } catch(e) {}
+        
+        popup.location.href = url;
+        
+        if (popup.focus) {
+            popup.focus();
+        }
+    }
+};
+</script>
 @stack('scripts')
 
 <!-- ── FLOATING PINNED STICKY NOTES: Global JS (All Pages) ────────────── -->
