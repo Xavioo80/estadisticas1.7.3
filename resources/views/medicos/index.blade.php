@@ -9,11 +9,12 @@
         inset: 0;
         z-index: 1050;
         background-color: rgba(11, 17, 32, 0.78);
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         display: none !important;
         align-items: center;
         justify-content: center;
-        padding: 1rem;
+        padding: 1.25rem;
     }
     .modal-backdrop-custom.active {
         display: flex !important;
@@ -21,62 +22,156 @@
     .modal-dialog-custom {
         background-color: var(--bg-surface);
         border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg, 14px);
+        border-radius: 20px;
         width: 100%;
-        max-width: 820px;
-        max-height: 92vh;
-        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.4);
+        max-width: 840px;
+        max-height: 94vh;
+        box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        animation: modalFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes modalFadeIn {
-        from { opacity: 0; transform: scale(0.97) translateY(-6px); }
+        from { opacity: 0; transform: scale(0.96) translateY(-8px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
     .modal-header-custom {
-        background: linear-gradient(135deg, var(--color-primary, #3b82f6), #1d4ed8);
+        background: #2563eb;
         color: #ffffff;
-        padding: 0.85rem 1.25rem;
+        padding: 1.15rem 1.6rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-shrink: 0;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
     }
+    .modal-icon-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+    .modal-close-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .modal-close-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+        transform: scale(1.05);
+    }
+    .modal-top-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-bottom: 0.5rem;
+    }
+    .btn-pill-sample {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+        border-radius: 20px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        padding: 4px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-pill-sample:hover {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+        border-color: #93c5fd;
+    }
+    .btn-pill-clean {
+        background-color: var(--bg-subtle, #f8fafc);
+        color: var(--text-secondary, #64748b);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 20px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        padding: 4px 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-pill-clean:hover {
+        background-color: var(--border-color, #e2e8f0);
+        color: var(--text-primary, #0f172a);
+    }
+
+    html.dark .btn-pill-sample,
+    [data-theme="dark"] .btn-pill-sample {
+        background-color: rgba(37, 99, 235, 0.2);
+        color: #60a5fa;
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+    html.dark .btn-pill-sample:hover,
+    [data-theme="dark"] .btn-pill-sample:hover {
+        background-color: rgba(37, 99, 235, 0.35);
+        color: #93c5fd;
+    }
+
     .modal-form-grid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
-        gap: 12px;
-        padding: 1.2rem 1.35rem;
+        gap: 14px;
+        padding: 1.25rem 1.65rem 0.75rem 1.65rem;
         overflow-y: auto;
     }
     .modal-field {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 5px;
     }
     .modal-field label {
         font-size: 0.72rem;
         font-weight: 700;
         text-transform: uppercase;
-        color: var(--text-secondary);
+        color: var(--text-secondary, #64748b);
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 4px;
-        letter-spacing: 0.2px;
+        gap: 5px;
+        letter-spacing: 0.3px;
+    }
+    .modal-field label i {
+        font-size: 0.85rem;
+        color: var(--text-muted, #94a3b8);
     }
     .modal-field input,
     .modal-field select,
     .modal-field textarea {
         background-color: var(--input-bg);
         color: var(--text-primary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-sm, 6px);
-        padding: 0.42rem 0.65rem;
-        font-size: 0.83rem;
-        height: 36px;
+        border: 1px solid var(--border-color, #cbd5e1);
+        border-radius: 10px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.84rem;
+        height: 38px;
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .modal-field textarea {
@@ -85,10 +180,16 @@
     .modal-field input:focus,
     .modal-field select:focus,
     .modal-field textarea:focus {
-        border-color: var(--color-primary, #3b82f6);
+        border-color: #2563eb;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
     }
+    .modal-field input::placeholder,
+    .modal-field textarea::placeholder {
+        color: var(--text-muted, #94a3b8);
+        opacity: 0.85;
+    }
+
     .grid-col-12 { grid-column: span 12; }
     .grid-col-9  { grid-column: span 9; }
     .grid-col-8  { grid-column: span 8; }
@@ -103,6 +204,45 @@
         .grid-col-9, .grid-col-8, .grid-col-7, .grid-col-6, .grid-col-5, .grid-col-4, .grid-col-3, .grid-col-2 {
             grid-column: span 12;
         }
+    }
+
+    .btn-modal-cancel {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary, #64748b);
+        font-weight: 700;
+        font-size: 0.86rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-modal-cancel:hover {
+        background-color: var(--bg-subtle, #f1f5f9);
+        color: var(--text-primary, #0f172a);
+    }
+    .btn-modal-submit {
+        background-color: #2563eb;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.86rem;
+        padding: 0.55rem 1.45rem;
+        border-radius: 10px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+        transition: all 0.15s ease;
+    }
+    .btn-modal-submit:hover {
+        background-color: #1d4ed8;
+        box-shadow: 0 5px 14px rgba(37, 99, 235, 0.38);
+        transform: translateY(-1px);
+    }
+    .btn-modal-submit:active {
+        transform: translateY(0);
     }
 
     .medico-info-label {
@@ -210,35 +350,35 @@
 <div id="createMedicoModal" class="modal-backdrop-custom">
     <div class="modal-dialog-custom">
         <!-- Header -->
-        <div class="modal-header-custom">
-            <div class="d-flex align-items-center gap-2.5">
-                <div class="d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 9px; background: rgba(255,255,255,0.2); color: #fff;">
-                    <i class="bi bi-person-plus-fill" style="font-size: 1.2rem;"></i>
+        <div class="modal-header-custom" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 14px !important; padding: 1.15rem 1.6rem !important;">
+            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 14px !important; flex: 1 1 auto !important; min-width: 0 !important;">
+                <div class="modal-icon-badge" style="width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 12px !important; background: rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.35rem !important; flex-shrink: 0 !important;">
+                    <i class="bi bi-person-plus-fill"></i>
                 </div>
-                <div>
-                    <h5 class="mb-0 font-weight-bold" style="font-size: 0.96rem; color: #fff;">Registrar Nuevo Personal Médico</h5>
-                    <small style="opacity: 0.9; font-size: 0.75rem; color: rgba(255,255,255,0.9);">Alta de facultativo y asignación de parámetros</small>
+                <div style="display: flex !important; flex-direction: column !important; justify-content: center !important; min-width: 0 !important;">
+                    <h5 class="mb-0 font-weight-bold" style="font-size: 1.1rem !important; color: #ffffff !important; line-height: 1.25 !important; letter-spacing: -0.2px !important; margin: 0 !important;">Registrar Nuevo Personal Médico</h5>
+                    <small style="opacity: 0.92 !important; font-size: 0.8rem !important; color: rgba(255,255,255,0.95) !important; font-weight: 500 !important; margin-top: 3px !important; line-height: 1.2 !important;">Alta de facultativo y asignación de parámetros</small>
                 </div>
             </div>
-            <button type="button" onclick="closeCreateModal()" class="btn btn-icon btn-sm" style="color: #fff; background: rgba(255,255,255,0.18); width: 30px; height: 30px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center;" title="Cerrar">
+            <button type="button" onclick="closeCreateModal()" class="modal-close-btn" style="flex-shrink: 0 !important;" title="Cerrar">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
-        <!-- Form Body con CSS Grid Optimizado -->
+        <!-- Form Body -->
         <form id="createMedicoForm" onsubmit="saveCreateMedico(event)">
             @csrf
-            <div class="modal-form-grid">
+            <div class="modal-form-grid" style="padding-top: 1.5rem !important;">
                 <!-- Fila 1: Código (Compacto) + Nombre Completo -->
-                <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-hash text-primary"></i> Código <span class="text-danger">*</span></label>
+                <div class="modal-field grid-col-4">
+                    <label><i class="bi bi-hash"></i> CÓDIGO <span class="text-danger">*</span></label>
                     <input type="text" id="create_COD_MED" name="COD_MED" required
-                        class="font-monospace font-weight-bold text-center"
-                        style="background-color: var(--input-bg); color: var(--color-primary); font-size: 0.95rem;">
+                        class="font-monospace font-weight-bold"
+                        style="color: #2563eb; font-size: 1rem; font-weight: 800;">
                 </div>
 
-                <div class="modal-field grid-col-9">
-                    <label><i class="bi bi-person-fill text-primary"></i> Nombre Completo <span class="text-danger">*</span></label>
+                <div class="modal-field grid-col-8">
+                    <label><i class="bi bi-person"></i> NOMBRE COMPLETO <span class="text-danger">*</span></label>
                     <input type="text" id="create_NOM_MED" name="NOM_MED" required oninput="checkMssAutoDetectCreate(this.value)"
                         placeholder="Ej: DRA. MARIA LOPEZ"
                         class="text-uppercase font-weight-semibold">
@@ -246,7 +386,7 @@
 
                 <!-- Fila 2: Jornada + Especialidad + Nómina + Modalidad (4 Columnas) -->
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-clock-fill text-primary"></i> Jornada <span class="text-danger">*</span></label>
+                    <label><i class="bi bi-clock"></i> JORNADA <span class="text-danger">*</span></label>
                     <select id="create_JORNADA" name="JORNADA" required class="text-uppercase font-weight-semibold">
                         <option value="MATUTINA">MATUTINA</option>
                         <option value="VESPERTINA">VESPERTINA</option>
@@ -257,13 +397,25 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-award-fill text-primary"></i> Especialidad</label>
-                    <input type="text" id="create_ESPECIALIDAD" name="ESPECIALIDAD" value="MEDICO GENERAL" class="text-uppercase">
+                    <label><i class="bi bi-heart-pulse"></i> ESPECIALIDAD</label>
+                    <select id="create_ESPECIALIDAD" name="ESPECIALIDAD" class="text-uppercase font-weight-semibold">
+                        <option value="MEDICO GENERAL">MEDICO GENERAL</option>
+                        <option value="GINECOLOGIA">GINECOLOGIA</option>
+                        <option value="LICENCIADAS EN ENFERMERIA">LICENCIADAS EN ENFERMERIA</option>
+                        <option value="ENFERMERAS AUXILIARES">ENFERMERAS AUXILIARES</option>
+                        <option value="PEDIATRA">PEDIATRA</option>
+                        <option value="CONSEJERIA">CONSEJERIA</option>
+                        <option value="PSICOLOGIA">PSICOLOGIA</option>
+                        <option value="PSIQUIATRA">PSIQUIATRA</option>
+                        <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
+                        <option value="ABOGADO">ABOGADO</option>
+                        <option value="OTROS">OTROS</option>
+                    </select>
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-briefcase-fill text-primary"></i> Nómina</label>
-                    <select id="create_NOMINA" name="NOMINA" class="text-uppercase">
+                    <label><i class="bi bi-briefcase"></i> NÓMINA</label>
+                    <select id="create_NOMINA" name="NOMINA" class="text-uppercase font-weight-semibold">
                         <option value="MEDICO ASISTENCIAL">MEDICO ASISTENCIAL</option>
                         <option value="ESPECIALISTA">ESPECIALISTA</option>
                         <option value="LICENCIADA EN ENFERMERIA">LICENCIADA EN ENFERMERIA</option>
@@ -276,18 +428,19 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-file-earmark-text-fill text-primary"></i> Modalidad</label>
-                    <select id="create_MODALIDAD" name="MODALIDAD" class="text-uppercase">
+                    <label><i class="bi bi-patch-check"></i> MODALIDAD</label>
+                    <select id="create_MODALIDAD" name="MODALIDAD" class="text-uppercase font-weight-semibold">
                         <option value="PERMANENTE">PERMANENTE</option>
                         <option value="CONTRATO">CONTRATO</option>
                         <option value="SERVICIO SOCIAL">SERVICIO SOCIAL</option>
                         <option value="INTERINATO">INTERINATO</option>
+                        <option value="TEMPORAL">TEMPORAL</option>
                     </select>
                 </div>
 
                 <!-- Fila 3: Estado + Fecha Ingreso + Horas + Teléfono (4 Columnas) -->
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-toggle-on text-primary"></i> Estado</label>
+                    <label><i class="bi bi-activity"></i> ESTADO</label>
                     <select id="create_estado" name="estado" class="text-uppercase font-weight-bold">
                         <option value="activo">ACTIVO</option>
                         <option value="inactivo">INACTIVO</option>
@@ -295,36 +448,36 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-calendar-event text-primary"></i> Fecha Ingreso</label>
+                    <label><i class="bi bi-calendar-event"></i> FECHA INGRESO</label>
                     <input type="date" id="create_FECHA_INGRESO" name="FECHA_INGRESO" value="{{ date('Y-m-d') }}">
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-hourglass-split text-primary"></i> Horas Contratadas</label>
+                    <label><i class="bi bi-hourglass"></i> HORAS CONTRATADAS</label>
                     <input type="number" id="create_HORAS_CONTRATADAS" name="HORAS_CONTRATADAS" value="6" min="1" max="24">
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-telephone-fill text-primary"></i> Teléfono</label>
+                    <label><i class="bi bi-telephone"></i> TELÉFONO</label>
                     <input type="text" id="create_TELEFONO" name="TELEFONO" placeholder="Ej: 9999-9999">
                 </div>
 
                 <!-- Fila 4: Correo + Observaciones -->
-                <div class="modal-field grid-col-5">
-                    <label><i class="bi bi-envelope-fill text-primary"></i> Correo Electrónico</label>
+                <div class="modal-field grid-col-6">
+                    <label><i class="bi bi-envelope"></i> CORREO ELECTRÓNICO</label>
                     <input type="email" id="create_CORREO" name="CORREO" placeholder="doctor@salud.gob.hn">
                 </div>
 
-                <div class="modal-field grid-col-7">
-                    <label><i class="bi bi-card-text text-primary"></i> Observaciones</label>
+                <div class="modal-field grid-col-6">
+                    <label><i class="bi bi-card-text"></i> OBSERVACIONES</label>
                     <input type="text" id="create_observaciones" name="observaciones" placeholder="Detalles o notas del médico...">
                 </div>
 
                 <!-- Fila 5: Checkbox de Director -->
-                <div class="grid-col-12">
-                    <label class="d-flex align-items-center gap-2.5 p-2.5 rounded m-0" style="background: var(--bg-subtle); border: 1px solid var(--border-color); cursor: pointer;">
-                        <input type="checkbox" id="create_es_director" name="es_director" value="1" class="form-check-input mt-0" style="width: 18px; height: 18px;">
-                        <span style="font-size: 0.83rem; font-weight: 700; color: var(--text-primary);">
+                <div class="grid-col-12 mt-1">
+                    <label class="d-inline-flex align-items-center gap-2 p-2 px-3 rounded-lg m-0" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; cursor: pointer;">
+                        <input type="checkbox" id="create_es_director" name="es_director" value="1" class="form-check-input mt-0" style="width: 17px; height: 17px; cursor: pointer;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">
                             <i class="bi bi-star-fill text-warning mr-1"></i> Asignar como Director / Firma Principal del Mes
                         </span>
                     </label>
@@ -332,12 +485,12 @@
             </div>
 
             <!-- Footer -->
-            <div class="d-flex align-items-center justify-content-end gap-2 px-3.5 py-2.5 border-top" style="background-color: var(--bg-subtle); border-color: var(--border-color) !important;">
-                <button type="button" onclick="closeCreateModal()" class="btn btn-secondary btn-sm" style="font-weight: 600;">
+            <div class="d-flex align-items-center justify-content-between px-4 py-3" style="background-color: var(--bg-surface);">
+                <button type="button" onclick="closeCreateModal()" class="btn-modal-cancel">
                     Cancelar
                 </button>
-                <button type="submit" id="btnSaveCreateMedico" class="btn btn-primary btn-sm" style="font-weight: 600; padding: 0 16px;">
-                    <i class="bi bi-check-circle-fill mr-1"></i> Guardar Médico
+                <button type="submit" id="btnSaveCreateMedico" class="btn-modal-submit">
+                    <i class="bi bi-check-circle-fill"></i> Guardar Médico
                 </button>
             </div>
         </form>
@@ -350,44 +503,44 @@
 <div id="editMedicoModal" class="modal-backdrop-custom">
     <div class="modal-dialog-custom">
         <!-- Header -->
-        <div class="modal-header-custom" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
-            <div class="d-flex align-items-center gap-2.5">
-                <div class="d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 9px; background: rgba(255,255,255,0.2); color: #fff;">
-                    <i class="bi bi-pencil-square" style="font-size: 1.2rem;"></i>
+        <div class="modal-header-custom" style="background: #0284c7; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 14px !important; padding: 1.15rem 1.6rem !important;">
+            <div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 14px !important; flex: 1 1 auto !important; min-width: 0 !important;">
+                <div class="modal-icon-badge" style="width: 44px !important; height: 44px !important; min-width: 44px !important; border-radius: 12px !important; background: rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 1.35rem !important; flex-shrink: 0 !important;">
+                    <i class="bi bi-pencil-square"></i>
                 </div>
-                <div>
-                    <h5 class="mb-0 font-weight-bold" style="font-size: 0.96rem; color: #fff;">Editar Información del Médico</h5>
-                    <small id="editModalSubhead" style="opacity: 0.9; font-size: 0.75rem; color: rgba(255,255,255,0.9);">Modificar datos del profesional</small>
+                <div style="display: flex !important; flex-direction: column !important; justify-content: center !important; min-width: 0 !important;">
+                    <h5 class="mb-0 font-weight-bold" style="font-size: 1.1rem !important; color: #ffffff !important; line-height: 1.25 !important; letter-spacing: -0.2px !important; margin: 0 !important;">Editar Información del Médico</h5>
+                    <small id="editModalSubhead" style="opacity: 0.92 !important; font-size: 0.8rem !important; color: rgba(255,255,255,0.95) !important; font-weight: 500 !important; margin-top: 3px !important; line-height: 1.2 !important;">Modificar datos del profesional</small>
                 </div>
             </div>
-            <button type="button" onclick="closeEditModal()" class="btn btn-icon btn-sm" style="color: #fff; background: rgba(255,255,255,0.18); width: 30px; height: 30px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center;" title="Cerrar">
+            <button type="button" onclick="closeEditModal()" class="modal-close-btn" style="flex-shrink: 0 !important;" title="Cerrar">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
-        <!-- Form Body con CSS Grid Optimizado -->
+        <!-- Form Body -->
         <form id="editMedicoForm" onsubmit="saveEditMedico(event)">
             @csrf
             <input type="hidden" id="edit_medico_id" name="id">
 
-            <div class="modal-form-grid">
+            <div class="modal-form-grid" style="padding-top: 1.5rem !important;">
                 <!-- Fila 1: Código + Nombre Completo -->
-                <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-hash text-primary"></i> Código <span class="text-danger">*</span></label>
+                <div class="modal-field grid-col-4">
+                    <label><i class="bi bi-hash"></i> CÓDIGO <span class="text-danger">*</span></label>
                     <input type="text" id="edit_COD_MED" name="COD_MED" required
-                        class="font-monospace font-weight-bold text-center"
-                        style="background-color: var(--input-bg); color: var(--color-primary); font-size: 0.95rem;">
+                        class="font-monospace font-weight-bold"
+                        style="color: #0284c7; font-size: 1rem; font-weight: 800;">
                 </div>
 
-                <div class="modal-field grid-col-9">
-                    <label><i class="bi bi-person-fill text-primary"></i> Nombre Completo <span class="text-danger">*</span></label>
+                <div class="modal-field grid-col-8">
+                    <label><i class="bi bi-person"></i> NOMBRE COMPLETO <span class="text-danger">*</span></label>
                     <input type="text" id="edit_NOM_MED" name="NOM_MED" required oninput="checkMssAutoDetect(this.value)"
                         class="text-uppercase font-weight-semibold">
                 </div>
 
                 <!-- Fila 2: Jornada + Especialidad + Nómina + Modalidad (4 Columnas) -->
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-clock-fill text-primary"></i> Jornada <span class="text-danger">*</span></label>
+                    <label><i class="bi bi-clock"></i> JORNADA <span class="text-danger">*</span></label>
                     <select id="edit_JORNADA" name="JORNADA" class="text-uppercase font-weight-semibold">
                         <option value="MATUTINA">MATUTINA</option>
                         <option value="VESPERTINA">VESPERTINA</option>
@@ -398,13 +551,25 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-award-fill text-primary"></i> Especialidad</label>
-                    <input type="text" id="edit_ESPECIALIDAD" name="ESPECIALIDAD" class="text-uppercase">
+                    <label><i class="bi bi-heart-pulse"></i> ESPECIALIDAD</label>
+                    <select id="edit_ESPECIALIDAD" name="ESPECIALIDAD" class="text-uppercase font-weight-semibold">
+                        <option value="MEDICO GENERAL">MEDICO GENERAL</option>
+                        <option value="GINECOLOGIA">GINECOLOGIA</option>
+                        <option value="LICENCIADAS EN ENFERMERIA">LICENCIADAS EN ENFERMERIA</option>
+                        <option value="ENFERMERAS AUXILIARES">ENFERMERAS AUXILIARES</option>
+                        <option value="PEDIATRA">PEDIATRA</option>
+                        <option value="CONSEJERIA">CONSEJERIA</option>
+                        <option value="PSICOLOGIA">PSICOLOGIA</option>
+                        <option value="PSIQUIATRA">PSIQUIATRA</option>
+                        <option value="TRABAJADOR SOCIAL">TRABAJADOR SOCIAL</option>
+                        <option value="ABOGADO">ABOGADO</option>
+                        <option value="OTROS">OTROS</option>
+                    </select>
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-briefcase-fill text-primary"></i> Nómina</label>
-                    <select id="edit_NOMINA" name="NOMINA" class="text-uppercase">
+                    <label><i class="bi bi-briefcase"></i> NÓMINA</label>
+                    <select id="edit_NOMINA" name="NOMINA" class="text-uppercase font-weight-semibold">
                         <option value="MEDICO ASISTENCIAL">MEDICO ASISTENCIAL</option>
                         <option value="ESPECIALISTA">ESPECIALISTA</option>
                         <option value="LICENCIADA EN ENFERMERIA">LICENCIADA EN ENFERMERIA</option>
@@ -417,18 +582,19 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-file-earmark-text-fill text-primary"></i> Modalidad</label>
-                    <select id="edit_MODALIDAD" name="MODALIDAD" class="text-uppercase">
+                    <label><i class="bi bi-patch-check"></i> MODALIDAD</label>
+                    <select id="edit_MODALIDAD" name="MODALIDAD" class="text-uppercase font-weight-semibold">
                         <option value="PERMANENTE">PERMANENTE</option>
                         <option value="CONTRATO">CONTRATO</option>
                         <option value="SERVICIO SOCIAL">SERVICIO SOCIAL</option>
                         <option value="INTERINATO">INTERINATO</option>
+                        <option value="TEMPORAL">TEMPORAL</option>
                     </select>
                 </div>
 
                 <!-- Fila 3: Estado + Fecha Ingreso + Horas + Teléfono -->
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-toggle-on text-primary"></i> Estado</label>
+                    <label><i class="bi bi-activity"></i> ESTADO</label>
                     <select id="edit_estado" name="estado" class="text-uppercase font-weight-bold">
                         <option value="activo">ACTIVO</option>
                         <option value="inactivo">INACTIVO</option>
@@ -436,36 +602,36 @@
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-calendar-event text-primary"></i> Fecha Ingreso</label>
+                    <label><i class="bi bi-calendar-event"></i> FECHA INGRESO</label>
                     <input type="date" id="edit_FECHA_INGRESO" name="FECHA_INGRESO">
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-hourglass-split text-primary"></i> Horas Contratadas</label>
+                    <label><i class="bi bi-hourglass"></i> HORAS CONTRATADAS</label>
                     <input type="number" id="edit_HORAS_CONTRATADAS" name="HORAS_CONTRATADAS" min="1" max="24">
                 </div>
 
                 <div class="modal-field grid-col-3">
-                    <label><i class="bi bi-telephone-fill text-primary"></i> Teléfono</label>
+                    <label><i class="bi bi-telephone"></i> TELÉFONO</label>
                     <input type="text" id="edit_TELEFONO" name="TELEFONO" placeholder="Ej: 9999-9999">
                 </div>
 
                 <!-- Fila 4: Correo + Observaciones -->
-                <div class="modal-field grid-col-5">
-                    <label><i class="bi bi-envelope-fill text-primary"></i> Correo Electrónico</label>
+                <div class="modal-field grid-col-6">
+                    <label><i class="bi bi-envelope"></i> CORREO ELECTRÓNICO</label>
                     <input type="email" id="edit_CORREO" name="CORREO" placeholder="doctor@salud.gob.hn">
                 </div>
 
-                <div class="modal-field grid-col-7">
-                    <label><i class="bi bi-card-text text-primary"></i> Observaciones</label>
+                <div class="modal-field grid-col-6">
+                    <label><i class="bi bi-card-text"></i> OBSERVACIONES</label>
                     <input type="text" id="edit_observaciones" name="observaciones" placeholder="Detalles o notas del médico...">
                 </div>
 
                 <!-- Fila 5: Checkbox de Director -->
-                <div class="grid-col-12">
-                    <label class="d-flex align-items-center gap-2.5 p-2.5 rounded m-0" style="background: var(--bg-subtle); border: 1px solid var(--border-color); cursor: pointer;">
-                        <input type="checkbox" id="edit_es_director" name="es_director" value="1" class="form-check-input mt-0" style="width: 18px; height: 18px;">
-                        <span style="font-size: 0.83rem; font-weight: 700; color: var(--text-primary);">
+                <div class="grid-col-12 mt-1">
+                    <label class="d-inline-flex align-items-center gap-2 p-2 px-3 rounded-lg m-0" style="background: var(--bg-subtle, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; cursor: pointer;">
+                        <input type="checkbox" id="edit_es_director" name="es_director" value="1" class="form-check-input mt-0" style="width: 17px; height: 17px; cursor: pointer;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">
                             <i class="bi bi-star-fill text-warning mr-1"></i> Asignar como Director / Firma Principal del Mes
                         </span>
                     </label>
@@ -473,12 +639,12 @@
             </div>
 
             <!-- Footer -->
-            <div class="d-flex align-items-center justify-content-end gap-2 px-3.5 py-2.5 border-top" style="background-color: var(--bg-subtle); border-color: var(--border-color) !important;">
-                <button type="button" onclick="closeEditModal()" class="btn btn-secondary btn-sm" style="font-weight: 600;">
+            <div class="d-flex align-items-center justify-content-between px-4 py-3" style="background-color: var(--bg-surface);">
+                <button type="button" onclick="closeEditModal()" class="btn-modal-cancel">
                     Cancelar
                 </button>
-                <button type="submit" id="btnSaveEditMedico" class="btn btn-primary btn-sm" style="font-weight: 600; padding: 0 16px;">
-                    <i class="bi bi-check-circle-fill mr-1"></i> Guardar Cambios
+                <button type="submit" id="btnSaveEditMedico" class="btn-modal-submit" style="background-color: #0284c7;">
+                    <i class="bi bi-check-circle-fill"></i> Guardar Cambios
                 </button>
             </div>
         </form>
@@ -733,6 +899,44 @@ function openCreateModal() {
 
     $('#createMedicoModal').addClass('active');
     setTimeout(() => $('#create_NOM_MED').focus(), 100);
+}
+
+function llenarEjemploCaptura() {
+    $('#create_COD_MED').val('56');
+    $('#create_NOM_MED').val('DRA. MARIA LOPEZ');
+    $('#create_JORNADA').val('MATUTINA');
+    $('#create_ESPECIALIDAD').val('MEDICO GENERAL');
+    $('#create_NOMINA').val('MEDICO ASISTENCIAL');
+    $('#create_MODALIDAD').val('PERMANENTE');
+    $('#create_estado').val('activo');
+    $('#create_FECHA_INGRESO').val('2026-08-31');
+    $('#create_HORAS_CONTRATADAS').val(6);
+    $('#create_TELEFONO').val('9999-9999');
+    $('#create_CORREO').val('doctor@salud.gob.hn');
+    $('#create_observaciones').val('Detalles o notas del médico...');
+    $('#create_es_director').prop('checked', false);
+}
+
+function limpiarCamposCreate() {
+    $('#createMedicoForm')[0].reset();
+    $('#create_FECHA_INGRESO').val(new Date().toISOString().split('T')[0]);
+    $('#create_HORAS_CONTRATADAS').val(6);
+    $('#create_estado').val('activo');
+    $('#create_ESPECIALIDAD').val('MEDICO GENERAL');
+    $('#create_NOMINA').val('MEDICO ASISTENCIAL');
+    $('#create_MODALIDAD').val('PERMANENTE');
+    $('#create_TELEFONO').val('');
+    $('#create_CORREO').val('');
+    $('#create_observaciones').val('');
+    $('#create_es_director').prop('checked', false);
+
+    let maxCode = 0;
+    allMedicos.forEach(m => {
+        const num = parseInt(m.COD_MED, 10);
+        if (!isNaN(num) && num > maxCode) maxCode = num;
+    });
+    $('#create_COD_MED').val(maxCode + 1);
+    $('#create_NOM_MED').focus();
 }
 
 function closeCreateModal() {
