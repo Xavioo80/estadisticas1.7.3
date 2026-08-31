@@ -50,7 +50,7 @@
     <thead>
         <tr class="header-row-main">
             <th class="sticky-col-1" style="width: 44px; min-width: 44px; text-align: center;">N°</th>
-            <th class="sticky-col-2 col-medico-name" style="width: 320px; min-width: 320px; text-align: left !important; padding-left: 14px !important;">NOMBRE COMPLETO DEL MEDICO</th>
+            <th class="sticky-col-2 col-medico-name" style="width: 440px; min-width: 440px; text-align: left !important; padding-left: 14px !important;">NOMBRE COMPLETO DEL MEDICO</th>
             <th style="text-align: left !important; padding-left: 14px !important;">OBSERVACIONES</th>
         </tr>
     </thead>

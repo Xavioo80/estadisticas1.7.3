@@ -150,12 +150,12 @@ class MedicoController extends Controller
             $validated = $request->validate([
                 'COD_MED' => 'required',
                 'NOM_MED' => 'required',
-                'ESPECIALIDAD' => 'required',
-                'NOMINA' => 'required',
+                'ESPECIALIDAD' => 'nullable',
+                'NOMINA' => 'nullable',
                 'JORNADA' => 'required',
-                'MODALIDAD' => 'required',
-                'FECHA_INGRESO' => 'required|date',
-                'HORAS_CONTRATADAS' => 'required|numeric|min:0',
+                'MODALIDAD' => 'nullable',
+                'FECHA_INGRESO' => 'nullable|date',
+                'HORAS_CONTRATADAS' => 'nullable|numeric|min:0',
                 'consultas_por_hora' => 'nullable|numeric|min:0',
                 'consultas_dia' => 'nullable|numeric|min:0',
                 'TELEFONO' => 'nullable|max:15',
@@ -183,14 +183,14 @@ class MedicoController extends Controller
                 $data = [
                     'COD_MED' => $validated['COD_MED'],
                     'NOM_MED' => $validated['NOM_MED'],
-                    'ESPECIALIDAD' => $validated['ESPECIALIDAD'],
+                    'ESPECIALIDAD' => $validated['ESPECIALIDAD'] ?? 'MEDICO GENERAL',
                     'JORNADA' => $validated['JORNADA'],
-                    'NOMINA' => $validated['NOMINA'],
-                    'MODALIDAD' => $validated['MODALIDAD'],
-                    'FECHA_INGRESO' => $validated['FECHA_INGRESO'],
+                    'NOMINA' => $validated['NOMINA'] ?? 'MEDICO ASISTENCIAL',
+                    'MODALIDAD' => $validated['MODALIDAD'] ?? 'PERMANENTE',
+                    'FECHA_INGRESO' => $validated['FECHA_INGRESO'] ?? now()->toDateString(),
                     'CORREO' => $validated['CORREO'] ?? '',
                     'TELEFONO' => $validated['TELEFONO'] ?? '',
-                    'HORAS_CONTRATADAS' => $validated['HORAS_CONTRATADAS'],
+                    'HORAS_CONTRATADAS' => $validated['HORAS_CONTRATADAS'] ?? 6,
                     'CONSULTAS' => $validated['TIPO_CONSULTA'] ?? '',
                     'consultas_por_hora' => $validated['consultas_por_hora'] ?? 6,
                     'consultas_dia' => $validated['consultas_dia'] ?? 0,
@@ -249,6 +249,9 @@ class MedicoController extends Controller
      */
     public function show(Medico $medico)
     {
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'medico' => $medico]);
+        }
         return view('medicos.show', compact('medico'));
     }
 
@@ -324,6 +327,9 @@ class MedicoController extends Controller
     public function destroy(Medico $medico)
     {
         $medico->delete();
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Médico eliminado']);
+        }
         return back()->with('success', 'Médico eliminado');
     }
 

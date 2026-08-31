@@ -166,9 +166,9 @@
             left: 44px !important;
             top: 0 !important;
             z-index: 80 !important;
-            width: 320px !important;
-            min-width: 320px !important;
-            max-width: 320px !important;
+            width: 440px !important;
+            min-width: 440px !important;
+            max-width: 440px !important;
             background-color: var(--bg-surface-alt, #e2e8f0) !important;
         }
 
@@ -212,9 +212,9 @@
             position: sticky !important;
             left: 44px !important;
             z-index: 25 !important;
-            width: 320px !important;
-            min-width: 320px !important;
-            max-width: 320px !important;
+            width: 440px !important;
+            min-width: 440px !important;
+            max-width: 440px !important;
             background-color: var(--bg-surface) !important;
             text-align: left !important;
             padding-left: 14px !important;

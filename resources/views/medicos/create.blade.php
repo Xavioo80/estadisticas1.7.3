@@ -11,14 +11,11 @@
 <div class="informe-page-wrapper">
     <!-- Header -->
     <div class="informe-header">
-        <div class="d-flex align-items-center gap-3">
-            <div class="d-inline-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(77, 124, 254, 0.12); color: var(--color-primary);">
-                <i class="bi bi-person-plus-fill" style="font-size: 1.25rem;"></i>
-            </div>
-            <div>
-                <h2 class="mb-1">Registrar Nuevo Personal Médico</h2>
-                <p>Alta de facultativo o especialista para asignación de turnos y consultas</p>
-            </div>
+        <div>
+            <h2 style="margin: 0; font-size: 1.05rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; color: var(--text-primary);">
+                <i class="bi bi-person-plus-fill text-primary" style="font-size: 1.25rem;"></i> Registrar Nuevo Personal Médico
+            </h2>
+            <p style="margin: 2px 0 0 0; font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Alta de facultativo o especialista para asignación de turnos y consultas</p>
         </div>
 
         <div class="d-flex align-items-center gap-2">

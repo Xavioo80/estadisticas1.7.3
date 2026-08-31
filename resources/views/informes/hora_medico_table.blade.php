@@ -1,24 +1,56 @@
 @if(isset($dataByJornada) && $jornada === 'TOTAL JORNADAS')
     @php
         $grandTotals = [
-            'acuerdo' => 0, 'contrato' => 0, 'm_general' => 0, 'm_especialista' => 0,
-            'hrs_tadas' => 0, 'dia_cont' => 0, 'dia_cump' => 0, 'hr_cont' => 0, 'hr_cump' => 0,
-            'prog' => 0, 'repr' => 0, 'atend' => 0,
-            'hsc_comp' => 0, 'hsc_esfam' => 0, 'hsc_prom' => 0, 'hsc_cong' => 0,
-            'hsc_campo' => 0, 'hsc_asam' => 0, 'hsc_citas' => 0,
-            'hsc_ord' => 0, 'hsc_profil' => 0, 'hsc_pers' => 0
+            'acuerdo' => 0,
+            'contrato' => 0,
+            'm_general' => 0,
+            'm_especialista' => 0,
+            'hrs_tadas' => 0,
+            'dia_cont' => 0,
+            'dia_cump' => 0,
+            'hr_cont' => 0,
+            'hr_cump' => 0,
+            'prog' => 0,
+            'repr' => 0,
+            'atend' => 0,
+            'hsc_comp' => 0,
+            'hsc_esfam' => 0,
+            'hsc_prom' => 0,
+            'hsc_cong' => 0,
+            'hsc_campo' => 0,
+            'hsc_asam' => 0,
+            'hsc_citas' => 0,
+            'hsc_ord' => 0,
+            'hsc_profil' => 0,
+            'hsc_pers' => 0
         ];
     @endphp
     <tbody>
         @foreach($dataByJornada as $jorName => $jorData)
             @php
                 $jTotals = [
-                    'acuerdo' => 0, 'contrato' => 0, 'm_general' => 0, 'm_especialista' => 0,
-                    'hrs_tadas' => 0, 'dia_cont' => 0, 'dia_cump' => 0, 'hr_cont' => 0, 'hr_cump' => 0,
-                    'prog' => 0, 'repr' => 0, 'atend' => 0,
-                    'hsc_comp' => 0, 'hsc_esfam' => 0, 'hsc_prom' => 0, 'hsc_cong' => 0,
-                    'hsc_campo' => 0, 'hsc_asam' => 0, 'hsc_citas' => 0,
-                    'hsc_ord' => 0, 'hsc_profil' => 0, 'hsc_pers' => 0
+                    'acuerdo' => 0,
+                    'contrato' => 0,
+                    'm_general' => 0,
+                    'm_especialista' => 0,
+                    'hrs_tadas' => 0,
+                    'dia_cont' => 0,
+                    'dia_cump' => 0,
+                    'hr_cont' => 0,
+                    'hr_cump' => 0,
+                    'prog' => 0,
+                    'repr' => 0,
+                    'atend' => 0,
+                    'hsc_comp' => 0,
+                    'hsc_esfam' => 0,
+                    'hsc_prom' => 0,
+                    'hsc_cong' => 0,
+                    'hsc_campo' => 0,
+                    'hsc_asam' => 0,
+                    'hsc_citas' => 0,
+                    'hsc_ord' => 0,
+                    'hsc_profil' => 0,
+                    'hsc_pers' => 0
                 ];
                 foreach ($jorData as $row) {
                     $medicoRecord = $row['medico'];
@@ -51,16 +83,16 @@
                     $jTotals['repr'] += $row['repr'];
                     $jTotals['atend'] += $row['atenciones'];
                     $h = $row['hsc'] ?? null;
-                    $jTotals['hsc_comp']   += $h ? round((float)($h->compensatorio ?? 0)) : 0;
-                    $jTotals['hsc_esfam']  += $h ? round((float)($h->esfam ?? 0)) : 0;
-                    $jTotals['hsc_prom']   += $h ? round((float)($h->promocion ?? 0)) : 0;
-                    $jTotals['hsc_cong']   += $h ? round((float)($h->congresos_medicos ?? 0)) : 0;
-                    $jTotals['hsc_campo']  += $h ? round((float)($h->trabajo_campo ?? 0)) : 0;
-                    $jTotals['hsc_asam']   += $h ? round((float)($h->convocatoria_general ?? 0)) : 0;
-                    $jTotals['hsc_citas']  += $h ? round((float)($h->incapacidad ?? 0) + (float)($h->cita_ihss ?? 0)) : 0;
-                    $jTotals['hsc_ord']    += $h ? round((float)($h->vacaciones_ordinarias ?? 0)) : 0;
-                    $jTotals['hsc_profil'] += $h ? round((float)($h->descanso_profilactico ?? 0)) : 0;
-                    $jTotals['hsc_pers']   += $h ? round((float)($h->permiso_personal ?? 0)) : 0;
+                    $jTotals['hsc_comp'] += $h ? round((float) ($h->compensatorio ?? 0)) : 0;
+                    $jTotals['hsc_esfam'] += $h ? round((float) ($h->esfam ?? 0)) : 0;
+                    $jTotals['hsc_prom'] += $h ? round((float) ($h->promocion ?? 0)) : 0;
+                    $jTotals['hsc_cong'] += $h ? round((float) ($h->congresos_medicos ?? 0)) : 0;
+                    $jTotals['hsc_campo'] += $h ? round((float) ($h->trabajo_campo ?? 0)) : 0;
+                    $jTotals['hsc_asam'] += $h ? round((float) ($h->convocatoria_general ?? 0)) : 0;
+                    $jTotals['hsc_citas'] += $h ? round((float) ($h->incapacidad ?? 0) + (float) ($h->cita_ihss ?? 0)) : 0;
+                    $jTotals['hsc_ord'] += $h ? round((float) ($h->vacaciones_ordinarias ?? 0)) : 0;
+                    $jTotals['hsc_profil'] += $h ? round((float) ($h->descanso_profilactico ?? 0)) : 0;
+                    $jTotals['hsc_pers'] += $h ? round((float) ($h->permiso_personal ?? 0)) : 0;
                 }
 
                 foreach ($jTotals as $k => $v)
@@ -68,10 +100,11 @@
             @endphp
             <tr>
                 <td class="border-black sticky-col-1">
-                    {{ $loop->iteration }}</td>
-                <td class="border-black text-left font-weight-bold sticky-col-2"
-                    style="padding-left: 10px;">TOTAL JORNADA
-                    {{ $jorName }}</td>
+                    {{ $loop->iteration }}
+                </td>
+                <td class="border-black text-left font-weight-bold sticky-col-2" style="padding-left: 10px;">TOTAL JORNADA
+                    {{ $jorName }}
+                </td>
                 <td class="border-black">{{ round($jTotals['acuerdo']) }}</td>
                 <td class="border-black">{{ round($jTotals['contrato']) }}</td>
                 <td class="border-black">{{ round($jTotals['m_general']) }}</td>
@@ -96,7 +129,8 @@
                 <td class="border-black middle">{{ round($jTotals['hsc_asam']) > 0 ? round($jTotals['hsc_asam']) : '0' }}</td>
                 <td class="border-black middle">{{ round($jTotals['hsc_citas']) > 0 ? round($jTotals['hsc_citas']) : '0' }}</td>
                 <td class="border-black middle">{{ round($jTotals['hsc_ord']) > 0 ? round($jTotals['hsc_ord']) : '0' }}</td>
-                <td class="border-black middle">{{ round($jTotals['hsc_profil']) > 0 ? round($jTotals['hsc_profil']) : '0' }}</td>
+                <td class="border-black middle">{{ round($jTotals['hsc_profil']) > 0 ? round($jTotals['hsc_profil']) : '0' }}
+                </td>
                 <td class="border-black middle">{{ round($jTotals['hsc_pers']) > 0 ? round($jTotals['hsc_pers']) : '0' }}</td>
                 <td class="border-black no-print"></td>
             </tr>
@@ -122,16 +156,26 @@
                 @php $gp = $grandTotals['repr'] > 0 ? ($grandTotals['atend'] / $grandTotals['repr'] * 100) : 0; @endphp
                 {{ number_format($gp, 0) }}%
             </td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_comp']) > 0 ? round($grandTotals['hsc_comp']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_esfam']) > 0 ? round($grandTotals['hsc_esfam']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_prom']) > 0 ? round($grandTotals['hsc_prom']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_cong']) > 0 ? round($grandTotals['hsc_cong']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_campo']) > 0 ? round($grandTotals['hsc_campo']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_asam']) > 0 ? round($grandTotals['hsc_asam']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_citas']) > 0 ? round($grandTotals['hsc_citas']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_ord']) > 0 ? round($grandTotals['hsc_ord']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_profil']) > 0 ? round($grandTotals['hsc_profil']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($grandTotals['hsc_pers']) > 0 ? round($grandTotals['hsc_pers']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_comp']) > 0 ? round($grandTotals['hsc_comp']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_esfam']) > 0 ? round($grandTotals['hsc_esfam']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_prom']) > 0 ? round($grandTotals['hsc_prom']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_cong']) > 0 ? round($grandTotals['hsc_cong']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_campo']) > 0 ? round($grandTotals['hsc_campo']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_asam']) > 0 ? round($grandTotals['hsc_asam']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_citas']) > 0 ? round($grandTotals['hsc_citas']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_ord']) > 0 ? round($grandTotals['hsc_ord']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_profil']) > 0 ? round($grandTotals['hsc_profil']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($grandTotals['hsc_pers']) > 0 ? round($grandTotals['hsc_pers']) : '0' }}</td>
             <td class="border-black no-print"></td>
         </tr>
     </tfoot>
@@ -139,12 +183,28 @@
     <tbody>
         @php
             $totals = [
-                'acuerdo' => 0, 'contrato' => 0, 'm_general' => 0, 'm_especialista' => 0,
-                'hrs_tadas' => 0, 'dia_cont' => 0, 'dia_cump' => 0, 'hr_cont' => 0, 'hr_cump' => 0,
-                'prog' => 0, 'repr' => 0, 'atend' => 0,
-                'hsc_comp' => 0, 'hsc_esfam' => 0, 'hsc_prom' => 0, 'hsc_cong' => 0,
-                'hsc_campo' => 0, 'hsc_asam' => 0, 'hsc_citas' => 0,
-                'hsc_ord' => 0, 'hsc_profil' => 0, 'hsc_pers' => 0
+                'acuerdo' => 0,
+                'contrato' => 0,
+                'm_general' => 0,
+                'm_especialista' => 0,
+                'hrs_tadas' => 0,
+                'dia_cont' => 0,
+                'dia_cump' => 0,
+                'hr_cont' => 0,
+                'hr_cump' => 0,
+                'prog' => 0,
+                'repr' => 0,
+                'atend' => 0,
+                'hsc_comp' => 0,
+                'hsc_esfam' => 0,
+                'hsc_prom' => 0,
+                'hsc_cong' => 0,
+                'hsc_campo' => 0,
+                'hsc_asam' => 0,
+                'hsc_citas' => 0,
+                'hsc_ord' => 0,
+                'hsc_profil' => 0,
+                'hsc_pers' => 0
             ];
         @endphp
         @php
@@ -189,27 +249,27 @@
                 $totals['atend'] += $row['atenciones'];
 
                 $h = $row['hsc'] ?? null;
-                $hsc_comp   = $h ? round((float)($h->compensatorio ?? 0)) : 0;
-                $hsc_esfam  = $h ? round((float)($h->esfam ?? 0)) : 0;
-                $hsc_prom   = $h ? round((float)($h->promocion ?? 0)) : 0;
-                $hsc_cong   = $h ? round((float)($h->congresos_medicos ?? 0)) : 0;
-                $hsc_campo  = $h ? round((float)($h->trabajo_campo ?? 0)) : 0;
-                $hsc_asam   = $h ? round((float)($h->convocatoria_general ?? 0)) : 0;
-                $hsc_citas  = $h ? round((float)($h->incapacidad ?? 0) + (float)($h->cita_ihss ?? 0)) : 0;
-                $hsc_ord    = $h ? round((float)($h->vacaciones_ordinarias ?? 0)) : 0;
-                $hsc_profil = $h ? round((float)($h->descanso_profilactico ?? 0)) : 0;
-                $hsc_pers   = $h ? round((float)($h->permiso_personal ?? 0)) : 0;
+                $hsc_comp = $h ? round((float) ($h->compensatorio ?? 0)) : 0;
+                $hsc_esfam = $h ? round((float) ($h->esfam ?? 0)) : 0;
+                $hsc_prom = $h ? round((float) ($h->promocion ?? 0)) : 0;
+                $hsc_cong = $h ? round((float) ($h->congresos_medicos ?? 0)) : 0;
+                $hsc_campo = $h ? round((float) ($h->trabajo_campo ?? 0)) : 0;
+                $hsc_asam = $h ? round((float) ($h->convocatoria_general ?? 0)) : 0;
+                $hsc_citas = $h ? round((float) ($h->incapacidad ?? 0) + (float) ($h->cita_ihss ?? 0)) : 0;
+                $hsc_ord = $h ? round((float) ($h->vacaciones_ordinarias ?? 0)) : 0;
+                $hsc_profil = $h ? round((float) ($h->descanso_profilactico ?? 0)) : 0;
+                $hsc_pers = $h ? round((float) ($h->permiso_personal ?? 0)) : 0;
 
-                $totals['hsc_comp']  += $hsc_comp;
+                $totals['hsc_comp'] += $hsc_comp;
                 $totals['hsc_esfam'] += $hsc_esfam;
-                $totals['hsc_prom']  += $hsc_prom;
-                $totals['hsc_cong']  += $hsc_cong;
+                $totals['hsc_prom'] += $hsc_prom;
+                $totals['hsc_cong'] += $hsc_cong;
                 $totals['hsc_campo'] += $hsc_campo;
-                $totals['hsc_asam']  += $hsc_asam;
+                $totals['hsc_asam'] += $hsc_asam;
                 $totals['hsc_citas'] += $hsc_citas;
-                $totals['hsc_ord']   += $hsc_ord;
-                $totals['hsc_profil']+= $hsc_profil;
-                $totals['hsc_pers']  += $hsc_pers;
+                $totals['hsc_ord'] += $hsc_ord;
+                $totals['hsc_profil'] += $hsc_profil;
+                $totals['hsc_pers'] += $hsc_pers;
             @endphp
             <tr style="height: auto;" class="medico-row {{ $isONG ? 'ong-row' : '' }}" data-medico-id="{{ $medicoRecord->id }}">
                 <td class="border-black sticky-col-1">{{ $index + 1 }}</td>
@@ -217,7 +277,7 @@
                     @php
                         $nombreLimpio = trim($medicoRecord->NOM_MED);
                         $prefijos = ['DR. ', 'DRA. ', 'DR ', 'DRA ', 'G.O. ', 'G.O ', 'GO. ', 'GO '];
-                        
+
                         $cambio = true;
                         while ($cambio) {
                             $cambio = false;
@@ -232,19 +292,29 @@
                     @endphp
                     {{ trim($nombreLimpio) }}
                 </td>
-                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}</td>
+                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}
+                </td>
                 <td class="border-black middle">{{ $isContrato ? 'X' : '-' }}</td>
                 <td class="border-black middle">{{ $isGeneral ? 'X' : '-' }}</td>
-                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round($row['diasContratados']) : '0') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round($row['horasContratadasMes']) : '0') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
+                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
+                    {{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}
+                </td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round($row['diasContratados']) : '0') }}</td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round($row['horasContratadasMes']) : '0') }}</td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
                 <td class="border-black middle">{{ $isONG ? '-' : ($row['prog'] > 0 ? round($row['prog']) : '0') }}</td>
-                <td class="border-black middle font-weight-bold">{{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
+                <td class="border-black middle font-weight-bold">
+                    {{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
                 <td class="border-black middle font-weight-bold text-primary">{{ round($row['atenciones']) }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['rendimiento'] > 0 ? round($row['rendimiento']) . '%' : '0%') }}</td>
+                <td class="border-black middle">
+                    {{ $isONG ? '-' : ($row['rendimiento'] > 0 ? round($row['rendimiento']) . '%' : '0%') }}</td>
                 <td class="border-black middle">{{ $hsc_comp > 0 ? $hsc_comp : '0' }}</td>
                 <td class="border-black middle">{{ $hsc_esfam > 0 ? $hsc_esfam : '0' }}</td>
                 <td class="border-black middle">{{ $hsc_prom > 0 ? $hsc_prom : '0' }}</td>
@@ -252,8 +322,10 @@
                 <td class="border-black middle">{{ $hsc_campo > 0 ? $hsc_campo : '0' }}</td>
                 <td class="border-black middle">{{ $hsc_asam > 0 ? $hsc_asam : '0' }}</td>
                 <td class="border-black middle">{{ $hsc_citas > 0 ? $hsc_citas : '0' }}</td>
-                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($hsc_ord > 0 ? $hsc_ord : '0') }}</td>
-                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
+                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
+                    {{ $isSS ? '-' : ($hsc_ord > 0 ? $hsc_ord : '0') }}</td>
+                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
+                    {{ $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
                 <td class="border-black middle">{{ $hsc_pers > 0 ? $hsc_pers : '0' }}</td>
                 <td class="border-black no-print middle">
                     @php
@@ -267,18 +339,10 @@
                         $nomMed = $medicoRecord->NOM_MED ?? '';
                         $medId = $medicoRecord->id ?? 0;
                     @endphp
-                    <button type="button" class="btn-hsc-modal"
-                        data-medico-id="{{ $medId }}"
-                        data-medico-nombre="{{ $nomMed }}"
-                        data-atendidos="{{ $atenciones }}"
-                        data-programados="{{ $prog }}"
-                        data-pxh="{{ $pxh }}"
-                        data-total-dias="{{ $tdias }}"
-                        data-dias-cont="{{ $dcont }}"
-                        data-horas-dia="{{ $hpd }}"
-                        data-horas-cont="{{ $hcont }}"
-                        data-is-ss="{{ $isSS ? 1 : 0 }}"
-                        onclick="openHscModal(this)"
+                    <button type="button" class="btn-hsc-modal" data-medico-id="{{ $medId }}" data-medico-nombre="{{ $nomMed }}"
+                        data-atendidos="{{ $atenciones }}" data-programados="{{ $prog }}" data-pxh="{{ $pxh }}"
+                        data-total-dias="{{ $tdias }}" data-dias-cont="{{ $dcont }}" data-horas-dia="{{ $hpd }}"
+                        data-horas-cont="{{ $hcont }}" data-is-ss="{{ $isSS ? 1 : 0 }}" onclick="openHscModal(this)"
                         title="Calcular y Registrar Horas Sin Consulta">
                         <i class="bi bi-calculator"></i>
                     </button>
@@ -291,19 +355,17 @@
         @endphp
         @for($i = $rowsCount + 1; $i <= $minRows; $i++)
             <tr class="empty-row">
-                <td class="border-black sticky-col-1 text-center font-bold" style="color: var(--text-muted); opacity: 0.6; font-size: 0.82rem;">{{ $i }}</td>
+                <td class="border-black sticky-col-1 text-center font-bold"
+                    style="color: var(--text-muted); opacity: 0.6; font-size: 0.82rem;">{{ $i }}</td>
                 <td class="border-black sticky-col-2">&nbsp;</td>
-                <td class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">&nbsp;</td>
+                <td
+                    class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                    &nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle">&nbsp;</td>
+                <td
+                    class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                    &nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
@@ -313,8 +375,19 @@
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
-                <td class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">&nbsp;</td>
-                <td class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td class="border-black middle">&nbsp;</td>
+                <td
+                    class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                    &nbsp;</td>
+                <td
+                    class="border-black middle {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                    &nbsp;</td>
                 <td class="border-black middle">&nbsp;</td>
                 <td class="border-black no-print middle">&nbsp;</td>
             </tr>
@@ -324,10 +397,13 @@
         <tr>
             <td colspan="2" class="border-black sticky-col-footer" style="text-align: right; padding-right: 20px;">TOTAL
                 JORNADA {{ $jornada }}</td>
-            <td class="border-black {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">{{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : round($totals['acuerdo']) }}</td>
+            <td class="border-black {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                {{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : round($totals['acuerdo']) }}</td>
             <td class="border-black">{{ round($totals['contrato']) }}</td>
             <td class="border-black">{{ round($totals['m_general']) }}</td>
-            <td class="border-black {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">{{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : round($totals['m_especialista']) }}</td>
+            <td class="border-black {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                {{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : round($totals['m_especialista']) }}
+            </td>
             <td class="border-black">{{ round($totals['hrs_tadas']) }}</td>
             <td class="border-black">{{ number_format($totals['dia_cont'], 0) }}</td>
             <td class="border-black">{{ round($totals['dia_cump']) }}</td>
@@ -342,16 +418,30 @@
                 @endphp
                 {{ number_format($global_percent, 0) }}%
             </td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_comp']) > 0 ? round($totals['hsc_comp']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_esfam']) > 0 ? round($totals['hsc_esfam']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_prom']) > 0 ? round($totals['hsc_prom']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_cong']) > 0 ? round($totals['hsc_cong']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_campo']) > 0 ? round($totals['hsc_campo']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_asam']) > 0 ? round($totals['hsc_asam']) : '0' }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_citas']) > 0 ? round($totals['hsc_citas']) : '0' }}</td>
-            <td class="border-black font-weight-bold {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">{{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : (round($totals['hsc_ord']) > 0 ? round($totals['hsc_ord']) : '0') }}</td>
-            <td class="border-black font-weight-bold {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">{{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : (round($totals['hsc_profil']) > 0 ? round($totals['hsc_profil']) : '0') }}</td>
-            <td class="border-black font-weight-bold">{{ round($totals['hsc_pers']) > 0 ? round($totals['hsc_pers']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_comp']) > 0 ? round($totals['hsc_comp']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_esfam']) > 0 ? round($totals['hsc_esfam']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_prom']) > 0 ? round($totals['hsc_prom']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_cong']) > 0 ? round($totals['hsc_cong']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_campo']) > 0 ? round($totals['hsc_campo']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_asam']) > 0 ? round($totals['hsc_asam']) : '0' }}</td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_citas']) > 0 ? round($totals['hsc_citas']) : '0' }}</td>
+            <td
+                class="border-black font-weight-bold {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                {{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : (round($totals['hsc_ord']) > 0 ? round($totals['hsc_ord']) : '0') }}
+            </td>
+            <td
+                class="border-black font-weight-bold {{ request()->routeIs('informes.hora-medico.servicio-social') ? 'td-hatched' : '' }}">
+                {{ request()->routeIs('informes.hora-medico.servicio-social') ? '-' : (round($totals['hsc_profil']) > 0 ? round($totals['hsc_profil']) : '0') }}
+            </td>
+            <td class="border-black font-weight-bold">
+                {{ round($totals['hsc_pers']) > 0 ? round($totals['hsc_pers']) : '0' }}</td>
             <td class="border-black no-print"></td>
         </tr>
     </tfoot>

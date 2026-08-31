@@ -214,8 +214,8 @@
         }
 
         table.table-oficial thead tr.row-sub th {
-            height: 75px !important;
-            max-height: 76px !important;
+            height: 92px !important;
+            max-height: 92px !important;
             font-weight: 900 !important;
         }
 
@@ -475,48 +475,48 @@
                             <th rowspan="3" class="b-thick-r" style="width: 21.5%; text-align: left; padding-left: 6px !important;">NOMBRE COMPLETO DEL MEDICO</th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.2%;">MODALIDAD</th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">CATEGORIA</th>
-                            <th rowspan="3" class="b-thick-r" style="width: 3.5%;"><div class="v-text">HORAS CONTRATADAS X DIA</div></th>
+                            <th rowspan="3" class="b-thick-r" style="width: 3.5%;"><div class="v-text">HORAS / DÍA</div></th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">DIAS MES</th>
                             <th colspan="2" rowspan="2" class="b-thick-r" style="width: 6.4%;">HORAS MES</th>
                             <th colspan="3" rowspan="2" class="b-thick-r" style="width: 10.5%;">ATENCIONES</th>
-                            <th rowspan="3" class="b-thick-r" style="width: 3.6%;"><div class="v-text">% DE RENDIMIENTO</div></th>
+                            <th rowspan="3" class="b-thick-r" style="width: 3.6%;"><div class="v-text">% RENDIMIENTO</div></th>
                             <th colspan="10" style="width: 33.0%; background-color: #f8fafc !important;">HORAS SIN CONSULTA</th>
                         </tr>
                         {{-- Fila 2: Subgrupos bajo Horas Sin Consulta --}}
                         <tr class="row-mid">
                             <th colspan="7" class="b-thick-r" style="width: 23.1%;">TOTAL DE HORAS OFICIALES</th>
                             <th colspan="2" class="b-thick-r" style="width: 6.6%;">VACACIONES</th>
-                            <th rowspan="2" style="width: 3.3%;"><div class="v-text">PERMISOS PERSONALES.</div></th>
+                            <th rowspan="2" style="width: 3.3%;"><div class="v-text">PERMISOS PERSONALES</div></th>
                         </tr>
                         {{-- Fila 3: Subcolumnas Verticales Detalladas --}}
                         <tr class="row-sub">
                             {{-- Modalidad --}}
-                            <th style="width: 3.1%;"><div class="v-text">ACUERDO.</div></th>
-                            <th class="b-thick-r" style="width: 3.1%;"><div class="v-text">CONTRATO.</div></th>
+                            <th style="width: 3.1%;"><div class="v-text">ACUERDO</div></th>
+                            <th class="b-thick-r" style="width: 3.1%;"><div class="v-text">CONTRATO</div></th>
                             {{-- Categoría --}}
-                            <th style="width: 3.2%;"><div class="v-text">MÉDICO GENERAL.</div></th>
-                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">MÉDICO ESPECIALISTA.</div></th>
+                            <th style="width: 3.2%;"><div class="v-text">GENERAL</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">ESPECIALISTA</div></th>
                             {{-- Días Mes --}}
-                            <th style="width: 3.2%;"><div class="v-text">CONTRATADOS.</div></th>
-                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDOS.</div></th>
+                            <th style="width: 3.2%;"><div class="v-text">CONTRATADOS</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDOS</div></th>
                             {{-- Horas Mes --}}
-                            <th style="width: 3.2%;"><div class="v-text">CONTRATADAS.</div></th>
-                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDAS.</div></th>
+                            <th style="width: 3.2%;"><div class="v-text">CONTRATADAS</div></th>
+                            <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDAS</div></th>
                             {{-- Atenciones --}}
-                            <th style="width: 3.5%;"><div class="v-text">PROGRAMADAS.</div></th>
-                            <th style="width: 3.5%;"><div class="v-text">REPROGRAMADAS.</div></th>
-                            <th class="b-thick-r" style="width: 3.5%;"><div class="v-text">ATENDIDAS.</div></th>
+                            <th style="width: 3.5%;"><div class="v-text">PROGRAMADAS</div></th>
+                            <th style="width: 3.5%;"><div class="v-text">REPROGRAMADAS</div></th>
+                            <th class="b-thick-r" style="width: 3.5%;"><div class="v-text">ATENDIDAS</div></th>
                             {{-- Horas Sin Consulta: Oficiales --}}
                             <th style="width: 3.3%;"><div class="v-text">FERIADOS / COMPENSATORIOS</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">ESFAM.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">ACTIVIDADES DE PROMOCION.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">CONGRESOS / TALLERES.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">INVESTIGACION DE CAMPO.</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">ASAMBLEAS COLEGIO MEDICO.</div></th>
-                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">CITAS, INCAPACIDADES IHSS / PRIVADA.</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">ESFAM</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">PROMOCION</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">CONGRESOS / TALLERES</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">INVESTIGACION DE CAMPO</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">ASAMBLEA COLEGIO MÉDICO</div></th>
+                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">CITAS / INCAPACIDADES</div></th>
                             {{-- Horas Sin Consulta: Vacaciones --}}
-                            <th style="width: 3.3%;"><div class="v-text">ORDINARIAS.</div></th>
-                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">PROFILACTICAS.</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">ORDINARIAS</div></th>
+                            <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">PROFILÁCTICAS</div></th>
                         </tr>
                     </thead>
                     <tbody>

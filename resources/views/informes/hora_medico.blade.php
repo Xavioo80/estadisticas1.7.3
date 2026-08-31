@@ -46,8 +46,9 @@
         }
 
         #mainTable thead tr.header-row-sub th {
-            height: 84px !important;
-            max-height: 88px !important;
+            height: 100px !important;
+            font-size: 0.70rem !important;
+            max-height: 100px !important;
             vertical-align: middle !important;
             padding: 2px 1px !important;
         }
@@ -133,289 +134,292 @@
 
         .btn-hsc-modal i {
             font-size: 0.72rem !important;
-        /* ─── Columnas Fijas (Sticky Columns) ─── */
-        .sticky-col-1,
-        #mainTable th.sticky-col-1,
-        #mainTable td.sticky-col-1 {
-            position: sticky !important;
-            left: 0 !important;
-            width: 36px !important;
-            min-width: 36px !important;
-            max-width: 36px !important;
-            background-color: var(--bg-surface, #ffffff) !important;
-            z-index: 30 !important;
-            text-align: center !important;
-            font-size: 0.80rem !important;
-            box-sizing: border-box !important;
-        }
 
-        .sticky-col-2,
-        #mainTable th.sticky-col-2,
-        #mainTable td.sticky-col-2,
-        #mainTable .sticky-col-2 {
-            position: sticky !important;
-            left: 36px !important;
-            width: 230px !important;
-            min-width: 230px !important;
-            max-width: 230px !important;
-            background-color: var(--bg-surface, #ffffff) !important;
-            z-index: 30 !important;
-            text-align: left !important;
-            padding-left: 10px !important;
-            padding-right: 6px !important;
-            font-size: 0.82rem !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            box-sizing: border-box !important;
-        }
+            /* ─── Columnas Fijas (Sticky Columns) ─── */
+            .sticky-col-1,
+            #mainTable th.sticky-col-1,
+            #mainTable td.sticky-col-1 {
+                position: sticky !important;
+                left: 0 !important;
+                width: 36px !important;
+                min-width: 36px !important;
+                max-width: 36px !important;
+                background-color: var(--bg-surface, #ffffff) !important;
+                z-index: 30 !important;
+                text-align: center !important;
+                font-size: 0.80rem !important;
+                box-sizing: border-box !important;
+            }
 
-        html.dark .sticky-col-1,
-        html.dark #mainTable th.sticky-col-1,
-        html.dark #mainTable td.sticky-col-1,
-        [data-theme="dark"] .sticky-col-1,
-        [data-theme="dark"] #mainTable th.sticky-col-1,
-        [data-theme="dark"] #mainTable td.sticky-col-1,
-        html.dark .sticky-col-2,
-        html.dark #mainTable th.sticky-col-2,
-        html.dark #mainTable td.sticky-col-2,
-        [data-theme="dark"] .sticky-col-2,
-        [data-theme="dark"] #mainTable th.sticky-col-2,
-        [data-theme="dark"] #mainTable td.sticky-col-2 {
-            background-color: #0f172a !important;
-            color: var(--text-primary) !important;
-        }
+            .sticky-col-2,
+            #mainTable th.sticky-col-2,
+            #mainTable td.sticky-col-2,
+            #mainTable .sticky-col-2 {
+                position: sticky !important;
+                left: 36px !important;
+                width: 230px !important;
+                min-width: 230px !important;
+                max-width: 230px !important;
+                background-color: var(--bg-surface, #ffffff) !important;
+                z-index: 30 !important;
+                text-align: left !important;
+                padding-left: 10px !important;
+                padding-right: 6px !important;
+                font-size: 0.82rem !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                box-sizing: border-box !important;
+            }
 
-        /* En thead, las celdas sticky de la esquina tienen z-index 100 */
-        #mainTable thead th.sticky-col-1 {
-            position: sticky !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 100 !important;
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-        }
+            html.dark .sticky-col-1,
+            html.dark #mainTable th.sticky-col-1,
+            html.dark #mainTable td.sticky-col-1,
+            [data-theme="dark"] .sticky-col-1,
+            [data-theme="dark"] #mainTable th.sticky-col-1,
+            [data-theme="dark"] #mainTable td.sticky-col-1,
+            html.dark .sticky-col-2,
+            html.dark #mainTable th.sticky-col-2,
+            html.dark #mainTable td.sticky-col-2,
+            [data-theme="dark"] .sticky-col-2,
+            [data-theme="dark"] #mainTable th.sticky-col-2,
+            [data-theme="dark"] #mainTable td.sticky-col-2 {
+                background-color: #0f172a !important;
+                color: var(--text-primary) !important;
+            }
 
-        #mainTable thead th.sticky-col-2 {
-            position: sticky !important;
-            top: 0 !important;
-            left: 36px !important;
-            z-index: 100 !important;
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-        }
+            /* En thead, las celdas sticky de la esquina tienen z-index 100 */
+            #mainTable thead th.sticky-col-1 {
+                position: sticky !important;
+                top: 0 !important;
+                left: 0 !important;
+                z-index: 100 !important;
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+            }
 
-        /* ─── Encabezados Fijos de 3 Filas (Sticky Multi-row Thead) ─── */
-        #mainTable thead,
-        #mainTable thead.thead-premium {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 60 !important;
-        }
+            #mainTable thead th.sticky-col-2 {
+                position: sticky !important;
+                top: 0 !important;
+                left: 36px !important;
+                z-index: 100 !important;
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+            }
 
-        #mainTable thead th {
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-            color: var(--text-primary, #0f172a) !important;
-            border: 1px solid #94a3b8 !important;
-            box-sizing: border-box !important;
-        }
+            /* ─── Encabezados Fijos de 3 Filas (Sticky Multi-row Thead) ─── */
+            #mainTable thead,
+            #mainTable thead.thead-premium {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 60 !important;
+            }
 
-        #mainTable thead tr.header-row-main th {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 60 !important;
-        }
+            #mainTable thead th {
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+                color: var(--text-primary, #0f172a) !important;
+                border: 1px solid #94a3b8 !important;
+                box-sizing: border-box !important;
+            }
 
-        #mainTable thead tr.header-row-mid th {
-            position: sticky !important;
-            top: 28px !important;
-            z-index: 55 !important;
-        }
+            #mainTable thead tr.header-row-main th {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 60 !important;
+            }
 
-        #mainTable thead tr.header-row-sub th {
-            position: sticky !important;
-            top: 54px !important;
-            z-index: 50 !important;
-        }
+            #mainTable thead tr.header-row-mid th {
+                position: sticky !important;
+                top: 28px !important;
+                z-index: 55 !important;
+            }
 
-        html.dark #mainTable thead th,
-        [data-theme="dark"] #mainTable thead th {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border: 1px solid #475569 !important;
-        }
+            #mainTable thead tr.header-row-sub th {
+                position: sticky !important;
+                top: 54px !important;
+                z-index: 50 !important;
+            }
 
-        html.dark #mainTable thead th.sticky-col-1,
-        html.dark #mainTable thead th.sticky-col-2,
-        [data-theme="dark"] #mainTable thead th.sticky-col-1,
-        [data-theme="dark"] #mainTable thead th.sticky-col-2 {
-            background-color: #1e293b !important;
-        }
+            html.dark #mainTable thead th,
+            [data-theme="dark"] #mainTable thead th {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border: 1px solid #475569 !important;
+            }
 
-        /* Hover de filas: mantener opacidad sólida en celdas sticky */
-        #mainTable tbody tr:hover td.sticky-col-1,
-        #mainTable tbody tr:hover td.sticky-col-2 {
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-        }
+            html.dark #mainTable thead th.sticky-col-1,
+            html.dark #mainTable thead th.sticky-col-2,
+            [data-theme="dark"] #mainTable thead th.sticky-col-1,
+            [data-theme="dark"] #mainTable thead th.sticky-col-2 {
+                background-color: #1e293b !important;
+            }
 
-        html.dark #mainTable tbody tr:hover td.sticky-col-1,
-        html.dark #mainTable tbody tr:hover td.sticky-col-2,
-        [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-1,
-        [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-2 {
-            background-color: #1e293b !important;
-        }
+            /* Hover de filas: mantener opacidad sólida en celdas sticky */
+            #mainTable tbody tr:hover td.sticky-col-1,
+            #mainTable tbody tr:hover td.sticky-col-2 {
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+            }
 
-        #tableContainer {
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-            min-width: 0 !important;
-            width: 100% !important;
-            overflow: auto !important;
-            position: relative !important;
-            scrollbar-width: thin;
-            scrollbar-color: #94a3b8 var(--bg-surface, #f8fafc);
-        }
+            html.dark #mainTable tbody tr:hover td.sticky-col-1,
+            html.dark #mainTable tbody tr:hover td.sticky-col-2,
+            [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-1,
+            [data-theme="dark"] #mainTable tbody tr:hover td.sticky-col-2 {
+                background-color: #1e293b !important;
+            }
 
-        #tableContainer::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
+            #tableContainer {
+                flex: 1 1 0% !important;
+                min-height: 0 !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                overflow: auto !important;
+                position: relative !important;
+                scrollbar-width: thin;
+                scrollbar-color: #94a3b8 var(--bg-surface, #f8fafc);
+            }
 
-        #tableContainer::-webkit-scrollbar-track {
-            background: var(--bg-surface, #f8fafc);
-        }
+            #tableContainer::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
 
-        #tableContainer::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
+            #tableContainer::-webkit-scrollbar-track {
+                background: var(--bg-surface, #f8fafc);
+            }
 
-        #tableContainer::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
+            #tableContainer::-webkit-scrollbar-thumb {
+                background: #94a3b8;
+                border-radius: 4px;
+            }
 
-        /* ─── Fila de Totales Fija con Cuadrícula Completa (Sticky Tfoot) ─── */
-        #mainTable tfoot {
-            position: sticky !important;
-            bottom: 0 !important;
-            z-index: 45 !important;
-        }
+            #tableContainer::-webkit-scrollbar-thumb:hover {
+                background: #64748b;
+            }
 
-        #mainTable tfoot tr {
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-        }
+            /* ─── Fila de Totales Fija con Cuadrícula Completa (Sticky Tfoot) ─── */
+            #mainTable tfoot {
+                position: sticky !important;
+                bottom: 0 !important;
+                z-index: 45 !important;
+            }
 
-        #mainTable tfoot td {
-            position: sticky !important;
-            bottom: 0 !important;
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-            color: var(--text-primary, #0f172a) !important;
-            font-weight: 800 !important;
-            font-size: 0.88rem !important;
-            border: 1px solid #94a3b8 !important;
-            vertical-align: middle !important;
-            padding: 4px 4px !important;
-            z-index: 45 !important;
-        }
+            #mainTable tfoot tr {
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+            }
 
-        html.dark #mainTable tfoot tr,
-        html.dark #mainTable tfoot td,
-        [data-theme="dark"] #mainTable tfoot tr,
-        [data-theme="dark"] #mainTable tfoot td {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border: 1px solid #475569 !important;
-        }
+            #mainTable tfoot td {
+                position: sticky !important;
+                bottom: 0 !important;
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+                color: var(--text-primary, #0f172a) !important;
+                font-weight: 800 !important;
+                font-size: 100.0rem !important;
+                border: 1px solid #94a3b8 !important;
+                vertical-align: middle !important;
+                padding: 4px 4px !important;
+                z-index: 45 !important;
+            }
 
-        #mainTable tfoot td.sticky-col-footer {
-            position: sticky !important;
-            left: 0 !important;
-            bottom: 0 !important;
-            width: 266px !important;
-            min-width: 266px !important;
-            max-width: 266px !important;
-            z-index: 80 !important;
-            background-color: var(--bg-surface-alt, #e2e8f0) !important;
-            border: 1px solid #94a3b8 !important;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
-            font-size: 0.82rem !important;
-            box-sizing: border-box !important;
-        }
+            html.dark #mainTable tfoot tr,
+            html.dark #mainTable tfoot td,
+            [data-theme="dark"] #mainTable tfoot tr,
+            [data-theme="dark"] #mainTable tfoot td {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border: 1px solid #475569 !important;
+            }
 
-        html.dark #mainTable tfoot td.sticky-col-footer,
-        [data-theme="dark"] #mainTable tfoot td.sticky-col-footer {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border: 1px solid #475569 !important;
-        }
-        .nav-tab-group {
-            display: inline-flex !important;
-            align-items: center !important;
-            background: var(--bg-surface-alt, #e2e8f0) !important;
-            padding: 3px !important;
-            border-radius: 10px !important;
-            border: 1px solid var(--border-color, #cbd5e1) !important;
-            gap: 3px !important;
-        }
+            #mainTable tfoot td.sticky-col-footer {
+                position: sticky !important;
+                left: 0 !important;
+                bottom: 0 !important;
+                width: 266px !important;
+                min-width: 266px !important;
+                max-width: 266px !important;
+                z-index: 80 !important;
+                background-color: var(--bg-surface-alt, #e2e8f0) !important;
+                border: 1px solid #94a3b8 !important;
+                box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+                font-size: 0.82rem !important;
+                box-sizing: border-box !important;
+            }
 
-        html.dark .nav-tab-group,
-        [data-theme="dark"] .nav-tab-group {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
+            html.dark #mainTable tfoot td.sticky-col-footer,
+            [data-theme="dark"] #mainTable tfoot td.sticky-col-footer {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border: 1px solid #475569 !important;
+            }
 
-        .nav-tab-btn {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            padding: 5px 12px !important;
-            font-size: 0.75rem !important;
-            font-weight: 700 !important;
-            border-radius: 7px !important;
-            text-decoration: none !important;
-            transition: all 0.18s ease-in-out !important;
-            white-space: nowrap !important;
-        }
+            .nav-tab-group {
+                display: inline-flex !important;
+                align-items: center !important;
+                background: var(--bg-surface-alt, #e2e8f0) !important;
+                padding: 3px !important;
+                border-radius: 10px !important;
+                border: 1px solid var(--border-color, #cbd5e1) !important;
+                gap: 3px !important;
+            }
 
-        .nav-tab-btn.active {
-            background: #2563eb !important;
-            color: #ffffff !important;
-            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35) !important;
-            border: 1px solid #1d4ed8 !important;
-        }
+            html.dark .nav-tab-group,
+            [data-theme="dark"] .nav-tab-group {
+                background: #1e293b !important;
+                border-color: #334155 !important;
+            }
 
-        .nav-tab-btn.active i {
-            color: #ffffff !important;
-        }
+            .nav-tab-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                padding: 5px 12px !important;
+                font-size: 0.75rem !important;
+                font-weight: 700 !important;
+                border-radius: 7px !important;
+                text-decoration: none !important;
+                transition: all 0.18s ease-in-out !important;
+                white-space: nowrap !important;
+            }
 
-        .nav-tab-btn:not(.active) {
-            background: var(--bg-surface, #ffffff) !important;
-            color: var(--text-primary, #334155) !important;
-            border: 1px solid var(--border-color, #cbd5e1) !important;
-        }
+            .nav-tab-btn.active {
+                background: #2563eb !important;
+                color: #ffffff !important;
+                box-shadow: 0 1px 3px rgba(37, 99, 235, 0.35) !important;
+                border: 1px solid #1d4ed8 !important;
+            }
 
-        .nav-tab-btn:not(.active):hover {
-            background: var(--bg-surface-alt, #f1f5f9) !important;
-            color: var(--text-primary, #0f172a) !important;
-            transform: translateY(-1px) !important;
-        }
+            .nav-tab-btn.active i {
+                color: #ffffff !important;
+            }
 
-        html.dark .nav-tab-btn:not(.active),
-        [data-theme="dark"] .nav-tab-btn:not(.active) {
-            background: #334155 !important;
-            color: #f8fafc !important;
-            border-color: #475569 !important;
-        }
+            .nav-tab-btn:not(.active) {
+                background: var(--bg-surface, #ffffff) !important;
+                color: var(--text-primary, #334155) !important;
+                border: 1px solid var(--border-color, #cbd5e1) !important;
+            }
 
-        html.dark .nav-tab-btn:not(.active):hover,
-        [data-theme="dark"] .nav-tab-btn:not(.active):hover {
-            background: #475569 !important;
-            color: #ffffff !important;
-        }
+            .nav-tab-btn:not(.active):hover {
+                background: var(--bg-surface-alt, #f1f5f9) !important;
+                color: var(--text-primary, #0f172a) !important;
+                transform: translateY(-1px) !important;
+            }
+
+            html.dark .nav-tab-btn:not(.active),
+            [data-theme="dark"] .nav-tab-btn:not(.active) {
+                background: #334155 !important;
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+            }
+
+            html.dark .nav-tab-btn:not(.active):hover,
+            [data-theme="dark"] .nav-tab-btn:not(.active):hover {
+                background: #475569 !important;
+                color: #ffffff !important;
+            }
     </style>
     <div class="informe-page-wrapper" id="report-wrapper">
         <!-- Header -->
         <div class="informe-header no-print">
             <div class="flex items-center gap-3 shrink-0">
-                <h2 style="margin: 0; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-primary);">
+                <h2
+                    style="margin: 0; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-primary);">
                     <i class="bi bi-clock-history text-primary"></i> Rendimiento Médico (Hora Médico)
                 </h2>
                 {{-- Navigation Tabs --}}
@@ -434,8 +438,7 @@
             <div class="header-actions-row">
                 <!-- Botón Observaciones (Acceso a Horas Sin Consulta / Observaciones) -->
                 <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => $jornada]) }}"
-                    class="btn-header-purple"
-                    title="Ver Informe Oficial de Observaciones">
+                    class="btn-header-purple" title="Ver Informe Oficial de Observaciones">
                     <i class="bi bi-journal-text"></i> Observaciones
                 </a>
 
