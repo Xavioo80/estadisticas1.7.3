@@ -1,6 +1,6 @@
 <!-- Modal de Comparación Cruzada y Auditoría Epidemiológica -->
 <div class="modal fade" id="modalComparacionCruzada" tabindex="-1" role="dialog" aria-labelledby="modalComparacionCruzadaLabel" aria-hidden="true" style="z-index: 1060;">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: min(1100px, 98vw); margin: 8px auto;">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: min(1140px, 98vw); margin: 8px auto;">
         <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); max-height: 96vh; display: flex; flex-direction: column;">
             
             <!-- Modal Header -->
@@ -15,7 +15,7 @@
                     <span style="color: var(--border-color); flex-shrink: 0; font-size: 0.85rem;">|</span>
                     <span class="text-muted"
                           style="font-size: 0.71rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
-                        Comparativa en tiempo real entre <strong>AT2-R (N)</strong>, <strong>Morbilidad</strong>, <strong>TRANS-2</strong> y <strong>Registros Globales (AT1)</strong>
+                        Comparativa en tiempo real entre <strong>AT2-R (N)</strong>, <strong>Morbilidad</strong>, <strong>TRANS-2</strong>, <strong>ITS</strong> y <strong>Registros Globales (AT1)</strong>
                     </span>
                 </div>
                 <button type="button" class="close text-muted" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close"
@@ -38,49 +38,60 @@
 
 <script>
     function abrirModalComparacion(ano, mes, jornada) {
-        // Si no se proporcionan, buscar en los filtros activos de la página
         if (!ano) {
-            ano = $('select[name="ano"]').val() || $('#ano').val() || new Date().getFullYear();
+            ano = $('select[name="ano"]').val() 
+               || $('#filter-form select[name="ano"]').val() 
+               || $('#filtroAno').val() 
+               || '';
         }
         if (!mes) {
-            mes = $('select[name="mes"]').val() || $('#mes').val() || '';
+            mes = $('select[name="mes"]').val() 
+               || $('#filter-form select[name="mes"]').val() 
+               || $('#filtroMes').val() 
+               || '';
         }
         if (!jornada) {
-            jornada = $('select[name="jornada"]').val() || 'TODAS';
+            jornada = $('select[name="jornada"]').val() 
+               || $('#filter-form select[name="jornada"]').val() 
+               || $('#filtroJornada').val() 
+               || 'TODAS';
         }
 
-        const $modal = $('#modalComparacionCruzada');
-        $modal.modal('show');
-
-        cargarDatosModalComparacion(ano, mes, jornada);
+        $('#modalComparacionCruzada').modal('show');
+        
+        cargarDatosComparacionCruzada(ano, mes, jornada);
     }
 
-    function cargarDatosModalComparacion(ano, mes, jornada) {
-        const $body = $('#modalComparacionCruzadaBody');
-        $body.html(`
+    function cargarDatosComparacionCruzada(ano, mes, jornada) {
+        const body = $('#modalComparacionCruzadaBody');
+        body.html(`
             <div class="d-flex flex-column align-items-center justify-content-center py-5">
                 <div class="spinner-border text-primary mb-2" role="status" style="width: 2rem; height: 2rem;"></div>
-                <span class="text-muted font-weight-bold" style="font-size: 0.85rem;">Consultando y cruzando bases de datos...</span>
+                <span class="text-muted font-weight-bold" style="font-size: 0.85rem;">Analizando consistencia en 5 fuentes...</span>
             </div>
         `);
 
+        const requestData = {};
+        if (ano) requestData.ano = ano;
+        if (mes) requestData.mes = mes;
+        if (jornada) requestData.jornada = jornada;
+
         $.ajax({
-            url: "{{ route('informes.comparacion-cruzada') }}",
-            type: 'GET',
-            cache: false,
-            data: { 
-                ano: ano, 
-                mes: mes, 
-                jornada: jornada,
-                _t: new Date().getTime() 
-            },
-            success: function(html) {
-                $body.html(html);
+            url: "{{ route('informes.comparacion-cruzada.ajax') }}",
+            type: "GET",
+            data: requestData,
+            success: function(response) {
+                body.html(response);
             },
             error: function(xhr) {
-                $body.html(`
-                    <div class="alert alert-danger my-4 text-center">
-                        <i class="bi bi-exclamation-octagon-fill mr-1"></i> Error al cargar la auditoría cruzada. Intente de nuevo.
+                console.error("Error al cargar la comparación cruzada:", xhr);
+                body.html(`
+                    <div class="alert alert-danger m-3 d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill mr-2" style="font-size: 1.2rem;"></i>
+                        <div>
+                            <strong>Error al cargar la auditoría:</strong> No se pudo procesar la comparación de datos.
+                            <div class="mt-1 small text-muted">${xhr.responseText ? xhr.responseText.substring(0, 100) : ''}</div>
+                        </div>
                     </div>
                 `);
             }
@@ -91,6 +102,6 @@
         const ano = $('#modal-cmp-ano').val();
         const mes = $('#modal-cmp-mes').val();
         const jornada = $('#modal-cmp-jornada').val();
-        cargarDatosModalComparacion(ano, mes, jornada);
+        cargarDatosComparacionCruzada(ano, mes, jornada);
     }
 </script>

@@ -55,37 +55,42 @@
                             </div>
 
                             <div class="d-flex align-items-center flex-wrap gap-2 ml-auto">
-                                <!-- Card Médico y Contador -->
-                                <div class="compact-stat-card stat-card-medico">
+                                <!-- Card Médico Dinámico -->
+                                <div class="compact-stat-card stat-card-medico"
+                                     style="cursor: default;"
+                                     title="@{{ getResumenMedicos().tooltip }}">
                                     <div class="d-flex align-items-center">
                                         <div class="stat-icon">
                                             <i class="fas fa-user-md"></i>
                                         </div>
                                         <div class="stat-details ml-2">
-                                            <span class="stat-label">Médico Responsable</span>
+                                            <span class="stat-label">@{{ getResumenMedicos().label }}</span>
                                             <span class="stat-value text-truncate"
-                                                style="font-weight: 800; font-size: 1rem; color: var(--text-primary); display: block; text-transform: uppercase; max-width: 350px;"
-                                                title="@{{lista[0].medico || 'SIN ASIGNAR'}}">
-                                                @{{lista[0].medico || 'SIN ASIGNAR'}}
+                                                style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; text-transform: uppercase; max-width: 340px;"
+                                                title="@{{ getResumenMedicos().tooltip }}">
+                                                @{{ getResumenMedicos().valor }}
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="stat-count text-success">
-                                        @{{lista.length}}
+                                    <div class="stat-count text-success" title="Total de filas en la tabla">
+                                        @{{ lista.length }}
                                     </div>
                                 </div>
 
-                                <!-- Card Fecha -->
-                                <div class="compact-stat-card stat-card-fecha" style="min-width: 200px;">
+                                <!-- Card Fecha Dinámica -->
+                                <div class="compact-stat-card stat-card-fecha"
+                                     style="min-width: 190px; cursor: default;"
+                                     title="@{{ getResumenFechas().tooltip }}">
                                     <div class="d-flex align-items-center">
                                         <div class="stat-icon">
                                             <i class="fas fa-calendar-alt"></i>
                                         </div>
                                         <div class="stat-details ml-2">
-                                            <span class="stat-label">Fecha de Carga</span>
-                                            <span class="stat-value"
-                                                style="font-weight: 800; font-size: 1rem; color: var(--text-primary); display: block;">
-                                                @{{lista[0].fecha || '00/00/0000'}}
+                                            <span class="stat-label">@{{ getResumenFechas().label }}</span>
+                                            <span class="stat-value text-truncate"
+                                                style="font-weight: 800; font-size: 0.95rem; color: var(--text-primary); display: block; max-width: 220px;"
+                                                title="@{{ getResumenFechas().tooltip }}">
+                                                @{{ getResumenFechas().valor }}
                                             </span>
                                         </div>
                                     </div>
@@ -1641,13 +1646,96 @@
                 }
             };
 
-            // Helper para buscar especialidad (Legacy o uso inverso)
+            // Normalizar clave de médico para búsqueda inteligente
+            function normalizarClaveMedico(texto) {
+                if (!texto) return '';
+                var str = texto.toString().toUpperCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/^(DR\.|DRA\.|MSS\.|G\.O\.\s*DRA\.|LIC\.|LICDA\.)\s*/i, '')
+                    .replace(/[^A-Z0-9\s]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return str;
+            }
+
+            // Mapeo de alias conocidos a nombres oficiales en tabla medicos
+            var aliasMedicosMap = {
+                'ANDREA MEJIA': 'MSS. ANDREA MICHELLE MEJIA MORAZAN',
+                'DRA. MAGALY COELLO': 'DRA. MAGALY ROCIO COELLO GARCIA',
+                'MAGALY COELLO': 'DRA. MAGALY ROCIO COELLO GARCIA',
+                'ISSIS NOHEMY RIVAS ARTILES': 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'DRA. ISSIS RIVAS': 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'DRA.ISSIS RIVAS': 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'KATHERINE ATENA FERNANDEZ PEREZ': 'MSS.KATHERINE ATENA FERNANDEZ PEREZ',
+                'MARCELA DE JESÚS CRUZ COLINDRES': 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+                'MARCELA DE JESUS CRUZ COLINDRES': 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+                'DRA. YUSEN NUÑEZ': 'DRA. YUSEN NIESVANOVA NUÑEZ',
+                'DR. EDWIN JOSUE ESPINAL MARTINEZ': 'DR. EDWIN JOSE ESPINAL MARTINEZ'
+            };
+
+            // Helper para resolver un médico por código o nombre contra el catálogo oficial
+            $scope.buscarMedicoPorTexto = function (input) {
+                if (!input) return null;
+                var raw = input.toString().trim().toUpperCase();
+                if (!raw) return null;
+
+                var list = $scope.medicosList || [];
+
+                // 1. Coincidencia por Código (COD_MED)
+                var porCodigo = list.find(function (m) {
+                    return m.COD_MED && m.COD_MED.toString().trim() === raw;
+                });
+                if (porCodigo) return porCodigo;
+
+                // 2. Coincidencia exacta por Nombre Oficial (NOM_MED)
+                var porNombreExacto = list.find(function (m) {
+                    return m.NOM_MED && m.NOM_MED.trim().toUpperCase() === raw;
+                });
+                if (porNombreExacto) return porNombreExacto;
+
+                // 3. Coincidencia por Alias conocido
+                if (aliasMedicosMap[raw]) {
+                    var target = aliasMedicosMap[raw];
+                    var porAlias = list.find(function (m) {
+                        return m.NOM_MED && m.NOM_MED.trim().toUpperCase() === target;
+                    });
+                    if (porAlias) return porAlias;
+                }
+
+                // 4. Coincidencia limpia normalizada
+                var clean = normalizarClaveMedico(raw);
+                if (!clean) return null;
+
+                var porLimpio = list.find(function (m) {
+                    return normalizarClaveMedico(m.NOM_MED) === clean;
+                });
+                if (porLimpio) return porLimpio;
+
+                // 5. Coincidencia por conjunto de palabras significativas (>2 letras)
+                var palabras = clean.split(' ').filter(function (p) { return p.length > 2; });
+                if (palabras.length > 0) {
+                    var candidatos = list.filter(function (m) {
+                        var cleanM = normalizarClaveMedico(m.NOM_MED);
+                        return palabras.every(function (p) { return cleanM.indexOf(p) !== -1; });
+                    });
+                    if (candidatos.length === 1) return candidatos[0];
+                }
+
+                // 6. Coincidencia por contención de subcadena
+                var porSubstring = list.find(function (m) {
+                    var cleanM = normalizarClaveMedico(m.NOM_MED);
+                    return cleanM.indexOf(clean) !== -1 || clean.indexOf(cleanM) !== -1;
+                });
+                if (porSubstring) return porSubstring;
+
+                return null;
+            };
+
+            // Helper para buscar especialidad
             function buscarEspecialidad(nombreMedico) {
                 if (!nombreMedico) return '';
-                var medico = $scope.medicosList.find(function (m) {
-                    return m.NOM_MED.trim().toUpperCase() === nombreMedico.trim().toUpperCase();
-                });
-                return medico ? medico.ESPECIALIDAD : '';
+                var medico = $scope.buscarMedicoPorTexto(nombreMedico);
+                return medico ? medico.ESPECIALIDAD : 'MEDICO GENERAL';
             }
 
             // Datos del modal (Base)
@@ -1867,24 +1955,26 @@
                 if (newVal) {
                     var codigo = newVal.toString().trim();
                     if (codigo) {
-                        var medicoEncontrado = ($scope.medicosList || []).find(function (m) {
-                            return m.COD_MED == codigo;
-                        });
-
+                        var medicoEncontrado = $scope.buscarMedicoPorTexto(codigo);
                         if (medicoEncontrado) {
+                            $scope.modalData.cm = medicoEncontrado.COD_MED;
                             $scope.modalData.medico = medicoEncontrado.NOM_MED;
                             $scope.modalData.prof = medicoEncontrado.ESPECIALIDAD;
                             $scope.modalData.jornada = medicoEncontrado.JORNADA || '';
-                        } else {
-                            $scope.modalData.medico = 'MEDICO NO EXISTE';
-                            $scope.modalData.prof = '';
-                            $scope.modalData.jornada = '';
                         }
-                    } else {
-                        // Si borran el código, limpiar campos (opcional, pero consistente)
-                        $scope.modalData.medico = '';
-                        $scope.modalData.prof = '';
-                        $scope.modalData.jornada = '';
+                    }
+                }
+            });
+
+            // Watcher para autocompletar CM y Profesión cuando se ingresa o pega el Nombre del Médico
+            $scope.$watch('modalData.medico', function (newVal, oldVal) {
+                if (newVal && newVal !== oldVal) {
+                    var medicoEncontrado = $scope.buscarMedicoPorTexto(newVal);
+                    if (medicoEncontrado && $scope.modalData.medico !== medicoEncontrado.NOM_MED) {
+                        $scope.modalData.medico = medicoEncontrado.NOM_MED;
+                        $scope.modalData.cm = medicoEncontrado.COD_MED;
+                        $scope.modalData.prof = medicoEncontrado.ESPECIALIDAD;
+                        $scope.modalData.jornada = medicoEncontrado.JORNADA || '';
                     }
                 }
             });
@@ -1939,16 +2029,11 @@
             }
 
             // Inyectar registros importados de Excel a la tabla principal
-            $scope.cargarRegistrosImportados = function(filas) {
+            $scope.cargarRegistrosImportados = function(filas, yaGuardado) {
                 if (!filas || !filas.length) return;
                 
-                if (!$scope.lista || $scope.lista.length === 0) {
-                    $scope.lista = angular.copy(filas);
-                } else {
-                    filas.forEach(function(f) {
-                        $scope.lista.push(angular.copy(f));
-                    });
-                }
+                // Reemplazar la lista con las nuevas filas para evitar duplicación con datos previos
+                $scope.lista = angular.copy(filas);
 
                 // Recalcular PG_EMB, SM, rangos y forzar actualización
                 $scope.lista.forEach(function(row) {
@@ -1956,14 +2041,114 @@
                     $scope.calcularPgEmbYSm(row);
                 });
 
-                $scope.marcarModificado();
+                if (yaGuardado) {
+                    $scope.tablaGuardada = true;
+                } else {
+                    $scope.marcarModificado();
+                }
+                localStorage.setItem('tablaIngresoData', JSON.stringify($scope.lista));
             };
 
-            window.cargarRegistrosImportadosATabla = function(filas) {
+            // Resumen dinámico de médicos presentes en la tabla
+            $scope.getResumenMedicos = function () {
+                var medicosMap = {};
+                var totalFilas = ($scope.lista || []).length;
+
+                ($scope.lista || []).forEach(function (row) {
+                    var m = (row.medico || '').trim();
+                    if (m && m !== 'SIN ASIGNAR' && m !== 'MEDICO NO EXISTE') {
+                        medicosMap[m] = (medicosMap[m] || 0) + 1;
+                    }
+                });
+
+                var nombres = Object.keys(medicosMap);
+                var distinctCount = nombres.length;
+
+                if (distinctCount === 0) {
+                    var primerFila = ($scope.lista && $scope.lista[0]) ? ($scope.lista[0].medico || 'SIN ASIGNAR') : 'SIN ASIGNAR';
+                    return {
+                        label: 'Médico',
+                        valor: primerFila,
+                        count: totalFilas,
+                        isMultiple: false,
+                        tooltip: 'No hay médicos asignados'
+                    };
+                }
+
+                if (distinctCount === 1) {
+                    return {
+                        label: 'Médico Responsable',
+                        valor: nombres[0],
+                        count: totalFilas,
+                        isMultiple: false,
+                        tooltip: nombres[0] + ' (' + totalFilas + ' atenciones)'
+                    };
+                }
+
+                var tooltipList = nombres.map(function (nombre) {
+                    return nombre + ': ' + medicosMap[nombre] + ' atenciones';
+                }).join('\n');
+
+                return {
+                    label: 'Médicos (' + distinctCount + ')',
+                    valor: 'VARIOS MÉDICOS (' + distinctCount + ')',
+                    count: totalFilas,
+                    isMultiple: true,
+                    tooltip: 'Médicos presentes en la tabla:\n' + tooltipList
+                };
+            };
+
+            // Resumen dinámico de fechas presentes en la tabla
+            $scope.getResumenFechas = function () {
+                var fechasMap = {};
+                var totalFilas = ($scope.lista || []).length;
+
+                ($scope.lista || []).forEach(function (row) {
+                    var f = (row.fecha || '').trim();
+                    if (f && f !== '00/00/0000') {
+                        fechasMap[f] = (fechasMap[f] || 0) + 1;
+                    }
+                });
+
+                var fechas = Object.keys(fechasMap);
+                var distinctCount = fechas.length;
+
+                if (distinctCount === 0) {
+                    var primerFecha = ($scope.lista && $scope.lista[0]) ? ($scope.lista[0].fecha || '00/00/0000') : '00/00/0000';
+                    return {
+                        label: 'Fecha de Carga',
+                        valor: primerFecha,
+                        isMultiple: false,
+                        tooltip: 'Sin fechas asignadas'
+                    };
+                }
+
+                if (distinctCount === 1) {
+                    return {
+                        label: 'Fecha de Carga',
+                        valor: fechas[0],
+                        isMultiple: false,
+                        tooltip: fechas[0] + ' (' + totalFilas + ' registros)'
+                    };
+                }
+
+                var tooltipList = fechas.map(function (f) {
+                    return f + ': ' + fechasMap[f] + ' registros';
+                }).join('\n');
+
+                return {
+                    label: 'Fechas (' + distinctCount + ')',
+                    valor: 'VARIAS FECHAS (' + distinctCount + ')',
+                    isMultiple: true,
+                    tooltip: 'Fechas presentes en la tabla:\n' + tooltipList
+                };
+            };
+
+            window.cargarRegistrosImportadosATabla = function(filas, yaGuardado) {
                 var scope = angular.element(document.querySelector('[ng-controller="TablaCtrl"]')).scope();
                 if (scope) {
                     scope.$apply(function() {
-                        scope.cargarRegistrosImportados(filas);
+                        scope.cargarRegistrosImportados(filas, yaGuardado);
                     });
                 }
             };
@@ -2010,6 +2195,8 @@
                     if (result.isConfirmed) {
                         $scope.$apply(function () {
                             $scope.lista = []; // Tabla totalmente vacía
+                            $scope.tablaGuardada = false;
+                            localStorage.removeItem('tablaIngresoData');
                         });
                         Swal.fire('¡Limpia!', 'La tabla ha sido reiniciada.', 'success');
                     }
@@ -2146,16 +2333,20 @@
 
             // Funciones para seleccionar desde modales
             $scope.seleccionarMedico = function (medico) {
-                if ($scope.currentFieldForModal) {
+                if ($scope.currentFieldForModal && $scope.currentFieldForModal.row !== undefined) {
                     var row = $scope.currentFieldForModal.row;
                     $scope.lista[row].cm = medico.COD_MED;
                     $scope.lista[row].medico = medico.NOM_MED;
                     $scope.lista[row].prof = medico.ESPECIALIDAD;
                     $scope.lista[row].jornada = medico.JORNADA || '';
+                    $scope.marcarModificado();
                 } else {
-                    // Si no hay campo específico (abierto desde botón footer), agregamos nueva fila o avisamos
-                    // Por ahora solo notificamos que fue seleccionado pero no asignado a fila esp.
-                    Swal.fire('Seleccionado', 'Médico: ' + medico.NOM_MED, 'info');
+                    $scope.modalData.cm = medico.COD_MED;
+                    $scope.modalData.medico = medico.NOM_MED;
+                    $scope.modalData.prof = medico.ESPECIALIDAD;
+                    $scope.modalData.jornada = medico.JORNADA || '';
+                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+                    Toast.fire({ icon: 'success', title: 'Médico seleccionado: ' + medico.NOM_MED });
                 }
                 $('#modalBuscadorMedicos').modal('hide');
             };
@@ -2406,13 +2597,15 @@
                     .then(function (response) { return response.json(); })
                     .then(function (data) {
                         if (data.success) {
+                            $scope.$apply(function () {
+                                $scope.tablaGuardada = true;
+                                localStorage.setItem('tablaIngresoData', JSON.stringify($scope.lista));
+                            });
                             Swal.fire({
                                 title: '¡Guardado Exitoso!',
                                 text: data.message,
-                                icon: 'success'
-                            }).then(function () {
-                                // Redireccionar al index de ingresos para ver los datos cargados
-                                window.location.href = "{{ route('ingresos.index') }}";
+                                icon: 'success',
+                                confirmButtonText: 'Aceptar'
                             });
                         } else {
                             Swal.fire('Error', 'Hubo un error al guardar: ' + (data.message || ''), 'error');
@@ -3488,14 +3681,14 @@
                                 if (attrs.field === 'cm') {
                                     var codigo = text.trim();
                                     if (codigo) {
-                                        var medicoEncontrado = (scope.medicosList || []).find(function (m) {
-                                            return m.COD_MED == codigo;
-                                        });
+                                        var medicoEncontrado = scope.buscarMedicoPorTexto(codigo);
 
                                         if (medicoEncontrado) {
+                                            scope.lista[attrs.row]['cm'] = medicoEncontrado.COD_MED;
                                             scope.lista[attrs.row]['medico'] = medicoEncontrado.NOM_MED;
                                             scope.lista[attrs.row]['prof'] = medicoEncontrado.ESPECIALIDAD;
                                             scope.lista[attrs.row]['jornada'] = medicoEncontrado.JORNADA || '';
+                                            element.text(medicoEncontrado.COD_MED);
                                         } else {
                                             // Médico no encontrado - Mostrar alerta
                                             scope.lista[attrs.row]['medico'] = 'MEDICO NO EXISTE';
@@ -3524,6 +3717,25 @@
                                         }
                                     } else {
                                         scope.lista[attrs.row]['medico'] = '';
+                                        scope.lista[attrs.row]['prof'] = '';
+                                    }
+                                }
+
+                                // Auto-calcular y normalizar al ingresar o escribir en Nombre del Médico
+                                if (attrs.field === 'medico') {
+                                    var nombreIngresado = text.trim();
+                                    if (nombreIngresado) {
+                                        var medicoEncontrado = scope.buscarMedicoPorTexto(nombreIngresado);
+
+                                        if (medicoEncontrado) {
+                                            scope.lista[attrs.row]['medico'] = medicoEncontrado.NOM_MED;
+                                            scope.lista[attrs.row]['cm'] = medicoEncontrado.COD_MED;
+                                            scope.lista[attrs.row]['prof'] = medicoEncontrado.ESPECIALIDAD;
+                                            scope.lista[attrs.row]['jornada'] = medicoEncontrado.JORNADA || '';
+                                            element.text(medicoEncontrado.NOM_MED);
+                                        }
+                                    } else {
+                                        scope.lista[attrs.row]['cm'] = '';
                                         scope.lista[attrs.row]['prof'] = '';
                                     }
                                 }

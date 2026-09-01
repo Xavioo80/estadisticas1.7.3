@@ -626,4 +626,141 @@ class RegistroGlobalController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Búsqueda en catálogo de diagnósticos para autocompletado en Informes AT1
+     */
+    public function buscarDiagnosticos(Request $request)
+    {
+        $q = trim($request->input('q', ''));
+        if (strlen($q) < 1) {
+            $diags = \App\Models\Diagnostico::select('codigo', 'patologia')->limit(30)->get();
+        } else {
+            $diags = \App\Models\Diagnostico::select('codigo', 'patologia')
+                ->where('patologia', 'LIKE', "%{$q}%")
+                ->orWhere('codigo', 'LIKE', "%{$q}%")
+                ->limit(30)
+                ->get();
+        }
+        return response()->json($diags);
+    }
+
+    /**
+     * Actualizar Diagnóstico individual desde Informes AT1 (Sincroniza Registros Globales e Informes)
+     */
+    public function updateAt1Diagnostico(Request $request)
+    {
+        try {
+            $request->validate([
+                'registro_id' => 'required|integer',
+                'diag_index' => 'required|integer|min:1|max:7',
+                'diagnostico' => 'nullable|string',
+                'cod' => 'nullable|string',
+                'cond' => 'nullable|string',
+            ]);
+
+            $registro = RegistroGlobal::findOrFail($request->registro_id);
+            $idx = (int)$request->diag_index;
+            $cod = $request->cod ? trim($request->cod) : null;
+            $diag = $request->diagnostico ? trim($request->diagnostico) : null;
+            $cond = $request->cond ? strtoupper(trim($request->cond)) : null;
+
+            $registro->{"cod_{$idx}"} = $cod;
+            $registro->{"diagnostico_{$idx}"} = $diag;
+            $registro->{"cond_{$idx}"} = $cond;
+
+            if ($idx === 1 && !empty($cond)) {
+                $registro->cond = $cond;
+            }
+
+            $registro->save(); // El observer sincroniza la tabla 'informes' y limpia caché
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Diagnóstico actualizado correctamente en Registros Globales e Informes AT1.',
+                'registro_id' => $registro->id,
+                'diag_index' => $idx,
+                'cod' => $cod ?: '',
+                'diagnostico' => $diag ?: '',
+                'cond' => $cond ?: ''
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el diagnóstico: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Eliminar Diagnóstico individual desde Informes AT1
+     */
+    public function deleteAt1Diagnostico(Request $request)
+    {
+        try {
+            $request->validate([
+                'registro_id' => 'required|integer',
+                'diag_index' => 'required|integer|min:1|max:7'
+            ]);
+
+            $registro = RegistroGlobal::findOrFail($request->registro_id);
+            $idx = (int)$request->diag_index;
+
+            // Contar diagnósticos activos en este registro
+            $activeCount = 0;
+            for ($i = 1; $i <= 7; $i++) {
+                $d = trim((string)($registro->{"diagnostico_{$i}"} ?? ''));
+                $c = trim((string)($registro->{"cod_{$i}"} ?? ''));
+                if ($d !== '' || $c !== '') {
+                    $activeCount++;
+                }
+            }
+
+            if ($request->boolean('check_only')) {
+                return response()->json([
+                    'success' => true,
+                    'total_diagnosticos' => $activeCount,
+                    'is_only_diagnosis' => ($activeCount <= 1),
+                    'paciente' => $registro->nombre_paciente,
+                    'exp' => $registro->exp,
+                    'medico' => $registro->medico,
+                    'fecha' => $registro->fecha,
+                    'diagnostico' => $registro->{"diagnostico_{$idx}"},
+                    'cod' => $registro->{"cod_{$idx}"}
+                ]);
+            }
+
+            if ($request->boolean('eliminar_registro_completo')) {
+                $registro->delete(); // El observer elimina todas las filas hijas en informes
+                return response()->json([
+                    'success' => true,
+                    'action' => 'deleted_record',
+                    'message' => 'Se ha eliminado el registro completo del paciente con éxito.'
+                ]);
+            }
+
+            // Eliminar solo este diagnóstico específico
+            $registro->{"cod_{$idx}"} = null;
+            $registro->{"diagnostico_{$idx}"} = null;
+            $registro->{"cond_{$idx}"} = null;
+
+            // Si se eliminó el diagnóstico 1 y no quedan más diagnósticos, limpiar cond principal
+            if ($idx === 1 && $activeCount <= 1) {
+                $registro->cond = null;
+            }
+
+            $registro->save(); // El observer sincroniza la tabla 'informes' y limpia caché
+
+            return response()->json([
+                'success' => true,
+                'action' => 'deleted_diagnosis',
+                'message' => 'Se ha eliminado el diagnóstico correctamente (el registro del paciente permanece guardado).'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -638,7 +638,19 @@ class IngresoController extends Controller
             // Agregar validaciones para los demás campos
         ]);
 
-        RegistroGlobal::create($request->all());
+        $data = $request->all();
+        $this->normalizarMedicoYProf($data);
+
+        if (!empty($data['edad']) && !empty($data['tipo'])) {
+            $rangosCalculados = \App\Services\ExcelImportService::calcularRangosEpidemiologicos($data['edad'], $data['tipo']);
+            $data['rango'] = $rangosCalculados['rango'];
+            $data['rango_2'] = $rangosCalculados['rango_2'];
+            $data['rango_3'] = $rangosCalculados['rango_3'];
+            $data['rango_4'] = $rangosCalculados['rango_4'];
+            $data['rango_5'] = $rangosCalculados['rango_5'];
+        }
+
+        RegistroGlobal::create($data);
 
         return redirect()->route('ingresos.index', [
             'mes' => Carbon::parse($request->fecha)->format('Y-m'),
@@ -814,14 +826,32 @@ class IngresoController extends Controller
                             return $value !== '' && $value !== null;
                         });
 
-                        // Normalizar fecha si existe
+                        // Normalizar fecha y calcular automáticamente Año, Mes y Semana Epidemiológica
                         if (!empty($cleanData['fecha'])) {
                             try {
-                                $cleanData['fecha'] = Carbon::parse($cleanData['fecha'])->format('Y-m-d');
+                                $carbonFecha = Carbon::parse($cleanData['fecha']);
+                                $cleanData['fecha'] = $carbonFecha->format('Y-m-d');
+                                $cleanData['ano'] = (string)$carbonFecha->year;
+                                $monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+                                $cleanData['mes'] = $monthNames[$carbonFecha->month - 1];
+                                $cleanData['se'] = (string)\App\Services\ExcelImportService::calcularSemanaEpidemiologica($carbonFecha);
                             } catch (\Exception $e) {
                                 Log::warning("Error normalizando fecha en storeMassive: " . $cleanData['fecha']);
                             }
                         }
+
+                        // Normalizar y calcular automáticamente Rangos 1 a 5 si hay edad y tipo
+                        if (!empty($cleanData['edad']) && !empty($cleanData['tipo'])) {
+                            $rangosCalculados = \App\Services\ExcelImportService::calcularRangosEpidemiologicos($cleanData['edad'], $cleanData['tipo']);
+                            $cleanData['rango'] = $rangosCalculados['rango'];
+                            $cleanData['rango_2'] = $rangosCalculados['rango_2'];
+                            $cleanData['rango_3'] = $rangosCalculados['rango_3'];
+                            $cleanData['rango_4'] = $rangosCalculados['rango_4'];
+                            $cleanData['rango_5'] = $rangosCalculados['rango_5'];
+                        }
+
+                        // Normalizar médico con catálogo de BD
+                        $this->normalizarMedicoYProf($cleanData);
 
                         $created = RegistroGlobal::create($cleanData);
                         $this->syncPacienteFromRow($cleanData);
@@ -1475,6 +1505,92 @@ class IngresoController extends Controller
             $this->guardarEnPacientes($cleanDni, $formattedDni, $nombre, $fechaNac, $tel, $colonia);
         } catch (\Throwable $e) {
             Log::warning('syncPacienteFromRow error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Normaliza el nombre y código del médico contra la base de datos oficial
+     */
+    protected function normalizarMedicoYProf(array &$data): void
+    {
+        $medico = $data['medico'] ?? null;
+        $cm = $data['cm'] ?? null;
+
+        if (empty($medico) && empty($cm)) {
+            return;
+        }
+
+        $medicos = Medico::all();
+        $encontrado = null;
+
+        // 1. Buscar por código si está presente
+        if (!empty($cm)) {
+            $encontrado = $medicos->firstWhere('COD_MED', trim((string)$cm));
+        }
+
+        // 2. Buscar por nombre exacto
+        if (!$encontrado && !empty($medico)) {
+            $medicoUpper = mb_strtoupper(trim((string)$medico), 'UTF-8');
+            $encontrado = $medicos->firstWhere('NOM_MED', $medicoUpper);
+        }
+
+        // 3. Buscar usando normalización de clave y alias
+        if (!$encontrado && !empty($medico)) {
+            $aliasMap = [
+                'ANDREA MEJIA' => 'MSS. ANDREA MICHELLE MEJIA MORAZAN',
+                'DRA. MAGALY COELLO' => 'DRA. MAGALY ROCIO COELLO GARCIA',
+                'MAGALY COELLO' => 'DRA. MAGALY ROCIO COELLO GARCIA',
+                'ISSIS NOHEMY RIVAS ARTILES' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'DRA. ISSIS RIVAS' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'DRA.ISSIS RIVAS' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+                'KATHERINE ATENA FERNANDEZ PEREZ' => 'MSS.KATHERINE ATENA FERNANDEZ PEREZ',
+                'MARCELA DE JESÚS CRUZ COLINDRES' => 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+                'MARCELA DE JESUS CRUZ COLINDRES' => 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+                'DRA. YUSEN NUÑEZ' => 'DRA. YUSEN NIESVANOVA NUÑEZ',
+                'DR. EDWIN JOSUE ESPINAL MARTINEZ' => 'DR. EDWIN JOSE ESPINAL MARTINEZ',
+            ];
+
+            $medicoUpper = mb_strtoupper(trim((string)$medico), 'UTF-8');
+            if (isset($aliasMap[$medicoUpper])) {
+                $target = $aliasMap[$medicoUpper];
+                $encontrado = $medicos->firstWhere('NOM_MED', $target);
+            }
+
+            if (!$encontrado) {
+                $cleanInput = \App\Services\ExcelImportService::normalizarClaveMedico($medico);
+                if (!empty($cleanInput)) {
+                    $encontrado = $medicos->first(function($m) use ($cleanInput) {
+                        return \App\Services\ExcelImportService::normalizarClaveMedico($m->NOM_MED) === $cleanInput;
+                    });
+
+                    if (!$encontrado) {
+                        $palabras = array_filter(explode(' ', $cleanInput), fn($p) => strlen($p) > 2);
+                        if (!empty($palabras)) {
+                            $cands = $medicos->filter(function($m) use ($palabras) {
+                                $cleanM = \App\Services\ExcelImportService::normalizarClaveMedico($m->NOM_MED);
+                                foreach ($palabras as $p) {
+                                    if (!str_contains($cleanM, $p)) return false;
+                                }
+                                return true;
+                            });
+                            if ($cands->count() === 1) {
+                                $encontrado = $cands->first();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($encontrado) {
+            $data['medico'] = $encontrado->NOM_MED;
+            $data['cm'] = $encontrado->COD_MED;
+            if (empty($data['prof']) || $data['prof'] === 'MÉDICO GENERAL' || $data['prof'] === 'MEDICO GENERAL') {
+                $data['prof'] = $encontrado->ESPECIALIDAD ?: 'MEDICO GENERAL';
+            }
+            if (empty($data['jornada']) || in_array($data['jornada'], ['M', 'V', 'F', 'FS'])) {
+                $data['jornada'] = !empty($encontrado->JORNADA) ? $encontrado->JORNADA : ($data['jornada'] === 'V' ? 'VESPERTINA' : ($data['jornada'] === 'FS' || $data['jornada'] === 'F' ? 'FIN DE SEMANA' : 'MATUTINA'));
+            }
         }
     }
 }

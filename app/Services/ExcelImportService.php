@@ -308,7 +308,7 @@ class ExcelImportService
                 'fila_excel' => $row,
                 'hash_registro' => $hashAtencion,
                 'fecha_atencion' => $fechaIso,
-                'medico' => $medicoNorm,
+                'medico' => $medicoInfo['medico'] ?? $medicoNorm,
                 'cm' => $medicoInfo['cm'] ?? '',
                 'prof' => $medicoInfo['prof'] ?? 'MÉDICO GENERAL',
                 'numero_identidad' => $identidadFormateada,
@@ -737,6 +737,83 @@ class ExcelImportService
 
         $modo = $opciones['modo'] ?? 'anexar';
 
+        // Si el modo es solo CARGAR A TABLA, no insertar en la base de datos
+        if ($modo === 'cargar_tabla') {
+            $mesesNombres = [
+                1 => 'ENERO', 2 => 'FEBRERO', 3 => 'MARZO', 4 => 'ABRIL',
+                5 => 'MAYO', 6 => 'JUNIO', 7 => 'JULIO', 8 => 'AGOSTO',
+                9 => 'SEPTIEMBRE', 10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE'
+            ];
+            $filasTabla = [];
+            $totalImportados = 0;
+
+            foreach ($registrosAImportar as $reg) {
+                $fechaAtencion = $reg->fecha_atencion ? Carbon::parse($reg->fecha_atencion) : now();
+                $ano = $fechaAtencion->year;
+                $mes = $mesesNombres[$fechaAtencion->month] ?? 'AGOSTO';
+                $se = $this->calcularSemanaEpidemiologica($fechaAtencion);
+                $rangos = $this->calcularRangosEpidemiologicos($reg->edad, $reg->tipo);
+
+                $dxList = is_array($reg->diagnosticos_json) ? $reg->diagnosticos_json : [];
+                $dxData = [];
+                for ($i = 1; $i <= 7; $i++) {
+                    $dx = $dxList[$i - 1] ?? null;
+                    $dxData["cod_{$i}"] = $dx['codigo'] ?? null;
+                    $dxData["diagnostico_{$i}"] = $dx['diagnostico'] ?? null;
+                    $dxData["cond_{$i}"] = $dx['condicion'] ?? null;
+                }
+
+                $medicoInfo = $this->buscarMedicoEnCatalogo($reg->medico);
+
+                $filaObj = [
+                    'numero' => $totalImportados + 1,
+                    'ano' => (string)$ano,
+                    'mes' => (string)$mes,
+                    'cm' => (string)($reg->cm ?: ($medicoInfo['cod_med'] ?? '')),
+                    'medico' => (string)($medicoInfo['nom_med'] ?? $reg->medico ?? ''),
+                    'prof' => (string)($medicoInfo['especialidad'] ?? $reg->prof ?: 'MÉDICO GENERAL'),
+                    'fecha' => $fechaAtencion->format('d/m/Y'),
+                    'se' => (int)$se,
+                    'exp' => (string)($reg->expediente ?? ''),
+                    'identidad' => (string)($reg->numero_identidad ?? ''),
+                    'nombre_paciente' => (string)($reg->nombre_paciente ?? ''),
+                    'fecha_nacimiento' => $reg->fecha_nacimiento ? $reg->fecha_nacimiento->format('d/m/Y') : '',
+                    'sexo' => (string)($reg->sexo ?? ''),
+                    'edad' => (string)($reg->edad ?? ''),
+                    'tipo' => (string)($reg->tipo ?: 'A'),
+                    'rango' => (string)$rangos['rango'],
+                    'rango_2' => (string)$rangos['rango_2'],
+                    'rango_3' => (string)$rangos['rango_3'],
+                    'rango_4' => (string)$rangos['rango_4'],
+                    'rango_5' => (string)$rangos['rango_5'],
+                    'cond' => (string)($dxData['cond_1'] ?? 'N'),
+                    'cod_col' => (string)($reg->cod_col ?? ''),
+                    'colonia' => (string)($reg->colonia_normalizada ?? ''),
+                    'referido_a' => '',
+                    'referido_de' => '',
+                    'pg_emb' => 'POBLACIONGENERAL',
+                    'jornada' => $medicoInfo['jornada'] ?? 'MATUTINA',
+                    'sm' => '',
+                ];
+
+                for ($j = 1; $j <= 7; $j++) {
+                    $filaObj["cod_{$j}"] = (string)($dxData["cod_{$j}"] ?? '');
+                    $filaObj["diagnostico_{$j}"] = (string)($dxData["diagnostico_{$j}"] ?? '');
+                    $filaObj["cond_{$j}"] = (string)($dxData["cond_{$j}"] ?? '');
+                }
+
+                $filasTabla[] = $filaObj;
+                $totalImportados++;
+            }
+
+            return [
+                'success' => true,
+                'message' => "Se cargaron {$totalImportados} registros a la tabla AT-1 para revisión y edición.",
+                'total_importados' => $totalImportados,
+                'filas_tabla' => $filasTabla,
+            ];
+        }
+
         DB::beginTransaction();
 
         try {
@@ -879,7 +956,7 @@ class ExcelImportService
                     'referido_a' => null,
                     'referido_de' => null,
                     'pg_emb' => 'PG',
-                    'jornada' => 'M',
+                    'jornada' => $medicoInfo['jornada'] ?? 'MATUTINA',
                     'sm' => null,
                     'user_id' => $importacion->usuario_id,
                     'created_at' => $now,
@@ -914,7 +991,7 @@ class ExcelImportService
                     'referido_a' => '',
                     'referido_de' => '',
                     'pg_emb' => 'POBLACIONGENERAL',
-                    'jornada' => 'M',
+                    'jornada' => $medicoInfo['jornada'] ?? 'MATUTINA',
                     'sm' => '',
                 ];
 
@@ -961,7 +1038,7 @@ class ExcelImportService
      * ========================================================================= */
 
     /**
-     * Detección flexible de encabezados
+     * Detección flexible de encabezados con prioridad de coincidencias
      */
     protected function detectarColumnas(array $headers): array
     {
@@ -974,21 +1051,24 @@ class ExcelImportService
         }, $headers);
 
         $aliases = [
-            'identidad' => ['identidad', 'noidentidad', 'numeroidentidad', 'numerodeidentidad', 'dni', 'cedula', 'documento', 'nodocumento', 'numerodocumento', 'identificacion'],
+            'identidad' => ['numerodeidentidad', 'numeroidentidad', 'noidentidad', 'identidad', 'dni', 'cedula', 'documento', 'nodocumento', 'numerodocumento', 'identificacion'],
             'nombre_paciente' => ['nombresyapellidos', 'nombrepaciente', 'paciente', 'nombrecompleto', 'nombres', 'nombre', 'apellidosynombres'],
             'fecha' => ['fechadeatencion', 'fechaatencion', 'fecha', 'fechaconsulta', 'fechadeconsulta', 'fconsulta', 'date', 'atencion'],
             'medico' => ['medico', 'nombremedico', 'nombredelmedico', 'doctor', 'profesional', 'atendidopor', 'responsable', 'medicoconsulta'],
-            'cm' => ['cm', 'codigomedico', 'codmed', 'colegiomedico'],
-            'prof' => ['prof', 'profesion', 'cargo', 'especialidadmedico'],
+            'cm' => ['codigomedico', 'codmed', 'colegiomedico', 'cm'],
+            'prof' => ['profesion', 'cargo', 'especialidadmedico', 'especialidad', 'prof'],
             'fecha_nacimiento' => ['fechanacimiento', 'fechadenacimiento', 'fnacimiento', 'nacimiento', 'fdenacimiento'],
-            'edad' => ['edad', 'anios', 'anos', 'age'],
-            'tipo' => ['tipo', 'tipoeedad', 'unidadedad', 'tipoedad'],
-            'sexo' => ['sexo', 'genero', 'gender'],
-            'expediente' => ['expediente', 'noexpediente', 'numeroexpediente', 'numerodeexpediente', 'historiaclinica', 'numerodehistoriaclinica', 'exp', 'hc'],
-            'telefono' => ['telefono', 'tel', 'celular', 'telefono1', 'numerodetelefono'],
-            'direccion' => ['direccion', 'colonia', 'procedencia', 'localidad', 'domicilio', 'direccionactualdelpaciente', 'direccionpaciente', 'residencia'],
-            'diagnostico_1' => ['diagnostico1', 'diagnostico', 'diag1', 'diagnosticoactividad', 'patologia1', 'diagnosticoingreso', 'diagnosticoprincipal', 'dx1'],
-            'cond_1' => ['condicion1', 'cond1', 'condicion', 'tipo1', 'condiciondiagnostico1'],
+            'edad' => ['edadanios', 'anios', 'anos', 'edad', 'age'],
+            'edad_meses' => ['meses', 'edadmeses'],
+            'edad_dias' => ['dias', 'edaddias'],
+            'tipo' => ['tipodeedad', 'tipoedad', 'unidadedad', 'unidaddeedad'],
+            'sexo' => ['sexofm', 'sexo', 'genero', 'gender'],
+            'expediente' => ['numerodeexpediente', 'numeroexpediente', 'noexpediente', 'numexpediente', 'expediente', 'noexp', 'exp'],
+            'historia_clinica' => ['numerodehistoriaclinica', 'numerohistoriaclinica', 'historiaclinica', 'nohc', 'hc'],
+            'telefono' => ['numerodetelefono', 'telefono1', 'telefono', 'tel', 'celular'],
+            'direccion' => ['procedencia', 'direccionactualdelpaciente', 'direccionpaciente', 'residencia', 'direccion', 'colonia', 'localidad', 'domicilio'],
+            'diagnostico_1' => ['diagnosticoactividad', 'diagnosticoprincipal', 'diagnosticoingreso', 'patologia1', 'diagnostico1', 'diagnostico', 'diag1', 'dx1'],
+            'cond_1' => ['condiciondiagnostico1', 'condicion1', 'cond1', 'condicion', 'tipo1'],
             'diagnostico_2' => ['diagnostico2', 'diag2', 'patologia2', 'dx2'],
             'cond_2' => ['condicion2', 'cond2', 'tipo2'],
             'diagnostico_3' => ['diagnostico3', 'diag3', 'patologia3', 'dx3'],
@@ -1005,12 +1085,31 @@ class ExcelImportService
 
         $map = [];
         foreach ($aliases as $field => $fieldAliases) {
-            foreach ($cleanHeaders as $colIdx => $cleanH) {
-                if (in_array($cleanH, $fieldAliases)) {
-                    $map[$field] = $colIdx;
-                    break;
+            // 1. Coincidencia exacta prioritaria
+            foreach ($fieldAliases as $alias) {
+                foreach ($cleanHeaders as $colIdx => $cleanH) {
+                    if ($cleanH === $alias) {
+                        $map[$field] = $colIdx;
+                        break 2;
+                    }
                 }
             }
+            // 2. Coincidencia por subcadena si no hubo exacta
+            if (!isset($map[$field])) {
+                foreach ($fieldAliases as $alias) {
+                    foreach ($cleanHeaders as $colIdx => $cleanH) {
+                        if (str_contains($cleanH, $alias)) {
+                            $map[$field] = $colIdx;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Si no se encontró expediente pero sí historia clínica (para archivos que no tengan columna expediente)
+        if (!isset($map['expediente']) && isset($map['historia_clinica'])) {
+            $map['expediente'] = $map['historia_clinica'];
         }
 
         return $map;
@@ -1353,24 +1452,145 @@ class ExcelImportService
     }
 
     /**
-     * Resolver médico y obtener su CM y Profesión
+     * Resolver médico y obtener su CM, Profesión y Jornada exacta según catálogo
      */
     protected function resolverMedico(string $medicoNorm): array
     {
+        $cleanInput = self::normalizarClaveMedico($medicoNorm);
+        if (empty($cleanInput)) {
+            return [
+                'medico' => $medicoNorm,
+                'cm' => '',
+                'prof' => 'MÉDICO GENERAL',
+                'jornada' => 'MATUTINA',
+            ];
+        }
+
+        // 1. Coincidencia por Código (si es numérico)
+        if (is_numeric($medicoNorm)) {
+            foreach ($this->medicosCatalog as $m) {
+                if ((string)$m['cod_med'] === (string)$medicoNorm) {
+                    return [
+                        'medico' => $m['nom_med'],
+                        'cm' => $m['cod_med'],
+                        'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                        'jornada' => $m['jornada'] ?: 'MATUTINA',
+                    ];
+                }
+            }
+        }
+
+        // 2. Coincidencia exacta de texto
         foreach ($this->medicosCatalog as $m) {
-            if ($m['nom_med'] === $medicoNorm || str_contains($m['nom_med'], $medicoNorm) || str_contains($medicoNorm, $m['nom_med'])) {
+            if ($m['nom_med'] === $medicoNorm) {
                 return [
                     'medico' => $m['nom_med'],
                     'cm' => $m['cod_med'],
                     'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                    'jornada' => $m['jornada'] ?: 'MATUTINA',
                 ];
             }
         }
+
+        // 3. Coincidencia normalizada (sin títulos ni acentos)
+        foreach ($this->medicosCatalog as $m) {
+            if (self::normalizarClaveMedico($m['nom_med']) === $cleanInput) {
+                return [
+                    'medico' => $m['nom_med'],
+                    'cm' => $m['cod_med'],
+                    'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                    'jornada' => $m['jornada'] ?: 'MATUTINA',
+                ];
+            }
+        }
+
+        // 4. Mapeos manuales directos para casos conocidos
+        $aliasMap = [
+            'ANDREA MEJIA' => 'MSS. ANDREA MICHELLE MEJIA MORAZAN',
+            'DRA. MAGALY COELLO' => 'DRA. MAGALY ROCIO COELLO GARCIA',
+            'MAGALY COELLO' => 'DRA. MAGALY ROCIO COELLO GARCIA',
+            'ISSIS NOHEMY RIVAS ARTILES' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+            'DRA. ISSIS RIVAS' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+            'DRA.ISSIS RIVAS' => 'DRA. ISSIS NOHEMY RIVAS ARTILES',
+            'KATHERINE ATENA FERNANDEZ PEREZ' => 'MSS.KATHERINE ATENA FERNANDEZ PEREZ',
+            'MARCELA DE JESÚS CRUZ COLINDRES' => 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+            'MARCELA DE JESUS CRUZ COLINDRES' => 'MSS. MARCELA DE JESUS CRUZ COLINDRES',
+            'DRA. YUSEN NUÑEZ' => 'DRA. YUSEN NIESVANOVA NUÑEZ',
+            'DR. EDWIN JOSUE ESPINAL MARTINEZ' => 'DR. EDWIN JOSE ESPINAL MARTINEZ',
+        ];
+        if (isset($aliasMap[$medicoNorm])) {
+            $target = $aliasMap[$medicoNorm];
+            foreach ($this->medicosCatalog as $m) {
+                if ($m['nom_med'] === $target) {
+                    return [
+                        'medico' => $m['nom_med'],
+                        'cm' => $m['cod_med'],
+                        'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                        'jornada' => $m['jornada'] ?: 'MATUTINA',
+                    ];
+                }
+            }
+        }
+
+        // 5. Coincidencia por conjunto de palabras significativas (>2 letras)
+        $palabras = array_filter(explode(' ', $cleanInput), fn($p) => strlen($p) > 2);
+        if (!empty($palabras)) {
+            $candidatos = [];
+            foreach ($this->medicosCatalog as $m) {
+                $cleanM = self::normalizarClaveMedico($m['nom_med']);
+                $todasCoinciden = true;
+                foreach ($palabras as $p) {
+                    if (!str_contains($cleanM, $p)) {
+                        $todasCoinciden = false;
+                        break;
+                    }
+                }
+                if ($todasCoinciden) {
+                    $candidatos[] = $m;
+                }
+            }
+            if (count($candidatos) === 1) {
+                $m = $candidatos[0];
+                return [
+                    'medico' => $m['nom_med'],
+                    'cm' => $m['cod_med'],
+                    'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                    'jornada' => $m['jornada'] ?: 'MATUTINA',
+                ];
+            }
+        }
+
+        // 6. Coincidencia por subcadena
+        foreach ($this->medicosCatalog as $m) {
+            $cleanM = self::normalizarClaveMedico($m['nom_med']);
+            if (str_contains($cleanM, $cleanInput) || str_contains($cleanInput, $cleanM)) {
+                return [
+                    'medico' => $m['nom_med'],
+                    'cm' => $m['cod_med'],
+                    'prof' => $m['especialidad'] ?: 'MÉDICO GENERAL',
+                    'jornada' => $m['jornada'] ?: 'MATUTINA',
+                ];
+            }
+        }
+
         return [
             'medico' => $medicoNorm,
             'cm' => '',
             'prof' => 'MÉDICO GENERAL',
+            'jornada' => 'MATUTINA',
         ];
+    }
+
+    public static function normalizarClaveMedico(?string $texto): string
+    {
+        if (empty($texto)) return '';
+        $str = mb_strtoupper(trim($texto), 'UTF-8');
+        $str = strtr($str, [
+            'Á'=>'A','É'=>'E','Í'=>'I','Ó'=>'O','Ú'=>'U','Ñ'=>'N','Ü'=>'U'
+        ]);
+        $str = preg_replace('/^(DR\.|DRA\.|MSS\.|G\.O\.\s*DRA\.|LIC\.|LICDA\.)\s*/i', '', $str);
+        $str = preg_replace('/[^A-Z0-9\s]/', ' ', $str);
+        return trim(preg_replace('/\s+/', ' ', $str));
     }
 
     /**
@@ -1390,80 +1610,162 @@ class ExcelImportService
     }
 
     /**
-     * Calcular semana epidemiológica
+     * Calcular semana epidemiológica estándar (Domingo a Sábado, primera semana de enero inicia SE 1)
      */
-    protected function calcularSemanaEpidemiologica(Carbon $date): int
+    public static function calcularSemanaEpidemiologica(Carbon $date): int
     {
-        return (int)$date->format('W');
+        $year = $date->year;
+        $jan1 = Carbon::create($year, 1, 1, 12, 0, 0);
+        $dayOfJan1 = $jan1->dayOfWeek; // 0=Domingo, 1=Lunes... 6=Sábado
+
+        $firstSunday = ($dayOfJan1 === 0) ? $jan1 : $jan1->copy()->addDays(7 - $dayOfJan1);
+        $d = $date->copy()->setTime(12, 0, 0);
+
+        if ($d->lt($firstSunday)) {
+            return 53;
+        }
+
+        $diffInDays = $firstSunday->diffInDays($d);
+        return (int)floor($diffInDays / 7) + 1;
     }
 
     /**
-     * Calcular Rangos 1 a 5 según edad y tipo
+     * Calcular Rangos 1 a 5 según edad y tipo con la nomenclatura oficial del sistema
      */
-    protected function calcularRangosEpidemiologicos($edad, $tipo): array
+    public static function calcularRangosEpidemiologicos($edad, $tipo): array
     {
-        $num = is_numeric($edad) ? (int)$edad : 0;
-        $t = mb_strtoupper((string)$tipo, 'UTF-8');
+        $edadNum = is_numeric($edad) ? (float)$edad : null;
+        $t = mb_strtoupper(trim((string)$tipo), 'UTF-8');
 
-        $rango1 = '';
-        $rango2 = '';
-        $rango3 = '';
-        $rango4 = '';
-        $rango5 = '';
-
-        if ($t === 'D') {
-            $rango1 = '< 1 M';
-            $rango2 = '< 1 M';
-            $rango3 = '< 1 M';
-            $rango4 = '< 1 M';
-            $rango5 = '< 1 M';
-        } elseif ($t === 'M') {
-            $rango1 = '1-11 M';
-            $rango2 = '1-11 M';
-            $rango3 = '1-11 M';
-            $rango4 = '1-11 M';
-            $rango5 = '1-11 M';
-        } else {
-            // Años
-            if ($num >= 1 && $num <= 4) $rango1 = '1-4 A';
-            elseif ($num >= 5 && $num <= 9) $rango1 = '5-9 A';
-            elseif ($num >= 10 && $num <= 14) $rango1 = '10-14 A';
-            elseif ($num >= 15 && $num <= 19) $rango1 = '15-19 A';
-            elseif ($num >= 20 && $num <= 49) $rango1 = '20-49 A';
-            elseif ($num >= 50 && $num <= 59) $rango1 = '50-59 A';
-            elseif ($num >= 60) $rango1 = '60+ A';
-
-            if ($num >= 1 && $num <= 4) $rango2 = '1-4 A';
-            elseif ($num >= 5 && $num <= 14) $rango2 = '5-14 A';
-            elseif ($num >= 15 && $num <= 49) $rango2 = '15-49 A';
-            elseif ($num >= 50) $rango2 = '50+ A';
-
-            if ($num >= 1 && $num <= 9) $rango3 = '1-9 A';
-            elseif ($num >= 10 && $num <= 19) $rango3 = '10-19 A';
-            elseif ($num >= 20 && $num <= 59) $rango3 = '20-59 A';
-            elseif ($num >= 60) $rango3 = '60+ A';
-
-            if ($num >= 1 && $num <= 4) $rango4 = '1-4 A';
-            elseif ($num >= 5 && $num <= 9) $rango4 = '5-9 A';
-            elseif ($num >= 10 && $num <= 14) $rango4 = '10-14 A';
-            elseif ($num >= 15 && $num <= 19) $rango4 = '15-19 A';
-            elseif ($num >= 20 && $num <= 59) $rango4 = '20-59 A';
-            elseif ($num >= 60) $rango4 = '60+ A';
-
-            if ($num >= 1 && $num <= 4) $rango5 = '1-4 A';
-            elseif ($num >= 5 && $num <= 14) $rango5 = '5-14 A';
-            elseif ($num >= 15 && $num <= 19) $rango5 = '15-19 A';
-            elseif ($num >= 20 && $num <= 49) $rango5 = '20-49 A';
-            elseif ($num >= 50 && $num <= 59) $rango5 = '50-59 A';
-            elseif ($num >= 60) $rango5 = '60+ A';
+        if ($edadNum === null || empty($t)) {
+            return [
+                'rango' => '',
+                'rango_2' => '',
+                'rango_3' => '',
+                'rango_4' => '',
+                'rango_5' => '',
+            ];
         }
 
+        // Convertir edad a años (idéntico a create.blade.php)
+        $edadEnAnios = $edadNum;
+        if ($t === 'M') {
+            $edadEnAnios = $edadNum / 12.0;
+        } elseif ($t === 'D') {
+            $edadEnAnios = $edadNum / 365.0;
+        }
+
+        // Rango 1
+        $idx1 = 8;
+        if ($edadEnAnios < 0.08) $idx1 = 0;
+        elseif ($edadEnAnios < 1.0) $idx1 = 1;
+        elseif ($edadEnAnios < 5.0) $idx1 = 2;
+        elseif ($edadEnAnios < 10.0) $idx1 = 3;
+        elseif ($edadEnAnios < 15.0) $idx1 = 4;
+        elseif ($edadEnAnios < 20.0) $idx1 = 5;
+        elseif ($edadEnAnios < 50.0) $idx1 = 6;
+        elseif ($edadEnAnios < 60.0) $idx1 = 7;
+
+        // Rango 2
+        $idx2 = 9;
+        if ($edadEnAnios < 0.08) $idx2 = 0;
+        elseif ($edadEnAnios < 0.16) $idx2 = 1;
+        elseif ($edadEnAnios < 1.0) $idx2 = 2;
+        elseif ($edadEnAnios < 5.0) $idx2 = 3;
+        elseif ($edadEnAnios < 10.0) $idx2 = 4;
+        elseif ($edadEnAnios < 15.0) $idx2 = 5;
+        elseif ($edadEnAnios < 20.0) $idx2 = 6;
+        elseif ($edadEnAnios < 50.0) $idx2 = 7;
+        elseif ($edadEnAnios < 60.0) $idx2 = 8;
+
+        // Rango 3
+        $idx3 = 8;
+        if ($edadEnAnios < 1.0) $idx3 = 0;
+        elseif ($edadEnAnios < 5.0) $idx3 = 1;
+        elseif ($edadEnAnios < 10.0) $idx3 = 2;
+        elseif ($edadEnAnios < 15.0) $idx3 = 3;
+        elseif ($edadEnAnios < 20.0) $idx3 = 4;
+        elseif ($edadEnAnios < 25.0) $idx3 = 5;
+        elseif ($edadEnAnios < 40.0) $idx3 = 6;
+        elseif ($edadEnAnios < 60.0) $idx3 = 7;
+
+        // Rango 4
+        $idx4 = 8;
+        if ($edadEnAnios < 1.0) $idx4 = 0;
+        elseif ($edadEnAnios < 5.0) $idx4 = 1;
+        elseif ($edadEnAnios < 10.0) $idx4 = 2;
+        elseif ($edadEnAnios < 15.0) $idx4 = 3;
+        elseif ($edadEnAnios < 20.0) $idx4 = 4;
+        elseif ($edadEnAnios < 25.0) $idx4 = 5;
+        elseif ($edadEnAnios < 30.0) $idx4 = 6;
+        elseif ($edadEnAnios < 50.0) $idx4 = 7;
+
+        // Rango 5
+        $idx5 = 2;
+        if ($edadEnAnios < 5.0) $idx5 = 0;
+        elseif ($edadEnAnios < 15.0) $idx5 = 1;
+
+        $r1 = [
+            '1. MENOR DE 1 MES',
+            '2. DE 1 MES A 1 AÑO',
+            '3. DE 1 A 4 AÑOS',
+            '4. DE 5 A 9 AÑOS',
+            '5. DE 10 A 14 AÑOS',
+            '6. DE 15 A 19 AÑOS',
+            '7. DE 20 A 49 AÑOS',
+            '8. DE 50 A 59 AÑOS',
+            '9. MAYORES DE 60 AÑOS'
+        ];
+
+        $r2 = [
+            'MENOR DE 1 MES',
+            'DE 1 A 2 MESES',
+            'DE 2 MES A 1 AÑO',
+            'DE 1 A 4 AÑOS',
+            'DE 5 A 9 AÑOS',
+            'DE 10 A 14 AÑOS',
+            'DE 15 A 19 AÑOS',
+            'DE 20 A 49 AÑOS',
+            'DE 50 A 59 AÑOS',
+            'MAYORES DE 60 AÑOS'
+        ];
+
+        $r3 = [
+            'MENOR 1 AÑO',
+            '1 - 4 AÑOS',
+            '5 A 9 AÑOS',
+            '10 A 14 AÑOS',
+            '15 A 19 AÑOS',
+            '20 A 24 AÑOS',
+            '25 A 39 AÑOS',
+            '40 A 59 AÑOS',
+            '60 Y MAS'
+        ];
+
+        $r4 = [
+            'MENOR 1 AÑO',
+            '1 - 4 AÑOS',
+            '5 A 9 AÑOS',
+            '10 A 14 AÑOS',
+            '15 A 19 AÑOS',
+            '20 A 24 AÑOS',
+            '25 A 29 AÑOS',
+            '30 A 49 AÑOS',
+            '50 Y +'
+        ];
+
+        $r5 = [
+            'MENORES DE 5 AÑOS',
+            'DE 5 A 14 AÑOS',
+            'MAYORES DE 15 AÑOS'
+        ];
+
         return [
-            'rango' => $rango1,
-            'rango_2' => $rango2,
-            'rango_3' => $rango3,
-            'rango_4' => $rango4,
-            'rango_5' => $rango5,
+            'rango' => $r1[$idx1] ?? '',
+            'rango_2' => $r2[$idx2] ?? '',
+            'rango_3' => $r3[$idx3] ?? '',
+            'rango_4' => $r4[$idx4] ?? '',
+            'rango_5' => $r5[$idx5] ?? '',
         ];
     }
 

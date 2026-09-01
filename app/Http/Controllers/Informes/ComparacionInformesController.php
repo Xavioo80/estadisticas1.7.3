@@ -22,18 +22,29 @@ class ComparacionInformesController extends Controller
      */
     public function index(Request $request)
     {
-        $helperData = $this->getAnosMesesDisponiblesInformes();
-        $anos = $helperData['anos'];
-        $meses = $helperData['meses'];
-
-        $ano = $request->input('ano', $helperData['anoDefault']);
-        $mes = $request->input('mes', '');
-        if (empty($mes)) {
-            $mes = $this->resolverMesPorDefecto($ano);
+        $anos = $this->getAnosDisponibles();
+        
+        $anoInput = $request->input('ano');
+        if (empty($anoInput) || !is_numeric($anoInput) || (int)$anoInput <= 1900) {
+            $ano = (string)$this->resolverUltimoAnoConDatos();
+        } else {
+            $ano = (string)$anoInput;
         }
 
-        $jornada = $request->input('jornada', 'TODAS') ?: 'TODAS';
-        $jornadas = Informe::distinct()->whereNotNull('jornada')->where('jornada', '!=', '')->pluck('jornada');
+        $meses = $this->getMesesDisponibles($ano);
+        if ($meses->isEmpty()) {
+            $meses = collect(['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE']);
+        }
+
+        $mesInput = strtoupper(trim((string)$request->input('mes', '')));
+        if (empty($mesInput) || !$meses->contains($mesInput)) {
+            $mes = $this->resolverMesPorDefecto($ano, true);
+        } else {
+            $mes = $mesInput;
+        }
+
+        $jornadas = $this->getJornadasDisponibles();
+        $jornada = strtoupper(trim((string)$request->input('jornada', 'TODAS'))) ?: 'TODAS';
 
         $resultado = $this->service->comparar($ano, $mes, $jornada);
 

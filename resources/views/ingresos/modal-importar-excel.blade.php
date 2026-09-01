@@ -1472,26 +1472,30 @@
                         _token: '{{ csrf_token() }}',
                         importacion_id: currentImportData.importacion_id,
                         solo_nuevos: soloNuevos ? 1 : 0,
-                        modo: (accion === 'sobreescribir' ? 'sobreescribir' : 'anexar')
+                        modo: accion
                     },
                     success: function(res) {
                         document.getElementById('importProgressContainer').classList.add('d-none');
                         document.getElementById('importSuccessContainer').classList.remove('d-none');
                         document.getElementById('importSuccessMessage').innerText = res.message || 'Operación completada exitosamente.';
 
-                        // Inyectar registros directamente en la tabla principal de Ingresos AT-1
+                        // Inyectar registros en la tabla de edición
                         if (res.filas_tabla && res.filas_tabla.length > 0) {
                             if (typeof window.cargarRegistrosImportadosATabla === 'function') {
-                                window.cargarRegistrosImportadosATabla(res.filas_tabla);
+                                window.cargarRegistrosImportadosATabla(res.filas_tabla, accion !== 'cargar_tabla');
                             }
                         }
 
                         setTimeout(function() {
                             $('#modalImportarExcel').modal('hide');
+                            var tituloModal = '¡Registros Cargados a Tabla!';
+                            if (accion === 'sobreescribir') tituloModal = '¡Día Sobreescrito en BD!';
+                            else if (accion === 'anexar') tituloModal = '¡Registros Anexados a BD!';
+
                             Swal.fire({
                                 icon: 'success',
-                                title: (accion === 'sobreescribir' ? '¡Día Sobreescrito y Cargado!' : '¡Registros Procesados!'),
-                                text: `Se han procesado ${res.total_importados} atenciones y se encuentran visibles en la tabla de Ingresos AT-1.`,
+                                title: tituloModal,
+                                text: res.message || `Se han procesado ${res.total_importados} atenciones.`,
                                 confirmButtonColor: '#10b981',
                                 confirmButtonText: 'Ver en Tabla'
                             });

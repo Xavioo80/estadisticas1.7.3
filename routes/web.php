@@ -24,6 +24,9 @@ Route::get('/informes/dashboard2', [DashboardController::class, 'charts'])->name
 // Report & Output Routes (Registros AT1 & Informes AT1)
 Route::get('/registrosat1', [RegistroGlobalController::class, 'index'])->name('registrosat1');
 Route::get('/informesat1', [RegistroGlobalController::class, 'informesAt1'])->name('informesat1');
+Route::post('/informesat1/update-diagnostico', [RegistroGlobalController::class, 'updateAt1Diagnostico'])->name('informesat1.updateDiagnostico');
+Route::post('/informesat1/delete-diagnostico', [RegistroGlobalController::class, 'deleteAt1Diagnostico'])->name('informesat1.deleteDiagnostico');
+Route::get('/informesat1/buscar-diagnosticos', [RegistroGlobalController::class, 'buscarDiagnosticos'])->name('informesat1.buscarDiagnosticos');
 Route::get('/tables', [RegistroGlobalController::class, 'index'])->name('tables');
 Route::get('/registros', [RegistroGlobalController::class, 'index'])->name('registros');
 Route::get('/informes', [RegistroGlobalController::class, 'informesAt1'])->name('informes');
@@ -127,6 +130,7 @@ Route::prefix('informes')->name('informes.')->group(function () {
     Route::get('/morbilidad/export', [MorbilidadController::class, 'export'])->name('morbilidad.export');
 
     Route::get('/comparacion-cruzada', [\App\Http\Controllers\Informes\ComparacionInformesController::class, 'index'])->name('comparacion-cruzada');
+    Route::get('/comparacion-cruzada/ajax', [\App\Http\Controllers\Informes\ComparacionInformesController::class, 'index'])->name('comparacion-cruzada.ajax');
     Route::get('/comparacion-cruzada/detalles', [\App\Http\Controllers\Informes\ComparacionInformesController::class, 'detalles'])->name('comparacion-cruzada.detalles');
 
     Route::get('/its', [ItsController::class, 'index'])->name('its');

@@ -93,6 +93,20 @@ class Tb9Controller extends Controller
             $data[$rango]['dates'][$dateStr] = $row->total;
         }
 
+        $rangoOrder = [
+            'MENORES DE 5 AÑOS' => 1,
+            'DE 5 A 14 AÑOS' => 2,
+            'DE 10 A 14 AÑOS' => 2,
+            'MAYORES DE 15 AÑOS' => 3,
+            'SIN RANGO' => 4,
+        ];
+        uksort($data, function ($a, $b) use ($rangoOrder) {
+            $ordA = $rangoOrder[trim($a)] ?? 99;
+            $ordB = $rangoOrder[trim($b)] ?? 99;
+            if ($ordA === $ordB) return strcmp($a, $b);
+            return $ordA <=> $ordB;
+        });
+
         ksort($dates);
         $headers = array_values($dates);
         $fechasObjs = array_map(fn($h) => ['fecha' => $h, 'obj' => \Carbon\Carbon::createFromFormat('d/m/Y', $h)], $headers);
@@ -138,6 +152,21 @@ class Tb9Controller extends Controller
                 $data[$rango] = ['dates' => []];
             $data[$rango]['dates'][$dateStr] = $row->total;
         }
+
+        $rangoOrder = [
+            'MENORES DE 5 AÑOS' => 1,
+            'DE 5 A 14 AÑOS' => 2,
+            'DE 10 A 14 AÑOS' => 2,
+            'MAYORES DE 15 AÑOS' => 3,
+            'SIN RANGO' => 4,
+        ];
+        uksort($data, function ($a, $b) use ($rangoOrder) {
+            $ordA = $rangoOrder[trim($a)] ?? 99;
+            $ordB = $rangoOrder[trim($b)] ?? 99;
+            if ($ordA === $ordB) return strcmp($a, $b);
+            return $ordA <=> $ordB;
+        });
+
         ksort($dates);
         $headers = array_values($dates);
 

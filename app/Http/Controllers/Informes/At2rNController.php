@@ -592,48 +592,8 @@ class At2rNController extends Controller
             return response()->json(['error' => 'Concepto no encontrado'], 404);
         }
 
-        $mapping = [
-            'ENFERMERAS AUXILIARES' => 1,
-            'LICENCIADA EN ENFERMERIA' => 2,
-            'LICENCIADAS EN ENFERMERIA' => 2,
-            'ENFERMERA PROFESIONAL' => 2,
-            'NUTRICION' => 2,
-            'NUTRICIÓN' => 2,
-            'LICENCIADA EN NUTRICION' => 2,
-            'LICENCIADAS EN NUTRICION' => 2,
-            'LICENCIADA EN NUTRICIÓN' => 2,
-            'LICENCIADAS EN NUTRICIÓN' => 2,
-            'NUTRICIONISTA' => 2,
-            'PSICOLOGIA' => 2,
-            'PSICOLOGÍA' => 2,
-            'PSICOLOGO' => 2,
-            'PSICÓLOGO' => 2,
-            'CONSEJERIA' => 2,
-            'CONSEJERÍA' => 2,
-            'SALUD MENTAL' => 2,
-            'MEDICO GENERAL' => 3,
-            'MÉDICO GENERAL' => 3,
-            'MEDICO ESPECIALISTA' => 4,
-            'MÉDICO ESPECIALISTA' => 4,
-            'PSIQUIATRA' => 4,
-            'PSIQUIATRIA' => 4,
-            'PSIQUIATRÍA' => 4,
-        ];
-        $omitir = ['TRABAJO SOCIAL', 'ODONTOLOGIA'];
-
-        $getCol = function ($prof, $force = false) use ($mapping, $omitir) {
-            $prof = strtoupper(trim($prof));
-            if (isset($mapping[$prof]))
-                return $mapping[$prof];
-            if (str_contains($prof, 'NUTRICI'))
-                return 2;
-            if (str_contains($prof, 'PSICOLOG'))
-                return 2;
-            if (str_contains($prof, 'PSIQ'))
-                return 4;
-            if (!$force && in_array($prof, $omitir))
-                return null;
-            return 4;
+        $getCol = function ($prof, $medico = '', $force = false) {
+            return $this->resolveColumnaProfesion($prof, $medico, $force);
         };
 
         $baseQuery = RegistroGlobal::query()->where('ano', $ano)->where('mes', $mes);
@@ -1359,65 +1319,6 @@ class At2rNController extends Controller
             'erc_nuevas' => $ercN,
             'erc_subs' => $ercS,
         ];
-    }
-
-    private function resolveColumnaProfesion($prof, $medico = '', bool $force = false): ?int
-    {
-        $prof = strtoupper(trim($prof ?? ''));
-        $medico = strtoupper(trim($medico ?? ''));
-
-        $mapping = [
-            'ENFERMERAS AUXILIARES' => 1,
-            'ENFERMERA AUXILIAR' => 1,
-            'LICENCIADA EN ENFERMERIA' => 2,
-            'LICENCIADAS EN ENFERMERIA' => 2,
-            'ENFERMERA PROFESIONAL' => 2,
-            'NUTRICION' => 2,
-            'NUTRICIÓN' => 2,
-            'LICENCIADA EN NUTRICION' => 2,
-            'LICENCIADAS EN NUTRICION' => 2,
-            'LICENCIADA EN NUTRICIÓN' => 2,
-            'LICENCIADAS EN NUTRICIÓN' => 2,
-            'NUTRICIONISTA' => 2,
-            'PSICOLOGIA' => 2,
-            'PSICOLOGÍA' => 2,
-            'PSICOLOGO' => 2,
-            'PSICÓLOGO' => 2,
-            'CONSEJERIA' => 2,
-            'CONSEJERÍA' => 2,
-            'SALUD MENTAL' => 2,
-            'MEDICO GENERAL' => 3,
-            'MEDICO ESPECIALISTA' => 4,
-            'MÉDICO ESPECIALISTA' => 4,
-            'PSIQUIATRA' => 4,
-            'PSIQUIATRIA' => 4,
-            'PSIQUIATRÍA' => 4,
-        ];
-        $omitir = ['TRABAJO SOCIAL', 'ODONTOLOGIA'];
-
-        // Si el nombre del médico o la profesión menciona especialista (Ginecólogo, Pediatra, Psiquiatra, Especialista)
-        if (str_contains($medico, 'GINECOL') || str_contains($medico, 'PEDIATR') || str_contains($medico, 'PSIQUIAT') || str_contains($medico, 'ESPECIALISTA')) {
-            return 4;
-        }
-
-        if ($prof === 'MÉDICO GENERAL' || $prof === 'MÉDICO ESPECIALISTA' || str_contains($prof, 'ESPECIALISTA')) {
-            return 4;
-        }
-
-        if ($prof === 'MEDICO GENERAL') {
-            return 3;
-        }
-
-        if (isset($mapping[$prof])) {
-            return $mapping[$prof];
-        }
-
-        if (str_contains($prof, 'AUXILIAR')) return 1;
-        if (str_contains($prof, 'ENFERMER') || str_contains($prof, 'NUTRICI') || str_contains($prof, 'PSICOLOG')) return 2;
-        if (str_contains($prof, 'ESPECIALISTA') || str_contains($prof, 'PSIQUIATR') || str_contains($prof, 'GINECOL') || str_contains($prof, 'PEDIATR')) return 4;
-        if (!$force && in_array($prof, $omitir)) return null;
-
-        return 4;
     }
 
     private function isPrenatalNuevaRecord($r): bool

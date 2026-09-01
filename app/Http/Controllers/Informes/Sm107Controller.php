@@ -206,36 +206,49 @@ class Sm107Controller extends Controller
         $reversaDiagnoses = [];
         if ($viewType == 'reversa') {
             $querySG = RegistroGlobal::where('ano', $ano)->where('mes', $mes)
-                ->select('id', 'fecha', 'edad', 'tipo', 'prof', 'sg', 'numero', 'diagnostico_1', 'diagnostico_2', 'diagnostico_3', 'diagnostico_4', 'diagnostico_5', 'diagnostico_6', 'diagnostico_7');
+                ->select('id', 'fecha', 'edad', 'tipo', 'prof', 'sg', 'numero', 
+                    'cod_1', 'diagnostico_1', 
+                    'cod_2', 'diagnostico_2', 
+                    'cod_3', 'diagnostico_3', 
+                    'cod_4', 'diagnostico_4', 
+                    'cod_5', 'diagnostico_5', 
+                    'cod_6', 'diagnostico_6', 
+                    'cod_7', 'diagnostico_7'
+                );
             if ($jornada != 'TODAS')
                 $querySG->where('jornada', $jornada);
 
             $smActivities = [
-                ['pattern' => 'ENTREVISTA V.D', 'session' => 19, 'norm' => 'ENTREVISTA V.D'],
-                ['pattern' => 'ENTREVISTA PSICOLÓGICA', 'session' => 20, 'norm' => 'ENTREVISTA PSICOLOGICA'],
-                ['pattern' => 'INTERVENSIÓN EN CRISIS', 'session' => 21, 'norm' => 'INTERVENSION EN CRISIS'],
-                ['pattern' => 'FICHA DE VIGILANCIA EPIDEMIOLÓGICA.', 'session' => 22, 'norm' => 'FICHA DE VIGILANCIA EPIDEMIOLOGICA.'],
-                ['pattern' => 'PSICOTERAPIA INDIVIDUAL', 'session' => 23, 'norm' => 'PSICOTERAPIA INDIVIDUAL'],
-                ['pattern' => 'PSICOTERAPIA EN GRUPO', 'session' => 24, 'participants' => 25, 'norm' => 'PSICOTERAPIA EN GRUPO'],
-                ['pattern' => 'PSICOTERAPIA DE FAMILIA', 'session' => 26, 'participants' => 27, 'norm' => 'PSICOTERAPIA DE FAMILIA'],
-                ['pattern' => 'REUNIÓN COORDINACIÓN GRUPOS DE APOYO', 'session' => 28, 'participants' => 29, 'norm' => 'REUNION COORDINACION GRUPOS DE APOYO'],
-                ['pattern' => 'PRUEBAS PSICOLÓGICAS APLICADAS', 'session' => 30, 'norm' => 'PRUEBAS PSICOLOGICAS APLICADAS'],
-                ['pattern' => 'REUNIÓN DE TRABAJO COMUNITARIO', 'session' => 31, 'participants' => 32, 'norm' => 'REUNION DE TRABAJO COMUNITARIO'],
-                ['pattern' => 'CAPACITACIONES BRINDADAS', 'session' => 33, 'participants' => 34, 'norm' => 'CAPACITACIONES BRINDADAS'],
-                ['pattern' => 'CAPACITACIONES RECIBIDAS', 'session' => 35, 'norm' => 'CAPACITACIONES RECIBIDAS'],
-                ['pattern' => 'CHARLAS BRINDADAS', 'session' => 36, 'participants' => 37, 'norm' => 'CHARLAS BRINDADAS'],
-                ['pattern' => 'ORGANIZACIÓN Y FORTALECIMIENTO DE GRUPO', 'session' => 38, 'norm' => 'ORGANIZACION Y FORTALECIMIENTO DE GRUPO'],
-                ['pattern' => 'CONSEJERIA VIH/SIDA', 'session' => 39, 'norm' => 'CONSEJERIA VIH/SIDA'],
-                ['pattern' => 'REFERENCIAS RECIBIDAS', 'session' => 40, 'norm' => 'REFERENCIAS RECIBIDAS'],
-                ['pattern' => 'REFERENCIAS ENVIADAS', 'session' => 41, 'norm' => 'REFERENCIAS ENVIADAS'],
-                ['pattern' => 'TAMIZAJE (+)', 'session' => 42, 'norm' => 'TAMIZAJE (+)'],
-                ['pattern' => 'TAMIZAJE (-)', 'session' => 43, 'norm' => 'TAMIZAJE (-)'],
+                ['code' => '130', 'pattern' => 'ENTREVISTA V.D', 'session' => 19, 'norm' => 'ENTREVISTA V.D'],
+                ['code' => '131', 'pattern' => 'ENTREVISTA PSICOLÓGICA', 'session' => 20, 'norm' => 'ENTREVISTA PSICOLOGICA'],
+                ['code' => '132', 'pattern' => 'INTERVENSIÓN EN CRISIS', 'session' => 21, 'norm' => 'INTERVENSION EN CRISIS'],
+                ['code' => '133', 'pattern' => 'FICHA DE VIGILANCIA EPIDEMIOLÓGICA.', 'session' => 22, 'norm' => 'FICHA DE VIGILANCIA EPIDEMIOLOGICA.'],
+                ['code' => '134', 'pattern' => 'PSICOTERAPIA INDIVIDUAL', 'session' => 23, 'norm' => 'PSICOTERAPIA INDIVIDUAL'],
+                ['code' => '135', 'pattern' => 'PSICOTERAPIA EN GRUPO', 'session' => 24, 'participants' => 25, 'norm' => 'PSICOTERAPIA EN GRUPO'],
+                ['code' => '137', 'pattern' => 'PSICOTERAPIA DE FAMILIA', 'session' => 26, 'participants' => 27, 'norm' => 'PSICOTERAPIA DE FAMILIA'],
+                ['code' => '139', 'pattern' => 'REUNIÓN COORDINACIÓN GRUPOS DE APOYO', 'session' => 28, 'participants' => 29, 'norm' => 'REUNION COORDINACION GRUPOS DE APOYO'],
+                ['code' => '141', 'pattern' => 'PRUEBAS PSICOLÓGICAS APLICADAS', 'session' => 30, 'norm' => 'PRUEBAS PSICOLOGICAS APLICADAS'],
+                ['code' => '143', 'pattern' => 'REUNIÓN DE TRABAJO COMUNITARIO', 'session' => 31, 'participants' => 32, 'norm' => 'REUNION DE TRABAJO COMUNITARIO'],
+                ['code' => '145', 'pattern' => 'CAPACITACIONES BRINDADAS', 'session' => 33, 'participants' => 34, 'norm' => 'CAPACITACIONES BRINDADAS'],
+                ['code' => '146', 'pattern' => 'CAPACITACIONES RECIBIDAS', 'session' => 35, 'norm' => 'CAPACITACIONES RECIBIDAS'],
+                ['code' => '147', 'pattern' => 'CHARLAS BRINDADAS', 'session' => 36, 'participants' => 37, 'norm' => 'CHARLAS BRINDADAS'],
+                ['code' => '149', 'pattern' => 'ORGANIZACIÓN Y FORTALECIMIENTO DE GRUPO', 'session' => 38, 'norm' => 'ORGANIZACION Y FORTALECIMIENTO DE GRUPO'],
+                ['code' => '150', 'pattern' => 'CONSEJERIA VIH/SIDA', 'session' => 39, 'norm' => 'CONSEJERIA VIH/SIDA'],
+                ['code' => '151', 'pattern' => 'REFERENCIAS RECIBIDAS', 'session' => 40, 'norm' => 'REFERENCIAS RECIBIDAS'],
+                ['code' => '152', 'pattern' => 'REFERENCIAS ENVIADAS', 'session' => 41, 'norm' => 'REFERENCIAS ENVIADAS'],
+                ['code' => '153', 'pattern' => 'TAMIZAJE (+)', 'session' => 42, 'norm' => 'TAMIZAJE (+)'],
+                ['code' => '154', 'pattern' => 'TAMIZAJE (-)', 'session' => 43, 'norm' => 'TAMIZAJE (-)'],
             ];
 
-            // Mapa O(1) para reconocimiento instantáneo de actividades
+            // Mapa O(1) para reconocimiento instantáneo de actividades (por texto y código)
             $actMap = [];
+            $actCodeMap = [];
             foreach ($smActivities as $act) {
-                $actMap[$act['norm']] = $act;
+                $actMap[$this->quitarAcentos(strtoupper($act['norm']))] = $act;
+                $actMap[$this->quitarAcentos(strtoupper($act['pattern']))] = $act;
+                if (!empty($act['code'])) {
+                    $actCodeMap[$act['code']] = $act;
+                }
             }
 
             for ($i = 19; $i <= 43; $i++)
@@ -269,11 +282,21 @@ class Sm107Controller extends Controller
                 $processedInRow = [];
                 for ($idxDiag = 1; $idxDiag <= 7; $idxDiag++) {
                     $diagVal = $r->{"diagnostico_{$idxDiag}"};
-                    if (empty($diagVal)) continue;
+                    $codVal = trim((string)($r->{"cod_{$idxDiag}"} ?? ''));
+                    if (empty($diagVal) && empty($codVal)) continue;
 
-                    $norm = preg_replace('/\s+/', ' ', strtoupper(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', trim($diagVal))));
-                    if (isset($actMap[$norm])) {
-                        $act = $actMap[$norm];
+                    $act = null;
+                    if (!empty($diagVal)) {
+                        $norm = preg_replace('/\s+/', ' ', strtoupper($this->quitarAcentos(trim($diagVal))));
+                        if (isset($actMap[$norm])) {
+                            $act = $actMap[$norm];
+                        }
+                    }
+                    if (!$act && !empty($codVal) && isset($actCodeMap[$codVal])) {
+                        $act = $actCodeMap[$codVal];
+                    }
+
+                    if ($act) {
                         if (in_array($act['session'], $processedInRow)) continue;
 
                         $reversaActivities[$act['session']][$day]++;
@@ -450,25 +473,25 @@ class Sm107Controller extends Controller
                 } else {
                     $actCode = (int)$rowId;
                     $smActivities = [
-                        ['pattern' => 'ENTREVISTA V.D', 'session' => 19],
-                        ['pattern' => 'ENTREVISTA PSICOLÓGICA', 'session' => 20],
-                        ['pattern' => 'INTERVENSIÓN EN CRISIS', 'session' => 21],
-                        ['pattern' => 'FICHA DE VIGILANCIA EPIDEMIOLÓGICA.', 'session' => 22],
-                        ['pattern' => 'PSICOTERAPIA INDIVIDUAL', 'session' => 23],
-                        ['pattern' => 'PSICOTERAPIA EN GRUPO', 'session' => 24, 'participants' => 25],
-                        ['pattern' => 'PSICOTERAPIA DE FAMILIA', 'session' => 26, 'participants' => 27],
-                        ['pattern' => 'REUNIÓN COORDINACIÓN GRUPOS DE APOYO', 'session' => 28, 'participants' => 29],
-                        ['pattern' => 'PRUEBAS PSICOLÓGICAS APLICADAS', 'session' => 30],
-                        ['pattern' => 'REUNIÓN DE TRABAJO COMUNITARIO', 'session' => 31, 'participants' => 32],
-                        ['pattern' => 'CAPACITACIONES BRINDADAS', 'session' => 33, 'participants' => 34],
-                        ['pattern' => 'CAPACITACIONES RECIBIDAS', 'session' => 35],
-                        ['pattern' => 'CHARLAS BRINDADAS', 'session' => 36, 'participants' => 37],
-                        ['pattern' => 'ORGANIZACIÓN Y FORTALECIMIENTO DE GRUPO', 'session' => 38],
-                        ['pattern' => 'CONSEJERIA VIH/SIDA', 'session' => 39],
-                        ['pattern' => 'REFERENCIAS RECIBIDAS', 'session' => 40],
-                        ['pattern' => 'REFERENCIAS ENVIADAS', 'session' => 41],
-                        ['pattern' => 'TAMIZAJE (+)', 'session' => 42],
-                        ['pattern' => 'TAMIZAJE (-)', 'session' => 43],
+                        ['code' => '130', 'pattern' => 'ENTREVISTA V.D', 'session' => 19],
+                        ['code' => '131', 'pattern' => 'ENTREVISTA PSICOLÓGICA', 'session' => 20],
+                        ['code' => '132', 'pattern' => 'INTERVENSIÓN EN CRISIS', 'session' => 21],
+                        ['code' => '133', 'pattern' => 'FICHA DE VIGILANCIA EPIDEMIOLÓGICA.', 'session' => 22],
+                        ['code' => '134', 'pattern' => 'PSICOTERAPIA INDIVIDUAL', 'session' => 23],
+                        ['code' => '135', 'pattern' => 'PSICOTERAPIA EN GRUPO', 'session' => 24, 'participants' => 25],
+                        ['code' => '137', 'pattern' => 'PSICOTERAPIA DE FAMILIA', 'session' => 26, 'participants' => 27],
+                        ['code' => '139', 'pattern' => 'REUNIÓN COORDINACIÓN GRUPOS DE APOYO', 'session' => 28, 'participants' => 29],
+                        ['code' => '141', 'pattern' => 'PRUEBAS PSICOLÓGICAS APLICADAS', 'session' => 30],
+                        ['code' => '143', 'pattern' => 'REUNIÓN DE TRABAJO COMUNITARIO', 'session' => 31, 'participants' => 32],
+                        ['code' => '145', 'pattern' => 'CAPACITACIONES BRINDADAS', 'session' => 33, 'participants' => 34],
+                        ['code' => '146', 'pattern' => 'CAPACITACIONES RECIBIDAS', 'session' => 35],
+                        ['code' => '147', 'pattern' => 'CHARLAS BRINDADAS', 'session' => 36, 'participants' => 37],
+                        ['code' => '149', 'pattern' => 'ORGANIZACIÓN Y FORTALECIMIENTO DE GRUPO', 'session' => 38],
+                        ['code' => '150', 'pattern' => 'CONSEJERIA VIH/SIDA', 'session' => 39],
+                        ['code' => '151', 'pattern' => 'REFERENCIAS RECIBIDAS', 'session' => 40],
+                        ['code' => '152', 'pattern' => 'REFERENCIAS ENVIADAS', 'session' => 41],
+                        ['code' => '153', 'pattern' => 'TAMIZAJE (+)', 'session' => 42],
+                        ['code' => '154', 'pattern' => 'TAMIZAJE (-)', 'session' => 43],
                     ];
 
                     $activity = collect($smActivities)->first(function($a) use ($actCode) {
@@ -477,12 +500,16 @@ class Sm107Controller extends Controller
 
                     if ($activity) {
                         $patternNormal = preg_replace('/\s+/', ' ', trim($this->quitarAcentos(strtoupper($activity['pattern']))));
-                        $records = $records->filter(function($r) use ($patternNormal) {
+                        $actCodeStr = $activity['code'] ?? null;
+                        $records = $records->filter(function($r) use ($patternNormal, $actCodeStr) {
                             for ($i = 1; $i <= 7; $i++) {
                                 $diag = $r->{"diagnostico_$i"};
-                                if (empty($diag)) continue;
-                                $textNormal = preg_replace('/\s+/', ' ', trim($this->quitarAcentos(strtoupper($diag))));
-                                if ($textNormal === $patternNormal) return true;
+                                $cod = trim((string)($r->{"cod_$i"} ?? ''));
+                                if (!empty($diag)) {
+                                    $textNormal = preg_replace('/\s+/', ' ', trim($this->quitarAcentos(strtoupper($diag))));
+                                    if ($textNormal === $patternNormal) return true;
+                                }
+                                if ($actCodeStr && $cod === $actCodeStr) return true;
                             }
                             return false;
                         });

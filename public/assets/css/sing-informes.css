@@ -2643,8 +2643,6 @@ html.dark .td-hatched,
 .table-bordered td,
 .table-sm107 th,
 .table-sm107 td,
-.table-trans2 th,
-.table-trans2 td,
 .table-its th,
 .table-its td,
 .table-premium th,
@@ -2672,6 +2670,119 @@ html.dark .td-hatched,
   border: 1px solid var(--modal-border, rgba(255, 255, 255, 0.22)) !important;
   box-shadow: var(--modal-shadow, 0 30px 60px -12px rgba(0, 0, 0, 0.85)) !important;
   border-radius: var(--radius-md, 12px) !important;
+}
+
+/* ==========================================================================
+   TRANS-2 EPIDEMIOLOGICAL REPORT WEEK BOXES & SEPARATORS
+   ========================================================================== */
+:root {
+  --trans2-border-internal: #cbd5e1;
+  --trans2-semana-border: #2563eb;
+  --trans2-semana-hdr-bg: rgba(37, 99, 235, 0.12);
+  --trans2-semana-odd-bg: #ffffff;
+  --trans2-semana-odd-hover: rgba(0, 0, 0, 0.02);
+  --trans2-semana-even-bg: #f0f7ff;
+  --trans2-semana-even-hover: #e0effe;
+}
+
+[data-theme="dark"] {
+  --trans2-border-internal: rgba(255, 255, 255, 0.12);
+  --trans2-semana-border: #38bdf8;
+  --trans2-semana-hdr-bg: rgba(56, 189, 248, 0.18);
+  --trans2-semana-odd-bg: transparent;
+  --trans2-semana-odd-hover: rgba(255, 255, 255, 0.03);
+  --trans2-semana-even-bg: rgba(56, 189, 248, 0.06);
+  --trans2-semana-even-hover: rgba(56, 189, 248, 0.11);
+}
+
+/* Cuadrícula interna fina con background-clip */
+.table-trans2 th,
+.table-trans2 td {
+  border: 1px solid var(--trans2-border-internal) !important;
+  background-clip: padding-box !important;
+  box-sizing: border-box;
+}
+
+/* MARCO EXTERIOR DEL CONJUNTO DE CADA SEMANA (RECUADRO 1.5px) */
+.table-trans2 thead tr.tr-semanas th.th-semana {
+  border: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--trans2-semana-border) !important;
+  background: var(--trans2-semana-hdr-bg) !important;
+  color: var(--trans2-semana-border) !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.5px;
+}
+
+.table-trans2 thead tr.tr-rangos th {
+  border-bottom: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset 0 -1.5px 0 var(--trans2-semana-border) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Borde izquierdo del conjunto (columna <1) */
+.table-trans2 thead tr.tr-rangos th.th-semana-start,
+.table-trans2 tbody td.td-semana-start {
+  border-left: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset 1.5px 0 0 var(--trans2-semana-border) !important;
+}
+
+/* Borde derecho del conjunto (columna 15+) */
+.table-trans2 thead tr.tr-rangos th.th-semana-end,
+.table-trans2 tbody td.td-semana-end {
+  border-right: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset -1.5px 0 0 var(--trans2-semana-border) !important;
+}
+
+/* Borde superior del bloque de datos */
+.table-trans2 tbody tr.row-semana-top td.td-semana-cell {
+  border-top: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset 0 1.5px 0 var(--trans2-semana-border) !important;
+}
+
+/* Borde inferior del bloque de datos */
+.table-trans2 tbody tr.row-semana-bottom td.td-semana-cell {
+  border-bottom: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset 0 -1.5px 0 var(--trans2-semana-border) !important;
+}
+
+/* Esquinas compuestas */
+.table-trans2 tbody tr.row-semana-top td.td-semana-start {
+  box-shadow: inset 1.5px 1.5px 0 var(--trans2-semana-border) !important;
+}
+.table-trans2 tbody tr.row-semana-top td.td-semana-end {
+  box-shadow: inset -1.5px 1.5px 0 var(--trans2-semana-border) !important;
+}
+.table-trans2 tbody tr.row-semana-bottom td.td-semana-start {
+  box-shadow: inset 1.5px -1.5px 0 var(--trans2-semana-border) !important;
+}
+.table-trans2 tbody tr.row-semana-bottom td.td-semana-end {
+  box-shadow: inset -1.5px -1.5px 0 var(--trans2-semana-border) !important;
+}
+
+/* Separador grueso entre texto y cuadrícula de datos */
+.table-trans2 thead tr.tr-semanas th.th-sticky-enfermedad,
+.table-trans2 tbody td.td-sticky-enfermedad {
+  border-right: 1.5px solid var(--trans2-semana-border) !important;
+  box-shadow: inset -1.5px 0 0 var(--trans2-semana-border), 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+.table-trans2 th.col-semana-even,
+.table-trans2 td.col-semana-even {
+  background-color: var(--trans2-semana-even-bg) !important;
+}
+
+.table-trans2 tr:hover td.col-semana-even {
+  background-color: var(--trans2-semana-even-hover) !important;
+}
+
+.table-trans2 th.col-semana-odd,
+.table-trans2 td.col-semana-odd {
+  background-color: var(--trans2-semana-odd-bg) !important;
+}
+
+.table-trans2 tr:hover td.col-semana-odd {
+  background-color: var(--trans2-semana-odd-hover) !important;
 }
 
 .modal-header {

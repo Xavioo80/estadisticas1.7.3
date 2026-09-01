@@ -9,7 +9,7 @@
                 <i class="bi bi-funnel-fill text-primary"></i> Filtros:
             </span>
 
-            <select id="modal-cmp-ano" class="form-control form-control-sm cmp-select">
+            <select id="modal-cmp-ano" class="form-control form-control-sm cmp-select" onchange="onModalAnoChange(this.value)">
                 @foreach($anos as $a)
                     <option value="{{ $a }}" {{ $a == $ano ? 'selected' : '' }}>{{ $a }}</option>
                 @endforeach
@@ -86,8 +86,8 @@
 
         <div class="cmp-kpi-item">
             <span class="cmp-kpi-label">Fuentes</span>
-            <span class="cmp-kpi-value text-primary">4</span>
-            <span class="cmp-kpi-sub">AT2RN · Morb · T2 · RG</span>
+            <span class="cmp-kpi-value text-primary">5</span>
+            <span class="cmp-kpi-sub">AT2RN · Morb · T2 · ITS · RG</span>
         </div>
 
     </div>
@@ -101,6 +101,7 @@
                     <th class="cmp-th-num" title="Informe Mensual AT2-R (N)">AT2-R</th>
                     <th class="cmp-th-num" title="Informe Mensual de Morbilidad">MORB.</th>
                     <th class="cmp-th-num" title="Informe Semanal TRANS-2 (Únicamente Casos Nuevos)">T-2</th>
+                    <th class="cmp-th-num" title="Informe Mensual de Infecciones de Transmisión Sexual (ITS)">ITS</th>
                     <th class="cmp-th-num" title="Base de Datos Registros Globales / AT1">R. GLOB.</th>
                     <th class="cmp-th-estado">ESTADO</th>
                 </tr>
@@ -111,7 +112,7 @@
                     @if($curCat !== $cmp['categoria'])
                         @php $curCat = $cmp['categoria']; @endphp
                         <tr class="cmp-cat-row" data-cat="{{ $curCat }}">
-                            <td colspan="6" class="cmp-cat-cell">
+                            <td colspan="7" class="cmp-cat-cell">
                                 <i class="bi bi-folder2-open mr-1"></i>{{ $curCat }}
                             </td>
                         </tr>
@@ -158,6 +159,15 @@
                                 <span class="cmp-only-new" title="TRANS-2 solo contabiliza casos nuevos">↑N</span>
                             @elseif($cmp['trans2'] !== null)
                                 <span class="cmp-num-badge {{ $cmp['trans2'] > 0 ? 'cmp-num--warning' : 'cmp-num--zero' }}">{{ $cmp['trans2'] }}</span>
+                            @else
+                                <span class="cmp-na">—</span>
+                            @endif
+                        </td>
+
+                        {{-- ITS --}}
+                        <td class="cmp-td-num">
+                            @if($cmp['its'] !== null)
+                                <span class="cmp-num-badge {{ $cmp['its'] > 0 ? 'cmp-num--its' : 'cmp-num--zero' }}">{{ $cmp['its'] }}</span>
                             @else
                                 <span class="cmp-na">—</span>
                             @endif
@@ -364,9 +374,9 @@
     text-transform: uppercase;
     white-space: nowrap;
 }
-.cmp-th-cond  { width: 34%; text-align: left; padding-left: 10px !important; }
-.cmp-th-num   { width: 10%; }
-.cmp-th-estado{ width: 16%; }
+.cmp-th-cond  { width: 32%; text-align: left; padding-left: 10px !important; }
+.cmp-th-num   { width: 9%; }
+.cmp-th-estado{ width: 13%; }
 
 /* Category rows */
 .cmp-cat-row { background: rgba(77, 124, 254, 0.07) !important; }
@@ -452,6 +462,7 @@
 .cmp-num--primary  { background: rgba(77,124,254,0.18); color: var(--color-primary); }
 .cmp-num--info     { background: rgba(6,182,212,0.18); color: #06b6d4; }
 .cmp-num--warning  { background: rgba(245,158,11,0.18); color: #d97706; }
+.cmp-num--its      { background: rgba(168,85,247,0.18); color: #9333ea; }
 .cmp-num--glob     { background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color); }
 .cmp-num--zero     { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }
 .cmp-na    { color: var(--text-secondary); font-size: 0.7rem; }
@@ -501,11 +512,11 @@
 @media (max-width: 900px) {
     #modal-cmp-jornada { width: 115px; }
     #modal-cmp-condicion-filter { width: 120px; }
-    .cmp-btn-text { display: none; }   /* Solo icono en móvil */
+    .cmp-btn-text { display: none; }
     .cmp-kpi-sub { display: none; }
     .cmp-kpi-label { font-size: 0.62rem; }
     .cmp-kpi-value { font-size: 0.9rem; }
-    .cmp-badge-stat { display: none; }  /* ocultar badges derecha */
+    .cmp-badge-stat { display: none; }
 }
 @media (max-width: 700px) {
     .cmp-filters-bar { flex-wrap: wrap; }
@@ -518,6 +529,11 @@
 </style>
 
 <script>
+function onModalAnoChange(nuevoAno) {
+    const jornada = $('#modal-cmp-jornada').val() || 'TODAS';
+    cargarDatosComparacionCruzada(nuevoAno, '', jornada);
+}
+
 function filtrarFilasPorCondicion(val) {
     const rows = document.querySelectorAll('.cmp-row');
     rows.forEach(r => {

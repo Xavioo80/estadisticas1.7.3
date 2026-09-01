@@ -4,14 +4,217 @@
 
 @push('styles')
 <style>
+    :root {
+        --trans2-border-internal: #cbd5e1;
+        --trans2-semana-border: #2563eb; /* Azul rey de alto contraste en Modo Claro */
+        --trans2-semana-hdr-bg: rgba(37, 99, 235, 0.12);
+        --trans2-semana-odd-bg: #ffffff;
+        --trans2-semana-odd-hover: rgba(0, 0, 0, 0.02);
+        --trans2-semana-even-bg: #f0f7ff;
+        --trans2-semana-even-hover: #e0effe;
+    }
+    
+    [data-theme="dark"] {
+        --trans2-border-internal: rgba(255, 255, 255, 0.12);
+        --trans2-semana-border: #38bdf8; /* Cyan luminoso de alto contraste en Modo Oscuro */
+        --trans2-semana-hdr-bg: rgba(56, 189, 248, 0.18);
+        --trans2-semana-odd-bg: transparent;
+        --trans2-semana-odd-hover: rgba(255, 255, 255, 0.03);
+        --trans2-semana-even-bg: rgba(56, 189, 248, 0.06);
+        --trans2-semana-even-hover: rgba(56, 189, 248, 0.11);
+    }
+
     .cell-clickable:hover {
         background-color: var(--color-primary-light) !important;
     }
+    
+    /* Encabezados y columnas fijas (Sticky) para TRANS-2 */
+    .table-trans2 {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+    
+    /* Cuadrícula interna fina */
+    .table-trans2 th,
+    .table-trans2 td {
+        border: 1px solid var(--trans2-border-internal) !important;
+        background-clip: padding-box !important;
+        box-sizing: border-box;
+    }
+    
+    .trans2-side-banner {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        height: 36px;
+        min-height: 36px;
+        background: var(--bg-subtle);
+        border-bottom: 2px solid var(--trans2-semana-border);
+        box-sizing: border-box;
+    }
+    
+    .table-trans2 thead {
+        position: relative;
+    }
+    
+    /* Fila 1: Semanas y Títulos de columna */
+    .table-trans2 thead tr.tr-semanas th {
+        position: sticky;
+        top: 36px;
+        z-index: 50;
+        height: 38px;
+        line-height: 1.2;
+        padding: 5px 4px !important;
+        background: var(--bg-subtle);
+        box-sizing: border-box;
+    }
+    
+    /* Marco perimetral superior del conjunto de semana (1.5px) */
+    .table-trans2 thead tr.tr-semanas th.th-semana {
+        border: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset 0 0 0 0.5px var(--trans2-semana-border) !important;
+        background: var(--trans2-semana-hdr-bg) !important;
+        color: var(--trans2-semana-border) !important;
+        font-weight: 800 !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.5px;
+    }
+
+    .semana-pill {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.76rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        background: var(--trans2-semana-hdr-bg);
+        color: var(--trans2-semana-border);
+        border: 1.5px solid var(--trans2-semana-border);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .table-trans2 thead tr.tr-semanas th.th-sticky-codigo {
+        position: sticky;
+        top: 36px;
+        left: 0;
+        z-index: 55;
+        height: 68px;
+        background: var(--bg-subtle);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+    }
+    
+    .table-trans2 thead tr.tr-semanas th.th-sticky-enfermedad {
+        position: sticky;
+        top: 36px;
+        left: 85px;
+        z-index: 55;
+        height: 68px;
+        background: var(--bg-subtle);
+        border-right: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset -1.5px 0 0 var(--trans2-semana-border), 2px 0 4px rgba(0,0,0,0.08) !important;
+    }
+    
+    /* Fila 2: Rangos de Edad (<1, 1-4, 5-14, 15+) */
+    .table-trans2 thead tr.tr-rangos th {
+        position: sticky;
+        top: 74px;
+        z-index: 49;
+        height: 30px;
+        line-height: 1.2;
+        padding: 5px 2px !important;
+        background: var(--bg-surface);
+        border-bottom: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset 0 -1.5px 0 var(--trans2-semana-border) !important;
+        box-sizing: border-box;
+    }
+
+    /* Borde izquierdo del conjunto de semana (columna <1) */
+    .table-trans2 thead tr.tr-rangos th.th-semana-start,
+    .table-trans2 tbody td.td-semana-start {
+        border-left: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset 1.5px 0 0 var(--trans2-semana-border) !important;
+    }
+
+    /* Borde derecho del conjunto de semana (columna 15+) */
+    .table-trans2 thead tr.tr-rangos th.th-semana-end,
+    .table-trans2 tbody td.td-semana-end {
+        border-right: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset -1.5px 0 0 var(--trans2-semana-border) !important;
+    }
+
+    /* Borde superior del bloque de datos */
+    .table-trans2 tbody tr.row-semana-top td.td-semana-cell {
+        border-top: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset 0 1.5px 0 var(--trans2-semana-border) !important;
+    }
+
+    /* Borde inferior del bloque de datos */
+    .table-trans2 tbody tr.row-semana-bottom td.td-semana-cell {
+        border-bottom: 1.5px solid var(--trans2-semana-border) !important;
+        box-shadow: inset 0 -1.5px 0 var(--trans2-semana-border) !important;
+    }
+
+    /* Esquinas compuestas */
+    .table-trans2 tbody tr.row-semana-top td.td-semana-start {
+        box-shadow: inset 1.5px 1.5px 0 var(--trans2-semana-border) !important;
+    }
+    .table-trans2 tbody tr.row-semana-top td.td-semana-end {
+        box-shadow: inset -1.5px 1.5px 0 var(--trans2-semana-border) !important;
+    }
+    .table-trans2 tbody tr.row-semana-bottom td.td-semana-start {
+        box-shadow: inset 1.5px -1.5px 0 var(--trans2-semana-border) !important;
+    }
+    .table-trans2 tbody tr.row-semana-bottom td.td-semana-end {
+        box-shadow: inset -1.5px -1.5px 0 var(--trans2-semana-border) !important;
+    }
+
+    /* Coloreado de Recuadros de Semana (Impar vs Par) */
+    .table-trans2 th.col-semana-even,
+    .table-trans2 td.col-semana-even {
+        background-color: var(--trans2-semana-even-bg) !important;
+    }
+    .table-trans2 tr:hover td.col-semana-even {
+        background-color: var(--trans2-semana-even-hover) !important;
+    }
+
+    .table-trans2 th.col-semana-odd,
+    .table-trans2 td.col-semana-odd {
+        background-color: var(--trans2-semana-odd-bg) !important;
+    }
+    .table-trans2 tr:hover td.col-semana-odd {
+        background-color: var(--trans2-semana-odd-hover) !important;
+    }
+    
+    /* Columnas fijas en el cuerpo */
+    .table-trans2 tbody td.td-sticky-codigo {
+        position: sticky;
+        left: 0;
+        z-index: 30;
+        background: var(--bg-surface);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.06);
+    }
+    
+    .table-trans2 tbody td.td-sticky-enfermedad {
+        position: sticky;
+        left: 85px;
+        z-index: 30;
+        background: var(--bg-surface);
+        border-right: 3.5px solid var(--trans2-semana-border) !important;
+        box-shadow: 3px 0 6px rgba(0,0,0,0.15);
+    }
+    
+    .table-trans2 tbody tr:hover td.td-sticky-codigo,
+    .table-trans2 tbody tr:hover td.td-sticky-enfermedad {
+        background-color: var(--bg-surface-hover, rgba(255,255,255,0.04)) !important;
+    }
+
     @media print {
         .no-print { display: none !important; }
         .informe-table-container { border: none !important; box-shadow: none !important; max-height: none !important; overflow: visible !important; }
         .trans2-side-container { display: block !important; }
         .table-trans2 th, .table-trans2 td { border: 1px solid #000 !important; color: #000 !important; }
+        .table-trans2 thead tr th, .table-trans2 tbody td { position: static !important; }
+        .trans2-side-banner { position: static !important; }
     }
 </style>
 @endpush
@@ -54,13 +257,14 @@
 <script>
     function fetchTrans2Details(rowId, range, se) {
         const ano = $('select[name="ano"]').val() || '{{ $anoDefault }}';
+        const mes = $('select[name="mes"]').val() || '{{ $mesDefault }}';
 
         $('#modalTrans2Title').text('Cargando detalles...');
         $('#modalTrans2SemanaBadge').text(`Semana ${se}`);
         $('#modalTrans2TableBody').html('<tr><td colspan="6" class="text-center py-4 text-muted font-weight-bold"><div class="spinner-border spinner-border-sm text-primary mr-1"></div> Cargando registros de pacientes...</td></tr>');
         $('#modalTrans2Detalles').modal('show');
 
-        const url = `{{ route('informes.trans2.details') }}?ano=${ano}&se=${se}&row_id=${rowId}&range=${range}&_t=${new Date().getTime()}`;
+        const url = `{{ route('informes.trans2.details') }}?ano=${ano}&mes=${mes}&se=${se}&row_id=${rowId}&range=${range}&_t=${new Date().getTime()}`;
 
         $.getJSON(url, function(data) {
             $('#modalTrans2Title').text(data.label || 'Detalles');

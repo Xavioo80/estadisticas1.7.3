@@ -65,6 +65,7 @@
       this.exportFileName = options.exportFileName || 'export_excel';
       this.dataScriptId = options.dataScriptId || 'registrosDataJson';
       this.CHUNK_SIZE = options.chunkSize || 200;
+      this.actionsRenderer = options.actionsRenderer || null;
 
       this.tbody = this.table.querySelector('tbody');
       this.scrollContainer = this.table.closest('.excel-table-scroll');
@@ -649,6 +650,9 @@
           const alignStyle = isNumeric ? 'text-align: right;' : '';
           rowHtml += `<td tabindex="0" style="${alignStyle}">${escHtml(val)}</td>`;
         }
+        if (typeof this.actionsRenderer === 'function') {
+          rowHtml += `<td class="col-actions text-center" style="white-space: nowrap; width: 80px;">${this.actionsRenderer(item, visualRowIndex)}</td>`;
+        }
         tr.innerHTML = rowHtml;
         fragment.appendChild(tr);
       });
@@ -656,6 +660,31 @@
       this.tbody.appendChild(fragment);
       this.renderedCount += nextChunk.length;
       this.updateFooter();
+    }
+
+    updateRecord(matchFn, updateFn) {
+      let updated = false;
+      this.allRecords.forEach(item => {
+        if (matchFn(item)) {
+          updateFn(item);
+          item.searchText = item.cells.join(' ').toLowerCase();
+          updated = true;
+        }
+      });
+      if (updated) {
+        this.applyFilters();
+      }
+      return updated;
+    }
+
+    deleteRecord(matchFn) {
+      const beforeCount = this.allRecords.length;
+      this.allRecords = this.allRecords.filter(item => !matchFn(item));
+      if (this.allRecords.length !== beforeCount) {
+        this.applyFilters();
+        return true;
+      }
+      return false;
     }
 
     updateFooter() {
