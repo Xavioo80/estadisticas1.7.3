@@ -2653,8 +2653,6 @@ html.dark .td-hatched,
 #sm2Table td,
 #sm307Table th,
 #sm307Table td,
-#morbilidadTable th,
-#morbilidadTable td,
 #tb9Table th,
 #tb9Table td,
 .sing-table-excel th,
@@ -2670,6 +2668,318 @@ html.dark .td-hatched,
   border: 1px solid var(--modal-border, rgba(255, 255, 255, 0.22)) !important;
   box-shadow: var(--modal-shadow, 0 30px 60px -12px rgba(0, 0, 0, 0.85)) !important;
   border-radius: var(--radius-md, 12px) !important;
+}
+
+/* ==========================================================================
+   MORBILIDAD REPORT AGE RANGE GROUP BOXES & SEPARATORS (100% OPAQUE)
+   ========================================================================== */
+:root {
+  --morb-border-internal: #cbd5e1;
+  --morb-rango-border: #0284c7;
+  --morb-rango-hdr-bg: #e0f2fe;
+  --morb-hom-bg: #eff6ff;
+  --morb-muj-bg: #fff1f2;
+  --morb-ns-bg: #ffffff;
+  --morb-diag-bg: #f1f5f9;
+  --morb-suma-bg: #0f172a;
+  --morb-rango-alt-bg: #f8fafc;
+  --morb-rango-alt-hover: #f1f5f9;
+}
+
+[data-theme="dark"] {
+  --morb-border-internal: rgba(255, 255, 255, 0.12);
+  --morb-rango-border: #38bdf8;
+  --morb-rango-hdr-bg: #0f2b48;
+  --morb-hom-bg: #132742;
+  --morb-muj-bg: #2d1822;
+  --morb-ns-bg: #0b1320;
+  --morb-diag-bg: #172338;
+  --morb-suma-bg: #030712;
+  --morb-rango-alt-bg: #0c1524;
+  --morb-rango-alt-hover: #121e33;
+}
+
+#morbilidadTable {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background-color: var(--bg-surface, #ffffff);
+}
+
+#morbilidadTable th,
+#morbilidadTable td {
+  border: 1px solid var(--morb-border-internal) !important;
+  background-clip: padding-box !important;
+  box-sizing: border-box;
+}
+
+#morbilidadTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+#morbilidadTable thead tr:first-child th.th-rango-box {
+  border: 1.5px solid var(--morb-rango-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--morb-rango-border) !important;
+  background-color: var(--morb-rango-hdr-bg) !important;
+  color: var(--morb-rango-border) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+#morbilidadTable .th-hom {
+  background-color: var(--morb-hom-bg) !important;
+  color: #2563eb !important;
+}
+[data-theme="dark"] #morbilidadTable .th-hom {
+  color: #60a5fa !important;
+}
+
+#morbilidadTable .th-muj {
+  background-color: var(--morb-muj-bg) !important;
+  color: #e11d48 !important;
+}
+[data-theme="dark"] #morbilidadTable .th-muj {
+  color: #fb7185 !important;
+}
+
+#morbilidadTable thead tr:nth-child(3) th {
+  background-color: var(--morb-ns-bg) !important;
+  color: var(--text-muted, #64748b) !important;
+}
+[data-theme="dark"] #morbilidadTable thead tr:nth-child(3) th {
+  color: #94a3b8 !important;
+}
+
+#morbilidadTable thead tr:last-child th {
+  border-bottom: 2px solid var(--morb-rango-border) !important;
+  box-shadow: inset 0 -2px 0 var(--morb-rango-border) !important;
+}
+
+#morbilidadTable .th-rango-start,
+#morbilidadTable .td-rango-start {
+  border-left: 1.5px solid var(--morb-rango-border) !important;
+  box-shadow: inset 1.5px 0 0 var(--morb-rango-border) !important;
+}
+
+#morbilidadTable .th-rango-end,
+#morbilidadTable .td-rango-end {
+  border-right: 1.5px solid var(--morb-rango-border) !important;
+  box-shadow: inset -1.5px 0 0 var(--morb-rango-border) !important;
+}
+
+#morbilidadTable th.sticky-col-first-v2,
+#morbilidadTable td.sticky-col-first-v2 {
+  border-right: 2px solid var(--morb-rango-border) !important;
+  box-shadow: inset -2px 0 0 var(--morb-rango-border), 3px 0 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+#morbilidadTable .th-suma,
+#morbilidadTable .td-suma {
+  background-color: var(--morb-suma-bg) !important;
+  color: #fff !important;
+  border-left: 2px solid var(--morb-rango-border) !important;
+  border-right: 2px solid var(--morb-rango-border) !important;
+  box-shadow: inset 2px 0 0 var(--morb-rango-border), inset -2px 0 0 var(--morb-rango-border) !important;
+}
+
+#morbilidadTable tfoot td {
+  border-top: 2px solid var(--morb-rango-border) !important;
+  background-color: #0f172a !important;
+  color: #fff !important;
+}
+[data-theme="dark"] #morbilidadTable tfoot td {
+  background-color: #030712 !important;
+}
+
+#morbilidadTable tbody td.col-rango-alt {
+  background-color: var(--morb-rango-alt-bg) !important;
+}
+#morbilidadTable tbody tr:hover td.col-rango-alt {
+  background-color: var(--morb-rango-alt-hover) !important;
+}
+
+#morbilidadTable tbody td.clickable-cell {
+  cursor: pointer !important;
+  transition: all 0.15s ease-in-out;
+}
+#morbilidadTable tbody td.clickable-cell:hover {
+  background-color: var(--color-primary, #3b82f6) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  transform: scale(1.05);
+  z-index: 20;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+
+/* ==========================================================================
+   ITS REPORT AGE & POPULATION GROUP BOXES & SEPARATORS (100% OPAQUE)
+   ========================================================================== */
+:root {
+  --its-border-internal: #cbd5e1;
+  --its-group-border: #0284c7;
+  --its-hdr-edad-bg: #e0f2fe;
+  --its-hdr-pop-bg: #f3e8ff;
+  --its-hdr-diag-bg: #e0f7fa;
+  --its-hdr-sex-bg: #ecfdf5;
+  --its-diag-col-bg: #f1f5f9;
+  --its-alt-bg: #f8fafc;
+  --its-alt-hover: #f1f5f9;
+}
+
+[data-theme="dark"] {
+  --its-border-internal: rgba(255, 255, 255, 0.12);
+  --its-group-border: #38bdf8;
+  --its-hdr-edad-bg: #0f2b48;
+  --its-hdr-pop-bg: #281b3d;
+  --its-hdr-diag-bg: #0d2830;
+  --its-hdr-sex-bg: #0d2d22;
+  --its-diag-col-bg: #172338;
+  --its-alt-bg: #0c1524;
+  --its-alt-hover: #121e33;
+}
+
+#itsTable {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background-color: var(--bg-surface, #ffffff);
+}
+
+#itsTable th,
+#itsTable td {
+  border: 1px solid var(--its-border-internal) !important;
+  background-clip: padding-box !important;
+  box-sizing: border-box;
+}
+
+#itsTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+#itsTable thead tr:first-child th.th-section-diag {
+  border: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--its-group-border) !important;
+  background-color: var(--its-hdr-diag-bg) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+}
+
+#itsTable thead tr:first-child th.th-section-sex {
+  border: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--its-group-border) !important;
+  background-color: var(--its-hdr-sex-bg) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+}
+
+#itsTable thead tr:first-child th.th-section-edad {
+  border: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--its-group-border) !important;
+  background-color: var(--its-hdr-edad-bg) !important;
+  color: var(--its-group-border) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px;
+}
+
+#itsTable thead tr:first-child th.th-section-pop {
+  border: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset 0 0 0 0.5px var(--its-group-border) !important;
+  background-color: var(--its-hdr-pop-bg) !important;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
+}
+
+#itsTable thead tr:nth-child(2) th.th-age-group {
+  border-top: 1.5px solid var(--its-group-border) !important;
+  border-left: 1.5px solid var(--its-group-border) !important;
+  border-right: 1.5px solid var(--its-group-border) !important;
+  background-color: var(--its-hdr-edad-bg) !important;
+  color: var(--its-group-border) !important;
+  font-weight: 800 !important;
+}
+
+#itsTable thead tr:nth-child(2) th.th-pop-group {
+  border-top: 1.5px solid var(--its-group-border) !important;
+  border-left: 1.5px solid var(--its-group-border) !important;
+  border-right: 1.5px solid var(--its-group-border) !important;
+  background-color: var(--its-hdr-pop-bg) !important;
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+#itsTable thead tr:last-child th {
+  border-bottom: 2px solid var(--its-group-border) !important;
+  box-shadow: inset 0 -2px 0 var(--its-group-border) !important;
+  background-color: var(--bg-surface, #ffffff) !important;
+  color: var(--text-muted, #64748b) !important;
+}
+[data-theme="dark"] #itsTable thead tr:last-child th {
+  background-color: #0b1320 !important;
+  color: #94a3b8 !important;
+}
+
+#itsTable .th-group-start,
+#itsTable .td-group-start {
+  border-left: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset 1.5px 0 0 var(--its-group-border) !important;
+}
+
+#itsTable .th-group-end,
+#itsTable .td-group-end {
+  border-right: 1.5px solid var(--its-group-border) !important;
+  box-shadow: inset -1.5px 0 0 var(--its-group-border) !important;
+}
+
+#itsTable .sticky-col-first {
+  position: sticky;
+  left: 0;
+  z-index: 30 !important;
+  background-color: var(--its-diag-col-bg) !important;
+  color: var(--text-primary, #1e293b) !important;
+  border-right: 2px solid var(--its-group-border) !important;
+  box-shadow: inset -2px 0 0 var(--its-group-border), 3px 0 6px rgba(0, 0, 0, 0.15) !important;
+}
+[data-theme="dark"] #itsTable .sticky-col-first {
+  color: #f8fafc !important;
+}
+
+#itsTable tbody .sticky-col-first {
+  background-color: var(--bg-surface, #fff) !important;
+  color: var(--text-primary, #1e293b) !important;
+}
+[data-theme="dark"] #itsTable tbody .sticky-col-first {
+  background-color: #0b1120 !important;
+  color: #e2e8f0 !important;
+}
+
+#itsTable tbody td {
+  background-color: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #1e293b);
+}
+[data-theme="dark"] #itsTable tbody td {
+  background-color: #0b1120;
+  color: #f8fafc;
+}
+
+#itsTable tfoot td {
+  border-top: 2px solid var(--its-group-border) !important;
+  box-shadow: inset 0 2px 0 var(--its-group-border) !important;
+  background-color: #0f172a !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+[data-theme="dark"] #itsTable tfoot td {
+  background-color: #030712 !important;
+}
+
+#itsTable tbody td.col-group-alt {
+  background-color: var(--its-alt-bg) !important;
+}
+#itsTable tbody tr:hover td.col-group-alt {
+  background-color: var(--its-alt-hover) !important;
 }
 
 /* ==========================================================================

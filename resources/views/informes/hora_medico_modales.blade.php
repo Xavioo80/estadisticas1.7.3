@@ -700,7 +700,7 @@
                                 <tr class="hsc-header-row-sub">
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">FERIADOS /<br>COMPENSATORIOS</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">ESFAM.</span></th>
-                                    <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">ACTIVIDADES DE<br>PROMOCION</span></th>
+                                    <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">**** OTRAS<br>ACTIVIDADES</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">CONGRESOS /<br>TALLERES.</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span class="hsc-v-header">INVESTIGACION<br>DE CAMPO.</span></th>
                                     <th class="bg-oficial-sub" style="width: 44px;"><span id="modal_th_asambleas" class="hsc-v-header">ASAMBLEAS<br>COLEGIO MEDICO.</span></th>

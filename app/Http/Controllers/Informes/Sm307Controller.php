@@ -95,12 +95,16 @@ class Sm307Controller extends Controller
 
         $resultsByCode = [];
 
-        // Para parsear fechas robustamente
+        $mesMap = [
+            'ENERO' => 1, 'FEBRERO' => 2, 'MARZO' => 3, 'ABRIL' => 4,
+            'MAYO' => 5, 'JUNIO' => 6, 'JULIO' => 7, 'AGOSTO' => 8,
+            'SEPTIEMBRE' => 9, 'OCTUBRE' => 10, 'NOVIEMBRE' => 11, 'DICIEMBRE' => 12
+        ];
         $monthNum = $mesMap[strtoupper($mes)] ?? 0;
         $anoInt = (int) $ano;
 
         foreach ($rawData as $r) {
-            // --- NUEVO FILTRADO POR FECHA ROBUSTO (como en Sm107) ---
+            // --- FILTRADO POR FECHA ROBUSTO ---
             if (str_contains($r->fecha, '/')) {
                 $parts = explode('/', $r->fecha);
                 if (count($parts) === 3) {
@@ -143,30 +147,38 @@ class Sm307Controller extends Controller
                 continue;
 
             // =====================================================================
-            // BÚSQUEDA DEL DIAGNÓSTICO POR "CONCEPTO" (TEXTUAL)
+            // BÚSQUEDA DEL DIAGNÓSTICO POR CÓDIGO Y POR CONCEPTO TEXTUAL
             // =====================================================================
             for ($i = 1; $i <= 7; $i++) {
                 $diagField = "diagnostico_$i";
+                $codField = "cod_$i";
                 $rawDiag = trim($r->$diagField ?? '');
+                $rawCod = trim($r->$codField ?? '');
 
-                if (empty($rawDiag))
+                if (empty($rawDiag) && empty($rawCod))
                     continue;
 
                 $finalCod = '';
                 $normDiag = $this->normalizeForMatch($rawDiag);
+                $normCod = $this->normalizeForMatch($rawCod);
 
-                // 1. Prioridad: Match exacto en el catálogo (Patología, Sinónimos o CIE-10)
-                if (isset($textLookup[$normDiag])) {
+                // 1. Prioridad: Match exacto por diagnóstico
+                if (!empty($normDiag) && isset($textLookup[$normDiag])) {
                     $finalCod = $textLookup[$normDiag];
                 }
                 // 2. Prioridad: Coincidencia parcial (Contenido en el concepto)
-                else {
+                elseif (!empty($normDiag)) {
                     foreach ($textLookup as $term => $code) {
                         if (strlen($term) > 4 && str_contains($normDiag, $term)) {
                             $finalCod = $code;
                             break;
                         }
                     }
+                }
+
+                // 3. Prioridad: Match por código si el diagnóstico vino vacío
+                if (empty($finalCod) && empty($normDiag) && !empty($normCod) && isset($textLookup[$normCod])) {
+                    $finalCod = $textLookup[$normCod];
                 }
 
                 if (empty($finalCod))
@@ -178,7 +190,7 @@ class Sm307Controller extends Controller
                 if (
                     ($ageIdx == 1 || $ageIdx == 2) &&
                     !in_array($p, ['PSIQUIATRA', 'PSICOLOGIA', 'PSICOLOGO', 'PSIQUIATRIA']) &&
-                    !in_array($finalCod, ['151', '152', '422', '423', '424', '425', '426', '427', '428', '429', '430', '431', '432', '433', '434'])
+                    !in_array($finalCod, ['151', '152', '402', '413', '422', '423', '424', '425', '426', '427', '428', '429', '430', '431', '432', '433', '434'])
                 ) {
                     continue;
                 }
@@ -360,15 +372,21 @@ class Sm307Controller extends Controller
 
             for ($i = 1; $i <= 7; $i++) {
                 $diagField = "diagnostico_$i";
+                $codField = "cod_$i";
                 $rawDiag = trim($r->$diagField ?? '');
-                if (empty($rawDiag)) continue;
+                $rawCod = trim($r->$codField ?? '');
+                if (empty($rawDiag) && empty($rawCod)) continue;
 
                 $finalCod = '';
                 $normDiag = $this->normalizeForMatch($rawDiag);
+                $normCod = $this->normalizeForMatch($rawCod);
 
-                if (isset($textLookup[$normDiag])) {
+                // 1. Prioridad: Match exacto por diagnóstico
+                if (!empty($normDiag) && isset($textLookup[$normDiag])) {
                     $finalCod = $textLookup[$normDiag];
-                } else {
+                }
+                // 2. Prioridad: Coincidencia parcial (Contenido en el concepto)
+                elseif (!empty($normDiag)) {
                     foreach ($textLookup as $term => $code) {
                         if (strlen($term) > 4 && str_contains($normDiag, $term)) {
                             $finalCod = $code;
@@ -377,13 +395,18 @@ class Sm307Controller extends Controller
                     }
                 }
 
+                // 3. Prioridad: Match por código si el diagnóstico vino vacío
+                if (empty($finalCod) && empty($normDiag) && !empty($normCod) && isset($textLookup[$normCod])) {
+                    $finalCod = $textLookup[$normCod];
+                }
+
                 if (empty($finalCod)) continue;
 
                 $p = strtoupper(trim($r->prof ?? ''));
                 if (
                     ($ageIdx == 1 || $ageIdx == 2) &&
                     !in_array($p, ['PSIQUIATRA', 'PSICOLOGIA', 'PSICOLOGO', 'PSIQUIATRIA']) &&
-                    !in_array($finalCod, ['151', '152', '422', '423', '424', '425', '426', '427', '428', '429', '430', '431', '432', '433', '434'])
+                    !in_array($finalCod, ['151', '152', '402', '422', '423', '424', '425', '426', '427', '428', '429', '430', '431', '432', '433', '434'])
                 ) {
                     continue;
                 }
@@ -517,7 +540,36 @@ class Sm307Controller extends Controller
         if ($lado == 'obverso') {
             return [
                 ['id' => '401', 'code' => 'F00-F09', 'label' => 'TRAST. MENTALES ORGÁNICOS INCLUIDOS LOS TRASTORNOS SINTOMÁTICOS (DEMENCIAS)', 'diag' => ['TRAST. MENTALES ORGANICOS', 'DEMENCIA', 'ALZHEIMER', 'F00', 'F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'F07', 'F08', 'F09']],
-                ['id' => '402', 'code' => 'F10-F19', 'label' => 'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS', 'diag' => ['CONSUMO DE SUSTANCIAS', 'DROGAS', 'ALCOHOLISMO', 'TABAQUISMO', 'PSICOACTIVAS', 'SINDROME DEPENDENCIA DEL ALCOHOL', 'PROBLEMAS RELACIONADOS CON EL USO DEL ALCOHOL', 'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDO AL ALCOHOL', 'TRASTORNO DEBIDO A CONSUMO DE OTRAS DROGAS', 'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS']],
+                ['id' => '402', 'code' => 'F10-F19', 'label' => 'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS', 'diag' => [
+                    'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS',
+                    'TRAST. MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS',
+                    'TRAST. MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL CONSUMO DE SUSTANCIAS PSICOTROPAS.',
+                    'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDO AL ALCOHOL',
+                    'TRASTORNO MENTAL Y DEL COMPORTAMIENTO DEBIDO AL ALCOHOL',
+                    'TRAST. MENTALES Y DEL COMPORTAMIENTO DEBIDO AL ALCOHOL',
+                    'TRAST. MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL USO DE ALCOHOL',
+                    'TRASTORNO DEBIDO A CONSUMO DE OTRAS DROGAS',
+                    'TRASTORNOS DEBIDO A CONSUMO DE OTRAS DROGAS',
+                    'TRASTORNO DEBIDO AL CONSUMO DE OTRAS DROGAS',
+                    'TRASTORNOS DEBIDOS AL CONSUMO DE OTRAS DROGAS',
+                    'TRASTORNOS MENTALES Y DEL COMPORTAMIENTO DEBIDOS AL USO DE OTRAS DROGAS',
+                    'SINDROME DEPENDENCIA DEL ALCOHOL',
+                    'SINDROME DE DEPENDENCIA DEL ALCOHOL',
+                    'SINDROME DE DEPENDENCIA CON CONSUMO ACTUAL DE LA SUSTANCIA',
+                    'PROBLEMAS RELACIONADOS CON EL USO DEL ALCOHOL',
+                    'PROBLEMAS RELACIONADOS CON EL USO DE LAS DROGAS',
+                    'CONSUMO DE SUSTANCIAS',
+                    'CONSUMO DE SUSTANCIAS PSICOTROPAS',
+                    'CONSUMO DE DROGAS',
+                    'DROGAS',
+                    'ALCOHOLISMO',
+                    'TABAQUISMO',
+                    'PSICOACTIVAS',
+                    'SUSTANCIAS PSICOTROPAS',
+                    'DEPENDENCIA DEL ALCOHOL',
+                    '37', '38', '76', '77', '156', '402',
+                    'F10', 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19'
+                ]],
                 ['id' => '403', 'code' => 'F20-F29', 'label' => 'ESQUIZOFRENIA, TRASTORNO ESQUIZOTIPICO Y TRASTORNO DE IDEAS DELIRANTES', 'diag' => ['ESQUIZOFRENIA', 'TRASTORNO ESQUIZOTIPICO', 'TRASTORNO DE IDEAS DELIRANTES', 'F20', 'F21', 'F22', 'F23', 'F24', 'F25', 'F26', 'F27', 'F28', 'F29']],
                 ['id' => '404', 'code' => 'F30', 'label' => 'TRANSTORNOS DEL HUMOR (EPISODIO MANIACO)', 'diag' => ['TRANSTORNOS DEL HUMOR (EPISODIO MANIACO)', 'MANIACO', 'F30']],
                 ['id' => '405', 'code' => 'F31', 'label' => 'TASTORNOS DEL HUMOR AFECTIVO ( BIPOLAR)', 'diag' => ['TASTORNOS DEL HUMOR AFECTIVO ( BIPOLAR)', 'BIPOLAR', 'TRASTORNO BIPOLAR', 'F31']],
@@ -528,7 +580,36 @@ class Sm307Controller extends Controller
                 ['id' => '410', 'code' => 'F60-F69', 'label' => 'TRASTORNOS DE LA PERSONALIDAD Y DEL COMPORTAMIENTO DEL ADULTO', 'diag' => ['TRASTORNOS DE LA PERSONALIDAD', 'COMPORTAMIENTO DEL ADULTO', 'F60', 'F61', 'F62', 'F63', 'F64', 'F65', 'F66', 'F67', 'F68', 'F69']],
                 ['id' => '411', 'code' => 'F70-F79', 'label' => 'RETRASO MENTAL', 'diag' => ['RETRASO MENTAL', 'DISCAPACIDAD INTELECTUAL', 'F70', 'F71', 'F72', 'F73', 'F74', 'F75', 'F76', 'F77', 'F78', 'F79']],
                 ['id' => '412', 'code' => 'F80-F89', 'label' => 'TRASTORNOS DEL DESARROLLO PSICOLÓGICO', 'diag' => ['TRASTORNOS DEL DESARROLLO PSICOLOGICO', 'F80', 'F81', 'F82', 'F83', 'F84', 'F88', 'F89']],
-                ['id' => '413', 'code' => 'F90-F98', 'label' => 'TRASTORNO EMOCIONALES Y DEL COMPORTAMIENTO QUE APARECEN HABITUALMENTE EN LA NIÑEZ Y LA ADOLESCENCIA.', 'diag' => ['TRASTORNO EMOCIONALES Y DEL COMPORTAMIENTO', 'TDAH', 'HIPERACTIVIDAD', 'SINDROME HIPERCINETICO', 'F90', 'F91', 'F92', 'F93', 'F94', 'F95', 'F98']],
+                ['id' => '413', 'code' => 'F90-F98', 'label' => 'TRASTORNO EMOCIONALES Y DEL COMPORTAMIENTO QUE APARECEN HABITUALMENTE EN LA NIÑEZ Y LA ADOLESCENCIA.', 'diag' => [
+                    'TRASTORNO EMOCIONALES Y DEL COMPORTAMIENTO QUE APARECEN HABITUALMENTE EN LA NIÑEZ Y LA ADOLESCENCIA.',
+                    'TRASTORNOS EMOCIONALES Y DEL COMPORTAMIENTO QUE APARECEN HABITUALMENTE EN LA NIÑEZ Y LA ADOLESCENCIA',
+                    'TRASTORNO EMOCIONALES Y DEL COMPORTAMIENTO',
+                    'TRASTORNOS EMOCIONALES Y DEL COMPORTAMIENTO',
+                    'SINDROME HIPERCINETICO DE LA NIÑEZ',
+                    'SINDROME HIPERSINETICO DE LA NIÑEZ',
+                    'SINDROME HIPERCINETICO',
+                    'SINDROME HIPERSINETICO',
+                    'TDAH',
+                    'HIPERACTIVIDAD',
+                    'DEFICIT DE ATENCION',
+                    'TRASTORNO POR DEFICIT DE ATENCION',
+                    'TRASTORNO DE LA CONDUCTA',
+                    'TRASTORNO DISOCIAL',
+                    'TRASTORNO DE ANSIEDAD POR SEPARACION DE LA NIÑEZ',
+                    'FOBIAS EN LA NIÑEZ',
+                    'MUTISMO SELECTIVO',
+                    'TRASTORNO DE TICS',
+                    'SINDROME DE TOURETTE',
+                    'TOURETTE',
+                    'ENURESIS',
+                    'ENCOPRESIS',
+                    'TARTAMUDEZ',
+                    'ESPASMOFEMIA',
+                    '43', '413',
+                    'F90', 'F90.0', 'F90.1', 'F90.8', 'F90.9',
+                    'F91', 'F91.0', 'F91.1', 'F91.2', 'F91.3', 'F91.8', 'F91.9',
+                    'F92', 'F93', 'F94', 'F95', 'F98'
+                ]],
                 ['id' => '414', 'code' => 'F99', 'label' => 'TRASTORNO MENTAL SIN ESPECIFICACIÓN', 'diag' => ['TRASTORNO MENTAL SIN ESPECIFICACION', 'F99']],
                 ['id' => '415', 'code' => 'G40', 'label' => 'EPILEPSIA', 'diag' => ['EPILEPSIA', 'G40']],
                 ['id' => '416', 'code' => 'G41', 'label' => 'ESTADO DE MAL EPILÉPTICO (STATUS) GRAN MAL, Y PEQUEÑO MAL, PARCIAL, COMPLEJO, OTROS, DE TIPO NO ESPECIFICADO, Y SE AGREGA ENTRE PARENTESIS ESTATUS.', 'diag' => ['ESTADO DE MAL EPILEPTICO', 'STATUS', 'G41']],

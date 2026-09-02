@@ -456,20 +456,17 @@
                     </div>
                 </div>
 
-                <!-- Barra de Metadatos Oficiales -->
                 <div class="header-info-bar">
                     <div>ESTABLECIMIENTO DE SALUD: <span class="val" id="lbl-establecimiento">{{ $nombreEstablecimiento }}</span></div>
-                    <div>JORNADA: <span class="val">{{ $currentJornada }}</span></div>
+                    <div>JORNADA: <span class="val">{{ $currentJornada }}{{ !empty($onlySS) ? ' (SERVICIO SOCIAL)' : '' }}</span></div>
                     <div>MES: <span class="val">{{ $mesNombre }}</span></div>
                     <div>AÑO: <span class="val">{{ $ano }}</span></div>
                 </div>
             </div>
 
-            <!-- ── 2. Tabla Oficial de 25 Columnas (Exacta a la Matriz Oficial) ── -->
             <div class="table-wrap">
                 <table class="table-oficial">
                     <thead>
-                        {{-- Fila 1: Grupos Superiores --}}
                         <tr class="row-main">
                             <th rowspan="3" class="b-thick-r" style="width: 2.5%;">#</th>
                             <th rowspan="3" class="b-thick-r" style="width: 21.5%; text-align: left; padding-left: 6px !important;">NOMBRE COMPLETO DEL MEDICO</th>
@@ -482,39 +479,30 @@
                             <th rowspan="3" class="b-thick-r" style="width: 3.6%;"><div class="v-text">% RENDIMIENTO</div></th>
                             <th colspan="10" style="width: 33.0%; background-color: #f8fafc !important;">HORAS SIN CONSULTA</th>
                         </tr>
-                        {{-- Fila 2: Subgrupos bajo Horas Sin Consulta --}}
                         <tr class="row-mid">
                             <th colspan="7" class="b-thick-r" style="width: 23.1%;">TOTAL DE HORAS OFICIALES</th>
                             <th colspan="2" class="b-thick-r" style="width: 6.6%;">VACACIONES</th>
                             <th rowspan="2" style="width: 3.3%;"><div class="v-text">PERMISOS PERSONALES</div></th>
                         </tr>
-                        {{-- Fila 3: Subcolumnas Verticales Detalladas --}}
                         <tr class="row-sub">
-                            {{-- Modalidad --}}
                             <th style="width: 3.1%;"><div class="v-text">ACUERDO</div></th>
                             <th class="b-thick-r" style="width: 3.1%;"><div class="v-text">CONTRATO</div></th>
-                            {{-- Categoría --}}
                             <th style="width: 3.2%;"><div class="v-text">GENERAL</div></th>
                             <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">ESPECIALISTA</div></th>
-                            {{-- Días Mes --}}
                             <th style="width: 3.2%;"><div class="v-text">CONTRATADOS</div></th>
                             <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDOS</div></th>
-                            {{-- Horas Mes --}}
                             <th style="width: 3.2%;"><div class="v-text">CONTRATADAS</div></th>
                             <th class="b-thick-r" style="width: 3.2%;"><div class="v-text">CUMPLIDAS</div></th>
-                            {{-- Atenciones --}}
                             <th style="width: 3.5%;"><div class="v-text">PROGRAMADAS</div></th>
                             <th style="width: 3.5%;"><div class="v-text">REPROGRAMADAS</div></th>
                             <th class="b-thick-r" style="width: 3.5%;"><div class="v-text">ATENDIDAS</div></th>
-                            {{-- Horas Sin Consulta: Oficiales --}}
                             <th style="width: 3.3%;"><div class="v-text">FERIADOS / COMPENSATORIOS</div></th>
                             <th style="width: 3.3%;"><div class="v-text">ESFAM</div></th>
-                            <th style="width: 3.3%;"><div class="v-text">PROMOCION</div></th>
+                            <th style="width: 3.3%;"><div class="v-text">**** OTRAS ACTIVIDADES</div></th>
                             <th style="width: 3.3%;"><div class="v-text">CONGRESOS / TALLERES</div></th>
                             <th style="width: 3.3%;"><div class="v-text">INVESTIGACION DE CAMPO</div></th>
                             <th style="width: 3.3%;"><div class="v-text">ASAMBLEA COLEGIO MÉDICO</div></th>
                             <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">CITAS / INCAPACIDADES</div></th>
-                            {{-- Horas Sin Consulta: Vacaciones --}}
                             <th style="width: 3.3%;"><div class="v-text">ORDINARIAS</div></th>
                             <th class="b-thick-r" style="width: 3.3%;"><div class="v-text">PROFILÁCTICAS</div></th>
                         </tr>
@@ -535,7 +523,7 @@
                                     $obs = strtoupper($m->observaciones ?? '');
 
                                     $isONG = (!empty($row['is_ong']) || !empty($m->es_ong) || str_contains($modalidad, 'ONG') || str_contains($nomina, 'ONG') || str_contains($nombre, 'MEDICOS SIN FRONTERAS') || str_contains($nombre, 'ONG') || str_contains($obs, 'MEDICOS SIN FRONTERAS'));
-                                    $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL'));
+                                    $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL') || str_contains($nombre, 'MSS.'));
                                     $isAcuerdo = (!$isONG && !$isSS && (str_contains($nomina, 'ACUERDO') || str_contains($nomina, 'PERMANENTE') || str_contains($modalidad, 'ACUERDO') || str_contains($modalidad, 'PERMANENTE')));
                                     $isContrato = (!$isONG && ($isSS || str_contains($nomina, 'CONTRATO') || str_contains($nomina, 'INTERINATO') || str_contains($modalidad, 'CONTRATO') || str_contains($modalidad, 'INTERINATO') || (!$isAcuerdo && ($nomina != '' || $modalidad != ''))));
 
@@ -579,8 +567,8 @@
                                     $totals['hsc_profil'] += $hsc_profil;
                                     $totals['hsc_pers']   += $hsc_pers;
 
+                                    $rendVal = ($row['repr'] > 0) ? round(($row['atenciones'] / $row['repr']) * 100) . '%' : '0%';
                                     $nombreLimpio = limpiarPrefijoMedico($m->NOM_MED);
-                                    $rendVal = ($row['rendimiento'] > 0) ? (round($row['rendimiento']) . '%') : '0%';
                                 @endphp
 
                                 <tr>
@@ -590,15 +578,15 @@
                                     <td class="b-thick-r">{{ $isContrato ? 'X' : '-' }}</td>
                                     <td>{{ $isGeneral ? 'X' : '-' }}</td>
                                     <td class="{{ $isSS ? 'td-hatched' : '' }} b-thick-r">{{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
-                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round($row['diasContratados']) : '0') }}</td>
-                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round($row['horasContratadasMes']) : '0') }}</td>
-                                    <td class="b-thick-r">{{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['prog'] > 0 ? round($row['prog']) : '0') }}</td>
-                                    <td>{{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
-                                    <td class="b-thick-r">{{ round($row['atenciones']) }}</td>
-                                    <td class="b-thick-r">{{ $isONG ? '-' : $rendVal }}</td>
+                                    <td class="b-thick-r">{{ $row['horasPorDia'] }}</td>
+                                    <td>{{ $row['diasContratados'] }}</td>
+                                    <td class="b-thick-r">{{ round($row['diasCumplidos']) }}</td>
+                                    <td>{{ $row['horasContratadasMes'] }}</td>
+                                    <td class="b-thick-r">{{ round($row['horasCumplidas']) }}</td>
+                                    <td>{{ round($row['prog']) }}</td>
+                                    <td>{{ round($row['repr']) }}</td>
+                                    <td class="b-thick-r">{{ $row['atenciones'] }}</td>
+                                    <td class="b-thick-r">{{ $rendVal }}</td>
                                     <td>{{ $hsc_comp > 0 ? $hsc_comp : '0' }}</td>
                                     <td>{{ $hsc_esfam > 0 ? $hsc_esfam : '0' }}</td>
                                     <td>{{ $hsc_prom > 0 ? $hsc_prom : '0' }}</td>
@@ -611,7 +599,6 @@
                                     <td>{{ $hsc_pers > 0 ? $hsc_pers : '0' }}</td>
                                 </tr>
                             @else
-                                {{-- Fila Vacía para Completar la Matriz de 24 Filas Oficial --}}
                                 <tr>
                                     <td class="b-thick-r">{{ $i + 1 }}</td>
                                     <td class="col-name b-thick-r">&nbsp;</td>
@@ -628,7 +615,6 @@
                             @endif
                         @endfor
 
-                        {{-- Fila Final: TOTAL JORNADA --}}
                         @php
                             $rendTotal = ($totals['repr'] > 0) ? round(($totals['atend'] / $totals['repr']) * 100) . '%' : '0%';
                         @endphp
@@ -663,7 +649,6 @@
                 </table>
             </div>
 
-            <!-- ── 3. Notas Oficiales al Pie (Exactas a la Imagen 4) ── -->
             <div class="print-footer-notes">
                 <div class="notes-col text-left">
                     <div>*** ESTE INFORME DEBE COINCIDIR CON EL TOTAL DE ATENCIONES DEL AT2R.</div>
@@ -674,6 +659,7 @@
                     <div>*** COLOCAR EL PERSONAL QUE ESTE DE VACACIONES / INCAPACITADO / TRASLADO (DE LO CONTRARIO SE REPORTARA COMO FALTANTE)</div>
                     <div>*** COLOCAR FECHA DE INICIO Y DE FINAL DE CADA MEDICO EN SERVICIO SOCIAL.</div>
                     <div>*** LLENAR UNA HOJA POR JORNADA (MATUTINA, VESPERTINA, FIN DE SEMANA Y SERVICIO SOCIAL).</div>
+                    <div>*** <span style="color: #dc2626; font-weight: bold;">OTRAS ACTIVIDADES</span> = SOLICITUD Y RECEPCIÓN DE INSUMOS, REALIZACIÓN Y ENTREGA DE INFORMES, ACT EXTRAMUROS, CLUB DE ENFERMOS CRONICOS, EMBARAZADAS, CHARLAS, TAMIZAJES, REUNION INTERSECTORIALES, OTROS.</div>
                 </div>
             </div>
         </div>

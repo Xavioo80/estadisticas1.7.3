@@ -60,165 +60,55 @@
         </div>
     </div>
 
-    <style>
+     <style>
         /* ═══════════════════════════════════════════════════
-           SOLUCIÓN: border-collapse:separate + border-spacing:0
-           Compatible con position:sticky y modo oscuro
-        ═══════════════════════════════════════════════════ */
+           INFORME DE MORBILIDAD - RECUADROS Y FONDOS 100% SÓLIDOS
+           ═══════════════════════════════════════════════════ */
+        :root {
+            --morb-border-internal: #cbd5e1;
+            --morb-rango-border: #0284c7; /* Azul / Cyan en Light Mode */
+            --morb-rango-hdr-bg: #e0f2fe; /* 100% Sólido en Light Mode */
+            --morb-hom-bg: #eff6ff;
+            --morb-muj-bg: #fff1f2;
+            --morb-ns-bg: #ffffff;
+            --morb-diag-bg: #f1f5f9;
+            --morb-suma-bg: #0f172a;
+            --morb-rango-alt-bg: #f8fafc;
+            --morb-rango-alt-hover: #f1f5f9;
+        }
 
-        /* Cada celda dibuja su propio borde derecho e inferior */
+        [data-theme="dark"] {
+            --morb-border-internal: rgba(255, 255, 255, 0.12);
+            --morb-rango-border: #38bdf8; /* Cyan luminoso en Dark Mode */
+            --morb-rango-hdr-bg: #0f2b48; /* 100% Sólido Azul Petróleo en Dark Mode */
+            --morb-hom-bg: #132742;
+            --morb-muj-bg: #2d1822;
+            --morb-ns-bg: #0b1320;
+            --morb-diag-bg: #172338;
+            --morb-suma-bg: #030712;
+            --morb-rango-alt-bg: #0c1524;
+            --morb-rango-alt-hover: #121e33;
+        }
+
+        #morbilidadTable {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            background-color: var(--bg-surface, #ffffff);
+        }
+
+        /* Cada celda dibuja su cuadrícula fina interna con padding-box */
         #morbilidadTable th,
         #morbilidadTable td {
-            border-right:  1px solid #cbd5e1 !important;
-            border-bottom: 1px solid #cbd5e1 !important;
-            border-top:    none !important;
-            border-left:   none !important;
+            border: 1px solid var(--morb-border-internal) !important;
+            background-clip: padding-box !important;
+            box-sizing: border-box;
         }
 
-        html.dark #morbilidadTable th,
-        html.dark #morbilidadTable td,
-        [data-theme="dark"] #morbilidadTable th,
-        [data-theme="dark"] #morbilidadTable td {
-            border-right:  1px solid #334155 !important;
-            border-bottom: 1px solid #334155 !important;
-        }
-
-        /* La primera fila del thead sí necesita borde superior */
-        #morbilidadTable thead tr:first-child th {
-            border-top: 1px solid #cbd5e1 !important;
-        }
-        html.dark #morbilidadTable thead tr:first-child th,
-        [data-theme="dark"] #morbilidadTable thead tr:first-child th {
-            border-top: 1px solid #334155 !important;
-        }
-
-        /* La primera columna (sticky) necesita borde izquierdo */
-        #morbilidadTable th:first-child,
-        #morbilidadTable td:first-child {
-            border-left: 1px solid #cbd5e1 !important;
-        }
-        html.dark #morbilidadTable th:first-child,
-        html.dark #morbilidadTable td:first-child,
-        [data-theme="dark"] #morbilidadTable th:first-child,
-        [data-theme="dark"] #morbilidadTable td:first-child {
-            border-left: 1px solid #334155 !important;
-        }
-
-        /* ── thead sticky: fondo opaco ── */
+        /* ── thead sticky: fondo 100% OPACO para evitar transparencias al hacer scroll ── */
         #morbilidadTable thead {
             position: sticky;
             top: 0;
             z-index: 50;
-        }
-
-        /* Fila 1 – rangos de edad: gris claro / oscuro */
-        #morbilidadTable thead tr:nth-child(1) th {
-            background-color: #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-        html.dark #morbilidadTable thead tr:nth-child(1) th,
-        [data-theme="dark"] #morbilidadTable thead tr:nth-child(1) th {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-        }
-
-        /* Fila 1 – celdas de rangos: azul índigo claro / oscuro */
-        #morbilidadTable thead tr:nth-child(1) th[colspan="4"] {
-            background-color: #eef2ff !important;
-            color: #312e81 !important;
-        }
-        html.dark #morbilidadTable thead tr:nth-child(1) th[colspan="4"],
-        [data-theme="dark"] #morbilidadTable thead tr:nth-child(1) th[colspan="4"] {
-            background-color: #1e293b !important;
-            color: #93c5fd !important;
-        }
-
-        /* Fila 2 – HOM */
-        .th-hom {
-            background-color: #eff6ff !important;
-            color: #1e40af !important;
-        }
-        html.dark .th-hom,
-        [data-theme="dark"] .th-hom {
-            background-color: rgba(59, 130, 246, 0.15) !important;
-            color: #60a5fa !important;
-        }
-
-        /* Fila 2 – MUJ */
-        .th-muj {
-            background-color: #fff1f2 !important;
-            color: #9f1239 !important;
-        }
-        html.dark .th-muj,
-        [data-theme="dark"] .th-muj {
-            background-color: rgba(244, 63, 94, 0.15) !important;
-            color: #fb7185 !important;
-        }
-
-        /* Celda SUMA (rowspan 3) */
-        #morbilidadTable thead tr:nth-child(1) th:last-child {
-            background-color: #1e293b !important;
-            color: #fff !important;
-        }
-        html.dark #morbilidadTable thead tr:nth-child(1) th:last-child,
-        [data-theme="dark"] #morbilidadTable thead tr:nth-child(1) th:last-child {
-            background-color: #0f172a !important;
-            color: #f8fafc !important;
-        }
-
-        /* Fila 3 – N / S */
-        #morbilidadTable thead tr:nth-child(3) th {
-            background-color: #ffffff !important;
-            color: #64748b !important;
-        }
-        html.dark #morbilidadTable thead tr:nth-child(3) th,
-        [data-theme="dark"] #morbilidadTable thead tr:nth-child(3) th {
-            background-color: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        /* ── Celda DIAGNOSTICO sticky (columna izquierda) ── */
-        .sticky-col-first-v2 {
-            position: sticky;
-            left: 0;
-            z-index: 30 !important;
-            background-color: #e2e8f0 !important;
-            color: #1e293b !important;
-        }
-        html.dark .sticky-col-first-v2,
-        [data-theme="dark"] .sticky-col-first-v2 {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-        }
-
-        #morbilidadTable tbody .sticky-col-first-v2 {
-            background-color: #fff !important;
-            color: #1e293b !important;
-        }
-        html.dark #morbilidadTable tbody .sticky-col-first-v2,
-        [data-theme="dark"] #morbilidadTable tbody .sticky-col-first-v2 {
-            background-color: #0f172a !important;
-            color: #e2e8f0 !important;
-        }
-
-        #morbilidadTable tbody td {
-            background-color: #ffffff;
-            color: #1e293b;
-        }
-        html.dark #morbilidadTable tbody td,
-        [data-theme="dark"] #morbilidadTable tbody td {
-            background-color: #0b1120;
-            color: #f8fafc;
-        }
-
-        #morbilidadTable tfoot .sticky-col-first-v2 {
-            background-color: #312e81 !important;
-            color: #fff !important;
-        }
-        html.dark #morbilidadTable tfoot .sticky-col-first-v2,
-        [data-theme="dark"] #morbilidadTable tfoot .sticky-col-first-v2 {
-            background-color: #1e293b !important;
-            color: #fff !important;
         }
 
         .thead-premium-v2 th {
@@ -228,21 +118,144 @@
             text-transform: uppercase;
         }
 
-        /* Bordes gruesos en divisores de grupo */
-        .border-heavy-right  { border-right:  2px solid #94a3b8 !important; }
-        .border-heavy-bottom { border-bottom: 2px solid #94a3b8 !important; }
-        html.dark .border-heavy-right  { border-right:  2px solid #475569 !important; }
-        html.dark .border-heavy-bottom { border-bottom: 2px solid #475569 !important; }
-        [data-theme="dark"] .border-heavy-right  { border-right:  2px solid #475569 !important; }
-        [data-theme="dark"] .border-heavy-bottom { border-bottom: 2px solid #475569 !important; }
-
-        /* Borde inferior reforzado en toda la fila N/S para separar thead del tbody */
-        #morbilidadTable thead tr:last-child th {
-            border-bottom: 2px solid #94a3b8 !important;
+        /* ─── ENCABEZADOS DE RANGOS DE EDAD (NIVEL 1) ─── */
+        #morbilidadTable thead tr:first-child th.th-rango-box {
+            border: 1.5px solid var(--morb-rango-border) !important;
+            box-shadow: inset 0 0 0 0.5px var(--morb-rango-border) !important;
+            background-color: var(--morb-rango-hdr-bg) !important;
+            color: var(--morb-rango-border) !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.5px;
         }
-        html.dark #morbilidadTable thead tr:last-child th,
-        [data-theme="dark"] #morbilidadTable thead tr:last-child th {
-            border-bottom: 2px solid #475569 !important;
+
+        /* Fila 2 – HOM (Sólido) */
+        .th-hom {
+            background-color: var(--morb-hom-bg) !important;
+            color: #2563eb !important;
+        }
+        [data-theme="dark"] .th-hom,
+        html.dark .th-hom {
+            color: #60a5fa !important;
+        }
+
+        /* Fila 2 – MUJ (Sólido) */
+        .th-muj {
+            background-color: var(--morb-muj-bg) !important;
+            color: #e11d48 !important;
+        }
+        [data-theme="dark"] .th-muj,
+        html.dark .th-muj {
+            color: #fb7185 !important;
+        }
+
+        /* Fila 3 – N / S (Sólido) */
+        #morbilidadTable thead tr:nth-child(3) th {
+            background-color: var(--morb-ns-bg) !important;
+            color: var(--text-muted, #64748b) !important;
+        }
+        [data-theme="dark"] #morbilidadTable thead tr:nth-child(3) th {
+            color: #94a3b8 !important;
+        }
+
+        /* Borde inferior del thead (Nivel 3) */
+        #morbilidadTable thead tr:last-child th {
+            border-bottom: 2px solid var(--morb-rango-border) !important;
+            box-shadow: inset 0 -2px 0 var(--morb-rango-border) !important;
+        }
+
+        /* ─── MARCO LATERAL DE CADA RANGO (1.5px) ─── */
+        #morbilidadTable .th-rango-start,
+        #morbilidadTable .td-rango-start {
+            border-left: 1.5px solid var(--morb-rango-border) !important;
+            box-shadow: inset 1.5px 0 0 var(--morb-rango-border) !important;
+        }
+
+        #morbilidadTable .th-rango-end,
+        #morbilidadTable .td-rango-end {
+            border-right: 1.5px solid var(--morb-rango-border) !important;
+            box-shadow: inset -1.5px 0 0 var(--morb-rango-border) !important;
+        }
+
+        /* Combinaciones en cabecera Nivel 3 */
+        #morbilidadTable thead tr:last-child th.th-rango-start {
+            box-shadow: inset 1.5px 0 0 var(--morb-rango-border), inset 0 -2px 0 var(--morb-rango-border) !important;
+        }
+        #morbilidadTable thead tr:last-child th.th-rango-end {
+            box-shadow: inset -1.5px 0 0 var(--morb-rango-border), inset 0 -2px 0 var(--morb-rango-border) !important;
+        }
+
+        /* ── Celda DIAGNOSTICO sticky (columna izquierda 100% sólida) ── */
+        .sticky-col-first-v2 {
+            position: sticky;
+            left: 0;
+            z-index: 30 !important;
+            background-color: var(--morb-diag-bg) !important;
+            color: var(--text-primary, #1e293b) !important;
+            border-right: 2px solid var(--morb-rango-border) !important;
+            box-shadow: inset -2px 0 0 var(--morb-rango-border), 3px 0 6px rgba(0, 0, 0, 0.15) !important;
+        }
+        [data-theme="dark"] .sticky-col-first-v2 {
+            color: #f8fafc !important;
+        }
+
+        #morbilidadTable tbody .sticky-col-first-v2 {
+            background-color: var(--bg-surface, #fff) !important;
+            color: var(--text-primary, #1e293b) !important;
+        }
+        [data-theme="dark"] #morbilidadTable tbody .sticky-col-first-v2 {
+            background-color: #0b1120 !important;
+            color: #e2e8f0 !important;
+        }
+
+        #morbilidadTable tbody td {
+            background-color: var(--bg-surface, #ffffff);
+            color: var(--text-primary, #1e293b);
+        }
+        [data-theme="dark"] #morbilidadTable tbody td {
+            background-color: #0b1120;
+            color: #f8fafc;
+        }
+
+        /* ── Celda SUMA (rowspan 3 y total final 100% sólida) ── */
+        #morbilidadTable .th-suma,
+        #morbilidadTable .td-suma {
+            background-color: var(--morb-suma-bg) !important;
+            color: #fff !important;
+            border-left: 2px solid var(--morb-rango-border) !important;
+            border-right: 2px solid var(--morb-rango-border) !important;
+            box-shadow: inset 2px 0 0 var(--morb-rango-border), inset -2px 0 0 var(--morb-rango-border) !important;
+        }
+        [data-theme="dark"] #morbilidadTable .th-suma,
+        [data-theme="dark"] #morbilidadTable .td-suma {
+            color: #f8fafc !important;
+        }
+
+        /* ─── PIE DE TABLA (TFOOT) ─── */
+        #morbilidadTable tfoot .sticky-col-first-v2 {
+            background-color: #1e1b4b !important;
+            color: #fff !important;
+        }
+        [data-theme="dark"] #morbilidadTable tfoot .sticky-col-first-v2 {
+            background-color: #0f172a !important;
+            color: #fff !important;
+        }
+
+        #morbilidadTable tfoot td {
+            border-top: 2px solid var(--morb-rango-border) !important;
+            box-shadow: inset 0 2px 0 var(--morb-rango-border) !important;
+            background-color: #0f172a !important;
+            color: #fff !important;
+        }
+        [data-theme="dark"] #morbilidadTable tfoot td {
+            background-color: #030712 !important;
+        }
+
+        /* ─── CARRILES ALTERNADOS POR RANGO (FONDO SÓLIDO Y SUAVE) ─── */
+        #morbilidadTable tbody td.col-rango-alt {
+            background-color: var(--morb-rango-alt-bg) !important;
+        }
+        #morbilidadTable tbody tr:hover td.col-rango-alt {
+            background-color: var(--morb-rango-alt-hover) !important;
         }
 
         .page-btn { cursor: pointer; }
@@ -272,26 +285,31 @@
                             ];
                         @endphp
                         <tr>
-                            <th rowspan="3" class="sticky-col-first-v2 align-middle border-heavy-right" style="width: 280px; min-width: 280px;">DIAGNOSTICO</th>
-                            @foreach($ageRanges as $range)
-                                <th colspan="4" class="border-heavy-right font-bold" style="font-size: 0.85rem; height: 35px;">{{ $range }}</th>
+                            <th rowspan="3" class="sticky-col-first-v2 align-middle" style="width: 280px; min-width: 280px; font-weight: 800;">DIAGNOSTICO</th>
+                            @foreach($ageRanges as $rIdx => $range)
+                                @php $rangeClass = ($rIdx % 2 === 1) ? 'col-rango-alt' : ''; @endphp
+                                <th colspan="4" class="th-rango-box {{ $rangeClass }} font-bold" style="font-size: 0.85rem; height: 35px;">
+                                    {{ $range }}
+                                </th>
                             @endforeach
-                            <th rowspan="3" class="align-middle font-black" style="width: 70px;">SUMA</th>
+                            <th rowspan="3" class="align-middle font-black th-suma" style="width: 70px;">SUMA</th>
                         </tr>
                         <!-- Nivel 2: Sexo -->
                         <tr>
-                            @foreach($ageRanges as $range)
-                                <th colspan="2" class="border-right font-semibold th-hom">HOM</th>
-                                <th colspan="2" class="border-heavy-right font-semibold th-muj">MUJ</th>
+                            @foreach($ageRanges as $rIdx => $range)
+                                @php $rangeClass = ($rIdx % 2 === 1) ? 'col-rango-alt' : ''; @endphp
+                                <th colspan="2" class="font-semibold th-hom th-rango-start {{ $rangeClass }}">HOM</th>
+                                <th colspan="2" class="font-semibold th-muj th-rango-end {{ $rangeClass }}">MUJ</th>
                             @endforeach
                         </tr>
                         <!-- Nivel 3: Condición (N / S) -->
-                        <tr class="border-heavy-bottom">
-                            @foreach($ageRanges as $range)
-                                <th class="font-medium" style="width: 43px;">N</th>
-                                <th class="font-medium border-right" style="width: 43px;">S</th>
-                                <th class="font-medium" style="width: 43px;">N</th>
-                                <th class="font-medium border-heavy-right" style="width: 43px;">S</th>
+                        <tr>
+                            @foreach($ageRanges as $rIdx => $range)
+                                @php $rangeClass = ($rIdx % 2 === 1) ? 'col-rango-alt' : ''; @endphp
+                                <th class="font-medium th-rango-start {{ $rangeClass }}" style="width: 43px;">N</th>
+                                <th class="font-medium {{ $rangeClass }}" style="width: 43px;">S</th>
+                                <th class="font-medium {{ $rangeClass }}" style="width: 43px;">N</th>
+                                <th class="font-medium th-rango-end {{ $rangeClass }}" style="width: 43px;">S</th>
                             @endforeach
                         </tr>
                     </thead>
@@ -305,33 +323,112 @@
                                 </tr>
                             @else
                                 <tr class="row-page-{{ $curPage }} {{ $row['color'] }} {{ $curPage == 2 ? 'd-none' : '' }}">
-                                    <td class="sticky-col-first-v2 text-left px-3 {{ $row['color'] ?: '' }} font-bold border-heavy-right" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 28px;">
+                                    <td class="sticky-col-first-v2 text-left px-3 {{ $row['color'] ?: '' }} font-bold" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 28px;">
                                         {{ $row['label'] }}
                                     </td>
                                     @for($col=1; $col<=32; $col++)
-                                        @php $val = $row['cols'][$col] ?? 0; @endphp
-                                        <td class="{{ $val > 0 ? 'font-bold' : 'opacity-40 text-slate-400' }} {{ $col % 4 == 0 ? 'border-heavy-right' : '' }}" style="font-size: 1.15rem;">
+                                        @php 
+                                            $val = $row['cols'][$col] ?? 0;
+                                            $isStart = ($col % 4 == 1);
+                                            $isEnd = ($col % 4 == 0);
+                                            $rangeIdx = intdiv($col - 1, 4);
+                                            $rangeClass = ($rangeIdx % 2 === 1) ? 'col-rango-alt' : '';
+                                        @endphp
+                                        <td class="td-rango-cell {{ $rangeClass }} {{ $isStart ? 'td-rango-start' : '' }} {{ $isEnd ? 'td-rango-end' : '' }} {{ $val > 0 ? 'font-bold clickable-cell' : 'opacity-40 text-slate-400' }}" 
+                                            style="font-size: 1.15rem; {{ $val > 0 ? 'cursor: pointer;' : '' }}"
+                                            @if($val > 0) onclick="fetchMorbilidadDetails('{{ $row['id'] }}', {{ $col }})" title="Ver detalle de pacientes ({{ $val }})" @endif>
                                             {{ $val > 0 ? $val : '--' }}
                                         </td>
                                     @endfor
-                                    <td class="bg-slate-800 text-white font-bold" style="font-size: 1.15rem;">{{ $row['total'] ?: '0' }}</td>
+                                    <td class="td-suma font-bold {{ ($row['total'] ?? 0) > 0 ? 'clickable-cell' : '' }}" 
+                                        style="font-size: 1.15rem; {{ ($row['total'] ?? 0) > 0 ? 'cursor: pointer;' : '' }}"
+                                        @if(($row['total'] ?? 0) > 0) onclick="fetchMorbilidadDetails('{{ $row['id'] }}', 'suma')" title="Ver todos los pacientes del mes ({{ $row['total'] }})" @endif>
+                                        {{ $row['total'] ?: '0' }}
+                                    </td>
                                 </tr>
                             @endif
                         @endforeach
                     </tbody>
                     <tfoot class="text-white sticky-bottom hover:bg-slate-900 transition-colors" style="z-index: 60; bottom: -1px; position: sticky; background-color: #1e293b !important;">
                         <tr>
-                            <td class="sticky-col-first-v2 text-right pr-4 border-heavy-right uppercase font-bold" style="z-index: 70;">TOTAL GENERAL</td>
+                            <td class="sticky-col-first-v2 text-right pr-4 uppercase font-bold" style="z-index: 70;">TOTAL GENERAL</td>
                             @for($col=1; $col<=32; $col++)
-                                <td class="{{ $col % 4 == 0 ? 'border-heavy-right' : '' }} font-bold">{{ $totalGeneral[$col] ?: '0' }}</td>
+                                @php 
+                                    $isStart = ($col % 4 == 1);
+                                    $isEnd = ($col % 4 == 0);
+                                    $rangeIdx = intdiv($col - 1, 4);
+                                    $rangeClass = ($rangeIdx % 2 === 1) ? 'col-rango-alt' : '';
+                                @endphp
+                                <td class="{{ $rangeClass }} {{ $isStart ? 'td-rango-start' : '' }} {{ $isEnd ? 'td-rango-end' : '' }} font-bold">{{ $totalGeneral[$col] ?: '0' }}</td>
                             @endfor
-                            <td class="bg-black text-white px-2 font-bold">{{ array_sum(array_slice($totalGeneral, 1, 28)) }}</td>
+                            <td class="td-suma px-2 font-bold">{{ array_sum(array_slice($totalGeneral, 1, 28)) }}</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     
+
+    <!-- Modal de Detalles de Pacientes en Morbilidad -->
+    <div class="modal fade" id="modalMorbilidadDetalles" tabindex="-1" role="dialog" aria-labelledby="modalMorbilidadDetallesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 95vw; width: 1200px;">
+            <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-xl);">
+                <div class="modal-header d-flex align-items-center justify-content-between" style="background-color: var(--bg-subtle); border-bottom-color: var(--border-color); padding: 1rem 1.5rem;">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-person-lines-fill text-primary" style="font-size: 1.25rem;"></i>
+                            <h5 class="modal-title font-weight-bold mb-0" id="modalMorbilidadTitle" style="color: var(--text-primary); letter-spacing: 0.3px;"></h5>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="badge badge-subtle-primary font-weight-bold" id="modalMorbilidadFiltroBadge" style="font-size: 0.78rem;"></span>
+                            <span class="badge badge-subtle-secondary" id="modalMorbilidadCountBadge" style="font-size: 0.78rem;"></span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group input-group-sm" style="width: 250px;">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-muted);"><i class="bi bi-search"></i></span>
+                            </div>
+                            <input type="text" id="modalMorbilidadSearch" class="form-control form-control-sm" placeholder="Buscar paciente, médico, exp..." style="background: var(--input-bg); border-color: var(--input-border); color: var(--text-primary);">
+                        </div>
+                        <button type="button" class="btn btn-icon btn-sm btn-subtle" data-dismiss="modal" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-body p-0">
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-sm table-hover mb-0" id="modalMorbilidadTable" style="font-size: 0.82rem; border-collapse: separate; border-spacing: 0;">
+                            <thead style="position: sticky; top: 0; z-index: 10;">
+                                <tr style="background: var(--bg-subtle); color: var(--text-muted); border-bottom: 2px solid var(--border-color);">
+                                    <th class="py-2 px-2 text-center text-nowrap" style="width: 75px;">N° Reg.</th>
+                                    <th class="py-2 px-3 text-nowrap">Fecha</th>
+                                    <th class="py-2 px-3 text-nowrap">Expediente</th>
+                                    <th class="py-2 px-3 text-nowrap">Identidad</th>
+                                    <th class="py-2 px-3 text-nowrap">Paciente</th>
+                                    <th class="py-2 px-2 text-center text-nowrap">Sexo</th>
+                                    <th class="py-2 px-2 text-center text-nowrap">Edad</th>
+                                    <th class="py-2 px-2 text-center text-nowrap">Cond.</th>
+                                    <th class="py-2 px-3 text-nowrap">Diagnóstico Registrado</th>
+                                    <th class="py-2 px-3 text-nowrap">Médico / Quien atendió</th>
+                                    <th class="py-2 px-2 text-center text-nowrap">Jornada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalMorbilidadTableBody">
+                                <!-- Renderizado dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-between align-items-center" style="background-color: var(--bg-subtle); border-top-color: var(--border-color); padding: 0.75rem 1.5rem;">
+                    <span class="text-muted small" id="modalMorbilidadFooterInfo">Haga clic en cualquier fila para más contexto.</span>
+                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" style="font-weight: 600;">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         function setPage(pageNum) {

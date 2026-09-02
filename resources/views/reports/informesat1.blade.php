@@ -383,7 +383,8 @@
               </div>
               <div class="col-4">
                 <label class="form-label font-weight-bold mb-1" style="font-size: 0.78rem;">Código CIE-10</label>
-                <input type="text" id="edit_cod" name="cod" class="form-control form-control-sm" placeholder="Ej: 4 / A09" style="background: var(--input-bg, #0f172a); color: var(--text-primary, #fff); border: 1px solid var(--border-color);">
+                <input type="text" id="edit_cod" name="cod" class="form-control form-control-sm" list="codigosDatalist" placeholder="Ej: 4 / A09 / 102" autocomplete="off" style="background: var(--input-bg, #0f172a); color: var(--text-primary, #fff); border: 1px solid var(--border-color); font-weight: 700;">
+                <datalist id="codigosDatalist"></datalist>
               </div>
               <div class="col-4">
                 <label class="form-label font-weight-bold mb-1" style="font-size: 0.78rem;">Condición</label>
@@ -486,22 +487,76 @@
         width: 'style'
       });
 
-      // Cargar catálogo de diagnósticos para autocompletado en Datalist
+      // Cargar catálogo de diagnósticos para autocompletado en Datalists
       let catalogoDiags = [];
+
+      function poblarDatalists(data) {
+        catalogoDiags = data || [];
+        const diagDatalist = document.getElementById('diagnosticosDatalist');
+        const codDatalist = document.getElementById('codigosDatalist');
+
+        if (diagDatalist && catalogoDiags.length > 0) {
+          diagDatalist.innerHTML = catalogoDiags.map(d => 
+            `<option value="${d.patologia}">${d.codigo ? d.codigo + ' - ' : ''}${d.patologia}</option>`
+          ).join('');
+        }
+
+        if (codDatalist && catalogoDiags.length > 0) {
+          codDatalist.innerHTML = catalogoDiags
+            .filter(d => d.codigo && String(d.codigo).trim() !== '')
+            .map(d => `<option value="${d.codigo}">${d.codigo} - ${d.patologia}</option>`)
+            .join('');
+        }
+      }
+
       fetch("{{ route('informesat1.buscarDiagnosticos') }}")
         .then(res => res.json())
-        .then(data => {
-          catalogoDiags = data || [];
-          const datalist = document.getElementById('diagnosticosDatalist');
-          if (datalist && catalogoDiags.length > 0) {
-            datalist.innerHTML = catalogoDiags.map(d => `<option value="${d.patologia}" data-codigo="${d.codigo}">${d.codigo ? d.codigo + ' - ' : ''}${d.patologia}</option>`).join('');
-          }
-        })
+        .then(data => poblarDatalists(data))
         .catch(err => console.warn('No se pudo precargar catálogo de diagnósticos:', err));
 
-      // Al escribir en el campo de diagnóstico, auto-rellenar código si coincide
-      $('#edit_diagnostico').on('input', function () {
+      // Función para buscar y autocompletar diagnóstico según el código ingresado
+      function buscarDiagPorCodigo(rawCod) {
+        if (!rawCod) return;
+        const codVal = String(rawCod).trim();
+        if (codVal === '') return;
+
+        // 1) Buscar coincidencia exacta en el catálogo precargado
+        const found = catalogoDiags.find(d => 
+          String(d.codigo || '').trim().toUpperCase() === codVal.toUpperCase()
+        );
+
+        if (found && found.patologia) {
+          $('#edit_diagnostico').val(found.patologia);
+          return;
+        }
+
+        // 2) Si no se encontró en memoria, consultar al servidor
+        fetch(`{{ route('informesat1.buscarDiagnosticos') }}?q=${encodeURIComponent(codVal)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              const exact = data.find(d => String(d.codigo || '').trim().toUpperCase() === codVal.toUpperCase()) || data[0];
+              if (exact && exact.patologia) {
+                $('#edit_diagnostico').val(exact.patologia);
+                if (!catalogoDiags.some(cd => cd.codigo === exact.codigo)) {
+                  catalogoDiags.push(exact);
+                  poblarDatalists(catalogoDiags);
+                }
+              }
+            }
+          })
+          .catch(err => console.warn('Error buscando código en catálogo:', err));
+      }
+
+      // Al escribir o cambiar el CÓDIGO CIE-10 -> autocompletar DIAGNÓSTICO
+      $('#edit_cod').on('input change blur', function () {
+        buscarDiagPorCodigo($(this).val());
+      });
+
+      // Al escribir o cambiar el DIAGNÓSTICO -> autocompletar CÓDIGO si coincide
+      $('#edit_diagnostico').on('input change blur', function () {
         const val = $(this).val().trim().toUpperCase();
+        if (!val) return;
         const found = catalogoDiags.find(d => (d.patologia || '').toUpperCase() === val);
         if (found && found.codigo) {
           $('#edit_cod').val(found.codigo);
@@ -585,6 +640,11 @@
         $('#edit_paciente_nombre').text(pac || 'Sin Nombre');
         $('#edit_paciente_exp').text((exp ? 'Exp: ' + exp : 'Sin Exp.') + (fecha ? ' | ' + fecha : ''));
         $('#edit_paciente_medico').text(medico || 'No especificado');
+
+        // Si tiene código pero no diagnóstico, buscarlo automáticamente
+        if (cod && (!diag || String(diag).trim() === '')) {
+          buscarDiagPorCodigo(cod);
+        }
 
         abrirModalEditar();
       });

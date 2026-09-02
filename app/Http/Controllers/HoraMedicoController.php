@@ -127,19 +127,20 @@ class HoraMedicoController extends Controller
                 $diasFinSemana++;
         }
 
+        $onlySS = ($jornada === 'SERVICIO SOCIAL' || $request->input('only_ss') == '1' || $request->input('tipo') === 'sociales' || request()->routeIs('informes.hora-medico.servicio-social'));
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mesNombre}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
 
-        if ($jornada === 'TOTAL JORNADAS') {
+        if ($jornada === 'TOTAL JORNADAS' || $jornada === 'TODAS LAS JORNADAS' || $jornada === 'SERVICIO SOCIAL') {
             $jornadasList = ['MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
             $dataByJornada = [];
             foreach ($jornadasList as $j)
-                $dataByJornada[$j] = $this->getJornadaData($ano, $mesNombre, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana);
-            return view('informes.vista_impresion_hora_medico', compact('dataByJornada', 'ano', 'mesNombre', 'jornada', 'totalDias', 'settings', 'currentDirectorId'));
+                $dataByJornada[$j] = $this->getJornadaData($ano, $mesNombre, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+            return view('informes.vista_impresion_hora_medico', compact('dataByJornada', 'ano', 'mesNombre', 'jornada', 'totalDias', 'settings', 'currentDirectorId', 'onlySS'));
         }
 
-        $data = $this->getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana);
-        return view('informes.vista_impresion_hora_medico', compact('data', 'ano', 'mesNombre', 'jornada', 'totalDias', 'settings', 'currentDirectorId'));
+        $data = $this->getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+        return view('informes.vista_impresion_hora_medico', compact('data', 'ano', 'mesNombre', 'jornada', 'totalDias', 'settings', 'currentDirectorId', 'onlySS'));
     }
 
     public function saveDirectorMensual(Request $request)
@@ -302,9 +303,12 @@ class HoraMedicoController extends Controller
             ->whereNotNull('medico')
             ->where('medico', '!=', '');
 
+        $isAllJornadas = in_array($jornada, ['TOTAL JORNADAS', 'TODAS LAS JORNADAS', 'TODAS', 'SERVICIO SOCIAL']);
+        $isSpecificJornada = !$isAllJornadas;
+
         // For specific jornada (not totals), also filter RG by jornada
         $rgJornadaQuery = (clone $rgBaseQuery);
-        if ($jornada !== 'TOTAL JORNADAS' && $jornada !== 'TODAS LAS JORNADAS' && $jornada !== 'TODAS' && $jornada !== 'SERVICIO SOCIAL' && !$onlySS) {
+        if ($isSpecificJornada) {
             $rgJornadaQuery->where('jornada', $jornada);
         }
 
@@ -327,8 +331,6 @@ class HoraMedicoController extends Controller
         $medicosConRegistrosNombres = array_keys($atencionesCounts);
         $medicosConRegistrosCm     = array_keys($atencionesByCm);
         $medicosConHSC             = $allHSC->keys()->toArray();
-
-        $isSpecificJornada = ($jornada !== 'TOTAL JORNADAS' && $jornada !== 'TODAS LAS JORNADAS' && $jornada !== 'TODAS' && $jornada !== 'SERVICIO SOCIAL' && !$onlySS);
 
         // Si es una jornada específica, solo incluir por HSC a los médicos cuya ficha pertenezca a esa jornada
         $medicosHscQuery = Medico::whereIn('id', $medicosConHSC);
@@ -522,7 +524,7 @@ class HoraMedicoController extends Controller
         if (empty($mesNombre)) {
             $mesNombre = $this->resolverMesPorDefecto((string)$ano, true);
         }
-        $jornada = 'TOTAL JORNADAS';
+        $jornada = $request->input('jornada', 'TOTAL JORNADAS');
         $nombreBusqueda = $request->input('search', $request->input('nombre', ''));
 
         $mesNum = $this->mesMap[$mesNombre] ?? date('n');
@@ -552,21 +554,43 @@ class HoraMedicoController extends Controller
             Medico::where('estado', 'activo')->where(function($q) {
                 $q->where('NOMINA', 'LIKE', '%SOCIAL%')
                   ->orWhere('MODALIDAD', 'LIKE', '%SOCIAL%')
-                  ->orWhere('ESPECIALIDAD', 'LIKE', '%SOCIAL%');
+                  ->orWhere('ESPECIALIDAD', 'LIKE', '%SOCIAL%')
+                  ->orWhere('NOM_MED', 'LIKE', 'MSS.%');
             })
         )->orderBy('NOM_MED')->get();
 
         $settings = Setting::pluck('value', 'key');
+        $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mesNombre}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
+
+        if ($jornada === 'TOTAL JORNADAS' || $jornada === 'TODAS LAS JORNADAS' || $jornada === 'SERVICIO SOCIAL') {
+            $jornadasList = ['MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+            $dataByJornada = [];
+            foreach ($jornadasList as $j) {
+                $dataByJornada[$j] = $this->getJornadaData($ano, $mesNombre, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana, true);
+            }
+            $data = $this->getJornadaData($ano, $mesNombre, 'TOTAL JORNADAS', $nombreBusqueda, $diasLaborables, $diasFinSemana, true);
+            $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
+            if ($anos->isEmpty())
+                $anos = [date('Y')];
+            $meses = array_keys($this->mesMap);
+            $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+
+            return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico_sociales', compact(
+                'dataByJornada', 'data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'jornadas', 'diasLaborables', 'diasFinSemana',
+                'semanasResumen', 'totalDias', 'nombreBusqueda', 'todosLosMedicos', 'settings', 'currentDirectorId'
+            ));
+        }
 
         $data = $this->getJornadaData($ano, $mesNombre, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, true);
         $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano');
         if ($anos->isEmpty())
             $anos = [date('Y')];
         $meses = array_keys($this->mesMap);
+        $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
 
         return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico_sociales', compact(
-            'data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'diasLaborables', 'diasFinSemana',
-            'semanasResumen', 'totalDias', 'nombreBusqueda', 'todosLosMedicos', 'settings'
+            'data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'jornadas', 'diasLaborables', 'diasFinSemana',
+            'semanasResumen', 'totalDias', 'nombreBusqueda', 'todosLosMedicos', 'settings', 'currentDirectorId'
         ));
     }
 
@@ -748,23 +772,23 @@ class HoraMedicoController extends Controller
                 $diasFinSemana++;
         }
 
-        $onlySS = ($jornada === 'SERVICIO SOCIAL' || request()->routeIs('informes.hora-medico.servicio-social'));
+        $onlySS = ($jornada === 'SERVICIO SOCIAL' || $request->input('only_ss') == '1' || $request->input('tipo') === 'sociales' || request()->routeIs('informes.hora-medico.servicio-social'));
         $nombreBusqueda = $request->input('nombre', $request->input('search', null));
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mes}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
         $mesNombre = $mes;
 
-        if ($jornada === 'TOTAL JORNADAS') {
+        if ($jornada === 'TOTAL JORNADAS' || $jornada === 'TODAS LAS JORNADAS' || $jornada === 'SERVICIO SOCIAL') {
             $jornadasList = ['MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
             $dataByJornada = [];
             foreach ($jornadasList as $j)
-                $dataByJornada[$j] = $this->getJornadaData($ano, $mes, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana);
-            return view('informes.vista_impresion_HSC', compact('dataByJornada', 'ano', 'mes', 'mesNombre', 'jornada', 'settings', 'currentDirectorId'));
+                $dataByJornada[$j] = $this->getJornadaData($ano, $mes, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+            return view('informes.vista_impresion_HSC', compact('dataByJornada', 'ano', 'mes', 'mesNombre', 'jornada', 'settings', 'currentDirectorId', 'onlySS'));
         }
 
         $data = $this->getJornadaData($ano, $mes, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
 
-        return view('informes.vista_impresion_HSC', compact('data', 'ano', 'mes', 'mesNombre', 'jornada', 'settings', 'currentDirectorId'));
+        return view('informes.vista_impresion_HSC', compact('data', 'ano', 'mes', 'mesNombre', 'jornada', 'settings', 'currentDirectorId', 'onlySS'));
     }
 
     public function consolidado(Request $request)
@@ -791,15 +815,27 @@ class HoraMedicoController extends Controller
                 $diasFinSemana++;
         }
 
-        $onlySS = ($jornada === 'SERVICIO SOCIAL' || request()->routeIs('informes.hora-medico.servicio-social'));
+        $onlySS = ($jornada === 'SERVICIO SOCIAL' || $request->input('only_ss') == '1' || $request->input('tipo') === 'sociales' || request()->routeIs('informes.hora-medico.servicio-social'));
         $nombreBusqueda = $request->input('nombre', $request->input('search', null));
-        $data = $this->getJornadaData($ano, $mes, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+
+        if ($jornada === 'TOTAL JORNADAS' || $jornada === 'TODAS LAS JORNADAS' || $jornada === 'SERVICIO SOCIAL') {
+            $jornadasList = ['MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+            $dataByJornada = [];
+            foreach ($jornadasList as $j) {
+                $dataByJornada[$j] = $this->getJornadaData($ano, $mes, $j, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+            }
+            $data = $this->getJornadaData($ano, $mes, 'TOTAL JORNADAS', $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+        } else {
+            $data = $this->getJornadaData($ano, $mes, $jornada, $nombreBusqueda, $diasLaborables, $diasFinSemana, $onlySS);
+            $dataByJornada = null;
+        }
 
         $anos = RegistroGlobal::distinct()->orderBy('ano', 'desc')->pluck('ano')->toArray();
         if (empty($anos)) {
             $anos = [date('Y'), date('Y') - 1];
         }
         $meses = array_keys($this->mesMap);
+        $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mes}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
         if ($onlySS) {
@@ -816,6 +852,6 @@ class HoraMedicoController extends Controller
         }
         $mesNombre = $mes;
 
-        return view($request->ajax() ? 'informes.hora_medico_consolidado_table' : 'informes.hora_medico_consolidado', compact('data', 'ano', 'mes', 'mesNombre', 'jornada', 'meses', 'anos', 'settings', 'currentDirectorId', 'todosLosMedicos'));
+        return view($request->ajax() ? 'informes.hora_medico_consolidado_table' : 'informes.hora_medico_consolidado', compact('data', 'dataByJornada', 'ano', 'mes', 'mesNombre', 'jornada', 'meses', 'anos', 'jornadas', 'settings', 'currentDirectorId', 'todosLosMedicos', 'onlySS'));
     }
 }

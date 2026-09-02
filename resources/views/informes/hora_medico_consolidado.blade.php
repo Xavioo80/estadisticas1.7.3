@@ -347,12 +347,12 @@
 
                 {{-- Navigation Tabs --}}
                 <div class="nav-tab-group">
-                    <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mes, 'jornada' => ($jornada === 'SERVICIO SOCIAL' ? 'MATUTINA' : $jornada)]) }}"
-                        class="nav-tab-btn {{ $jornada !== 'SERVICIO SOCIAL' ? 'active' : '' }}">
+                    <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mes, 'jornada' => $jornada, 'only_ss' => '0']) }}"
+                        class="nav-tab-btn {{ empty($onlySS) ? 'active' : '' }}">
                         <i class="bi bi-people-fill"></i> Generales y Especialistas
                     </a>
-                    <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mes, 'jornada' => 'SERVICIO SOCIAL']) }}"
-                        class="nav-tab-btn {{ $jornada === 'SERVICIO SOCIAL' ? 'active' : '' }}">
+                    <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mes, 'jornada' => $jornada, 'only_ss' => '1']) }}"
+                        class="nav-tab-btn {{ !empty($onlySS) ? 'active' : '' }}">
                         <i class="bi bi-mortarboard-fill"></i> Servicio Social
                     </a>
                 </div>
@@ -360,7 +360,7 @@
 
             <div class="header-actions-row">
                 <!-- Botón Volver a Hora Médico -->
-                <a href="{{ route('informes.hora-medico', ['ano' => $ano, 'mes' => $mes, 'jornada' => ($jornada === 'SERVICIO SOCIAL' ? 'MATUTINA' : $jornada)]) }}"
+                <a href="{{ !empty($onlySS) ? route('informes.hora-medico.servicio-social', ['ano' => $ano, 'mes' => $mes, 'jornada' => $jornada]) : route('informes.hora-medico', ['ano' => $ano, 'mes' => $mes, 'jornada' => $jornada]) }}"
                     class="btn-header-purple" title="Regresar a Rendimiento Médico (Hora Médico)">
                     <i class="bi bi-clock-history"></i> Hora Médico
                 </a>
@@ -413,29 +413,17 @@
         <!-- Barra de Filtros -->
         <div class="filter-container no-print">
             <div class="flex flex-1 items-center gap-2 mb-0 flex-wrap">
-                @if($jornada !== 'SERVICIO SOCIAL')
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Jornada:</span>
-                        <div style="width: 155px;">
-                            <select name="jornada" class="filter-select w-full" onchange="updateFilters()">
-                                <option value="MATUTINA" {{ $jornada == 'MATUTINA' ? 'selected' : '' }}>MATUTINA</option>
-                                <option value="VESPERTINA" {{ $jornada == 'VESPERTINA' ? 'selected' : '' }}>VESPERTINA</option>
-                                <option value="FIN DE SEMANA" {{ $jornada == 'FIN DE SEMANA' ? 'selected' : '' }}>FIN DE SEMANA
-                                </option>
-                                <option value="TOTAL JORNADAS" {{ ($jornada == 'TOTAL JORNADAS' || $jornada == 'TODAS LAS JORNADAS') ? 'selected' : '' }}>TOTAL JORNADAS</option>
-                            </select>
-                        </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Jornada:</span>
+                    <div style="width: 175px;">
+                        <select name="jornada" class="filter-select w-full" onchange="updateFilters()">
+                            <option value="TOTAL JORNADAS" {{ ($jornada == 'TOTAL JORNADAS' || $jornada == 'TODAS LAS JORNADAS' || $jornada == 'SERVICIO SOCIAL') ? 'selected' : '' }}>TOTAL JORNADAS</option>
+                            <option value="MATUTINA" {{ $jornada == 'MATUTINA' ? 'selected' : '' }}>MATUTINA</option>
+                            <option value="VESPERTINA" {{ $jornada == 'VESPERTINA' ? 'selected' : '' }}>VESPERTINA</option>
+                            <option value="FIN DE SEMANA" {{ $jornada == 'FIN DE SEMANA' ? 'selected' : '' }}>FIN DE SEMANA</option>
+                        </select>
                     </div>
-                @else
-                    <input type="hidden" name="jornada" value="SERVICIO SOCIAL">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Jornada:</span>
-                        <span class="badge badge-info font-bold px-2.5 py-1 text-xs"
-                            style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); border-radius: 6px;">
-                            <i class="bi bi-mortarboard-fill mr-1"></i> SERVICIO SOCIAL
-                        </span>
-                    </div>
-                @endif
+                </div>
 
                 <div class="flex items-center gap-1.5">
                     <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Mes:</span>
@@ -610,6 +598,7 @@
             let mes = $('[name="mes"]').val();
             let jornada = $('[name="jornada"]').val();
             let nombre = $('#nombre_medico').val();
+            let onlySS = '{{ !empty($onlySS) ? "1" : "0" }}';
 
             $('#table-loader').css('display', 'flex').fadeIn(150);
 
@@ -617,7 +606,8 @@
                 ano: ano,
                 mes: mes,
                 jornada: jornada,
-                nombre: nombre
+                nombre: nombre,
+                only_ss: onlySS
             }, function (html) {
                 $('#consolidadoContent').html(html);
                 $('#table-loader').fadeOut(150);
@@ -631,6 +621,7 @@
                 url.searchParams.set('ano', ano);
                 url.searchParams.set('mes', mes);
                 url.searchParams.set('jornada', jornada);
+                if (onlySS === '1') url.searchParams.set('only_ss', '1');
                 window.history.pushState({}, '', url);
             }).fail(function () {
                 $('#table-loader').fadeOut(150);
@@ -684,12 +675,13 @@
             let ano = $('[name="ano"]').val();
             let mes = $('[name="mes"]').val();
             let jornada = $('[name="jornada"]').val();
+            let onlySS = '{{ !empty($onlySS) ? "1" : "0" }}';
 
             const url = new URL("{{ route('informes.hora-medico.consolidado.imprimir') }}");
             url.searchParams.set('ano', ano);
             url.searchParams.set('mes', mes);
             url.searchParams.set('jornada', jornada);
-
+            if (onlySS === '1') url.searchParams.set('only_ss', '1');
             window.open(url.toString(), '_blank');
         }
 

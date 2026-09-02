@@ -591,7 +591,7 @@
                             {{-- Horas Sin Consulta: Oficiales (7) --}}
                             <th class="vertical-text align-middle" style="width: 30px;">FERIADOS / COMPENSATORIOS</th>
                             <th class="vertical-text align-middle" style="width: 30px;">ESFAM.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES DE PROMOCION</th>
+                            <th class="vertical-text align-middle" style="width: 30px;">**** OTRAS ACTIVIDADES</th>
                             <th class="vertical-text align-middle" style="width: 30px;">CONGRESOS / TALLERES.</th>
                             <th class="vertical-text align-middle" style="width: 30px;">INVESTIGACION DE CAMPO.</th>
                             <th class="vertical-text align-middle" style="width: 30px;">ASAMBLEAS COLEGIO MEDICO.</th>

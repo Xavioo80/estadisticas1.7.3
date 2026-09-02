@@ -723,6 +723,78 @@
     background: linear-gradient(135deg, #059669, #047857) !important;
     color: #ffffff !important;
   }
+
+  /* Actions Column & Sticky Cell */
+  .sing-table-excel thead th.th-actions,
+  .sing-table-excel tbody td.excel-actions-cell {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 15 !important;
+    background-color: var(--table-header-bg) !important;
+    border-left: 1px solid var(--border-color) !important;
+    text-align: center !important;
+    padding: 0.2rem 0.35rem !important;
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+  }
+  .sing-table-excel tbody td.excel-actions-cell {
+    background-color: var(--bg-surface) !important;
+  }
+  .sing-table-excel tbody tr:hover td.excel-actions-cell {
+    background-color: var(--bg-surface-hover) !important;
+  }
+  .sing-table-excel tbody tr.row-selected td.excel-actions-cell {
+    background-color: rgba(var(--color-primary-rgb, 77, 124, 254), 0.16) !important;
+  }
+
+  .btn-action-icon {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-action-icon:hover {
+    transform: scale(1.15);
+  }
+  .btn-action-icon.text-info:hover {
+    background-color: rgba(14, 165, 233, 0.18);
+    color: #38bdf8 !important;
+  }
+  .btn-action-icon.text-primary:hover {
+    background-color: rgba(77, 124, 254, 0.18);
+    color: #60a5fa !important;
+  }
+  .btn-action-icon.text-danger:hover {
+    background-color: rgba(239, 68, 68, 0.18);
+    color: #f87171 !important;
+  }
+
+  /* Multiselect Checkbox styling */
+  .row-select-checkbox, .select-all-checkbox {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    margin: 0;
+    accent-color: var(--color-primary, #3b82f6);
+  }
+  .excel-row-num-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .multiselect-active .row-select-checkbox,
+  .multiselect-active .select-all-checkbox {
+    display: inline-block !important;
+  }
 </style>
 @endpush
 
@@ -788,7 +860,15 @@
 
       <div style="height: 20px; width: 1px; background-color: var(--border-color); margin: 0 0.15rem;"></div>
 
-      <!-- Botones de Acción -->
+      <!-- Botones de Acción y Multiselección -->
+      <button type="button" class="btn btn-sm btn-subtle text-danger" id="btnToggleMultiSelect" style="height: 32px; padding: 0 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid var(--border-color);" title="Activar/Desactivar selección múltiple para eliminar filas">
+        <i class="bi bi-check2-square"></i> <span id="btnToggleMultiSelectText">Multiselección</span>
+      </button>
+
+      <button type="button" class="btn btn-danger btn-sm" id="btnDeleteSelected" style="display: none; height: 32px; padding: 0 0.85rem; font-size: 0.8rem; font-weight: 700; align-items: center; gap: 0.35rem; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);">
+        <i class="bi bi-trash3-fill"></i> Eliminar (<span id="selectedCountBadge">0</span>)
+      </button>
+
       <button type="button" class="btn btn-toolbar-add btn-sm" style="height: 32px; padding: 0 0.8rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;" onclick="SingApp.toast({title: 'Nuevo Registro', message: 'Abriendo formulario...', type: 'success'})">
         <i class="bi bi-plus-lg"></i> Agregar
       </button>
@@ -804,8 +884,11 @@
     <table class="sing-table-excel" id="excelAt1Table">
       <thead>
         <tr>
-          <!-- Columna Indicadora de Fila (Excel Row Index) -->
-          <th class="th-row-num"></th>
+          <!-- Columna Indicadora de Fila (Excel Row Index) & Multiselección -->
+          <th class="th-row-num text-center" style="position: sticky; left: 0; z-index: 20; width: 48px; min-width: 48px;">
+            <input type="checkbox" id="selectAllRows" class="select-all-checkbox form-check-input" title="Seleccionar todos los visibles" style="display: none; cursor: pointer; margin: 0 auto;">
+            <span class="row-num-header-label">#</span>
+          </th>
 
           <!-- Columnas en el orden exacto solicitado -->
           <th data-col="1" data-title="Nº" data-type="text">
@@ -955,6 +1038,9 @@
           <th data-col="49" data-title="ID" data-type="text">
             <div class="excel-th-content"><span class="excel-th-title">ID</span><button class="excel-filter-btn" title="Filtrar"><i class="bi bi-caret-down-fill"></i></button></div>
           </th>
+
+          <!-- Columna Fija de Acciones (CRUD) -->
+          <th class="th-actions text-center" style="position: sticky; right: 0; z-index: 20; min-width: 96px; width: 96px; background-color: var(--table-header-bg); border-left: 1px solid var(--border-color); color: var(--text-primary); font-weight: 700; font-size: 0.74rem;">ACCIONES</th>
         </tr>
       </thead>
       <tbody id="excelTableBody">
@@ -984,6 +1070,287 @@
     </div>
   </div>
 </div>
+
+<!-- =========================================================================
+     MODAL 1: VER DETALLE DE ATENCIÓN MÉDICA (CRUD DETALLE)
+     ========================================================================= -->
+<div class="modal fade" id="modalVerRegistro" tabindex="-1" aria-labelledby="modalVerRegistroLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 780px;">
+    <div class="modal-content" style="background: var(--bg-surface, #1e293b); color: var(--text-primary, #f8fafc); border: 1px solid var(--border-color, #334155); border-radius: var(--radius-md, 8px); box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-color, #334155); padding: 0.85rem 1.25rem;">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(14, 165, 233, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;">
+            <i class="bi bi-person-lines-fill"></i>
+          </div>
+          <div>
+            <h5 class="modal-title font-weight-bold mb-0" id="modalVerRegistroLabel" style="font-size: 0.95rem; color: var(--text-primary);">Detalle de Atención Médica AT-1</h5>
+            <small id="verModalSubTitle" style="color: var(--text-muted); font-size: 0.74rem;">Información clínica y registro de consulta</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body p-3" style="max-height: 75vh; overflow-y: auto;">
+        <!-- Header resumen -->
+        <div class="p-3 mb-3" style="background: var(--bg-surface-hover, #0f172a); border-radius: 6px; border: 1px solid var(--border-color, #334155);">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <span style="font-size: 0.73rem; color: var(--text-muted); display: block;">Paciente</span>
+              <strong id="ver_paciente_nombre" style="font-size: 0.95rem; color: var(--text-primary);">--</strong>
+            </div>
+            <div class="col-md-3 col-6">
+              <span style="font-size: 0.73rem; color: var(--text-muted); display: block;">Expediente</span>
+              <span id="ver_exp" style="font-family: monospace; font-weight: 700; color: var(--color-primary, #38bdf8);">--</span>
+            </div>
+            <div class="col-md-3 col-6">
+              <span style="font-size: 0.73rem; color: var(--text-muted); display: block;">Fecha Atención</span>
+              <span id="ver_fecha" style="font-weight: 600; color: var(--text-primary);">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid de Datos del Paciente y Consulta -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <div class="p-2.5 h-100" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.8rem; padding: 0.75rem;">
+              <h6 class="font-weight-bold mb-2 pb-1 border-bottom" style="font-size: 0.8rem; color: #38bdf8;"><i class="bi bi-person mr-1"></i> Datos Personales</h6>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Identidad:</span> <strong id="ver_identidad">--</strong></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Teléfono:</span> <span id="ver_telefono">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">F. Nacimiento:</span> <span id="ver_fecha_nacimiento">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Sexo / Edad:</span> <span id="ver_sexo_edad">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Etnia:</span> <span id="ver_etnia">--</span></div>
+              <div class="d-flex justify-content-between py-1"><span class="text-muted">Colonia / Procedencia:</span> <span id="ver_colonia">--</span></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-2.5 h-100" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.8rem; padding: 0.75rem;">
+              <h6 class="font-weight-bold mb-2 pb-1 border-bottom" style="font-size: 0.8rem; color: #38bdf8;"><i class="bi bi-hospital mr-1"></i> Datos de Consulta</h6>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Médico Tratante:</span> <strong id="ver_medico">--</strong></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Profesión:</span> <span id="ver_prof">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Jornada:</span> <span id="ver_jornada" class="badge badge-subtle-primary">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Semana Epidemiológica (SE):</span> <span id="ver_se">--</span></div>
+              <div class="d-flex justify-content-between py-1 border-bottom"><span class="text-muted">Condición General:</span> <span id="ver_cond">--</span></div>
+              <div class="d-flex justify-content-between py-1"><span class="text-muted">Referencia (A / De):</span> <span id="ver_referencia">--</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diagnósticos -->
+        <div class="p-2.5" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.75rem;">
+          <h6 class="font-weight-bold mb-2 pb-1 border-bottom" style="font-size: 0.8rem; color: #38bdf8;"><i class="bi bi-clipboard2-pulse mr-1"></i> Diagnósticos Registrados</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered mb-0" style="font-size: 0.78rem;">
+              <thead style="background: var(--bg-surface-hover); color: var(--text-muted);">
+                <tr>
+                  <th class="text-center" style="width: 45px;">N°</th>
+                  <th style="width: 90px;">Código</th>
+                  <th>Diagnóstico / Patología</th>
+                  <th class="text-center" style="width: 75px;">Condición</th>
+                </tr>
+              </thead>
+              <tbody id="verDiagnosticosTableBody">
+                <!-- Llenado dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--border-color, #334155); padding: 0.65rem 1.25rem;">
+        <button type="button" class="btn btn-sm btn-subtle" data-dismiss="modal" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btnEditarDesdeVer" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="bi bi-pencil-square"></i> Editar este Registro
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 2: EDITAR REGISTRO GLOBAL COMPLETO Y PACIENTE (CRUD POPUP)
+     ========================================================================= -->
+<div class="modal fade" id="modalEditarRegistroCompleto" tabindex="-1" aria-labelledby="modalEditarRegistroCompletoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 960px;">
+    <div class="modal-content" style="background: var(--bg-surface, #1e293b); color: var(--text-primary, #f8fafc); border: 1px solid var(--border-color, #334155); border-radius: var(--radius-md, 8px); box-shadow: 0 16px 45px rgba(0,0,0,0.55);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-color, #334155); padding: 0.85rem 1.25rem;">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(77, 124, 254, 0.15); color: var(--color-primary, #38bdf8); display: flex; align-items: center; justify-content: center; font-size: 1.05rem;">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div>
+            <h5 class="modal-title font-weight-bold mb-0" id="modalEditarRegistroCompletoLabel" style="font-size: 0.95rem; color: var(--text-primary);">Editar Registro Médico & Paciente AT-1</h5>
+            <small style="color: var(--text-muted); font-size: 0.74rem;">Modificar datos demográficos, atención médica y diagnósticos</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form id="formEditarRegistroCompleto">
+        @csrf
+        <input type="hidden" id="edit_reg_id" name="id">
+
+        <div class="modal-body p-3" style="max-height: 75vh; overflow-y: auto;">
+          <!-- Sección 1: Datos del Paciente -->
+          <div class="card mb-3" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px;">
+            <div class="card-header py-2 px-3" style="background: var(--bg-surface-hover); border-bottom: 1px solid var(--border-color);">
+              <span class="font-weight-bold" style="font-size: 0.82rem; color: #38bdf8;"><i class="bi bi-person-vcard mr-1"></i> 1. Información del Paciente</span>
+            </div>
+            <div class="card-body p-3">
+              <div class="row g-2">
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Expediente</label>
+                  <input type="text" id="edit_reg_exp" name="exp" class="form-control form-control-sm" placeholder="Ej: 1234 / CHTA50">
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Identidad (DNI)</label>
+                  <input type="text" id="edit_reg_identidad" name="identidad" class="form-control form-control-sm" placeholder="0801-1990-12345">
+                </div>
+                <div class="col-md-6 col-12">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Nombre Completo del Paciente</label>
+                  <input type="text" id="edit_reg_nombre_paciente" name="nombre_paciente" class="form-control form-control-sm" placeholder="Nombre y Apellidos">
+                </div>
+
+                <div class="col-md-2 col-4">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Sexo</label>
+                  <select id="edit_reg_sexo" name="sexo" class="form-select form-select-sm">
+                    <option value="H">H - Hombre</option>
+                    <option value="M">M - Mujer</option>
+                  </select>
+                </div>
+                <div class="col-md-2 col-4">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Edad</label>
+                  <input type="number" id="edit_reg_edad" name="edad" min="0" max="150" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-2 col-4">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Tipo Edad</label>
+                  <select id="edit_reg_tipo" name="tipo" class="form-select form-select-sm">
+                    <option value="A">A - Años</option>
+                    <option value="M">M - Meses</option>
+                    <option value="D">D - Días</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">F. Nacimiento</label>
+                  <input type="date" id="edit_reg_fecha_nacimiento" name="fecha_nacimiento" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Teléfono</label>
+                  <input type="text" id="edit_reg_telefono" name="telefono" class="form-control form-control-sm" placeholder="00000000">
+                </div>
+
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Etnia</label>
+                  <input type="text" id="edit_reg_etnia" name="etnia" class="form-control form-control-sm" placeholder="MESTIZO, etc.">
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Condición General</label>
+                  <select id="edit_reg_cond" name="cond" class="form-select form-select-sm">
+                    <option value="N">N - Nuevo</option>
+                    <option value="S">S - Subsiguiente</option>
+                  </select>
+                </div>
+                <div class="col-md-2 col-4">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Cód. Col</label>
+                  <input type="text" id="edit_reg_cod_col" name="cod_col" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4 col-8">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Colonia / Procedencia</label>
+                  <input type="text" id="edit_reg_colonia" name="colonia" class="form-control form-control-sm">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección 2: Datos de la Atención / Consulta -->
+          <div class="card mb-3" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px;">
+            <div class="card-header py-2 px-3" style="background: var(--bg-surface-hover); border-bottom: 1px solid var(--border-color);">
+              <span class="font-weight-bold" style="font-size: 0.82rem; color: #38bdf8;"><i class="bi bi-hospital mr-1"></i> 2. Datos de la Consulta Médica</span>
+            </div>
+            <div class="card-body p-3">
+              <div class="row g-2">
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Fecha Consulta</label>
+                  <input type="date" id="edit_reg_fecha" name="fecha" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-md-2 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Sem. Epi (SE)</label>
+                  <input type="number" id="edit_reg_se" name="se" min="1" max="53" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4 col-7">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Médico Responsable</label>
+                  <input type="text" id="edit_reg_medico" name="medico" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-md-3 col-5">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Profesión</label>
+                  <input type="text" id="edit_reg_prof" name="prof" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Jornada</label>
+                  <select id="edit_reg_jornada" name="jornada" class="form-select form-select-sm">
+                    <option value="MATUTINA">MATUTINA</option>
+                    <option value="VESPERTINA">VESPERTINA</option>
+                    <option value="NOCTURNA">NOCTURNA</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Referido A</label>
+                  <input type="text" id="edit_reg_referido_a" name="referido_a" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">Referido DE</label>
+                  <input type="text" id="edit_reg_referido_de" name="referido_de" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3 col-6">
+                  <label class="form-label font-weight-bold mb-1" style="font-size: 0.75rem;">PG / EMB</label>
+                  <input type="text" id="edit_reg_pg_emb" name="pg_emb" class="form-control form-control-sm">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección 3: Diagnósticos 1 al 7 -->
+          <div class="card mb-1" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px;">
+            <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center" style="background: var(--bg-surface-hover); border-bottom: 1px solid var(--border-color);">
+              <span class="font-weight-bold" style="font-size: 0.82rem; color: #38bdf8;"><i class="bi bi-clipboard2-pulse mr-1"></i> 3. Diagnósticos y Patologías (D1 a D7)</span>
+              <small class="text-muted" style="font-size: 0.7rem;">Autocompletado instantáneo por código CIE o nombre</small>
+            </div>
+            <div class="card-body p-3">
+              <div class="d-flex flex-column gap-2" id="editDiagsRowsContainer">
+                @for($i = 1; $i <= 7; $i++)
+                  <div class="row g-2 align-items-center p-1.5 rounded" style="background: var(--bg-surface-hover); border: 1px solid var(--border-color);">
+                    <div class="col-auto">
+                      <span class="badge badge-subtle-primary font-weight-bold" style="width: 28px; text-align: center;">D{{ $i }}</span>
+                    </div>
+                    <div class="col-md-2 col-4">
+                      <input type="text" id="edit_reg_cod_{{ $i }}" name="cod_{{ $i }}" class="form-control form-control-sm edit-diag-code-input" data-index="{{ $i }}" list="codigosGlobalDatalist" placeholder="CIE-10 (ej: 102)" autocomplete="off" style="font-weight: 700;">
+                    </div>
+                    <div class="col-md-6 col-8">
+                      <input type="text" id="edit_reg_diagnostico_{{ $i }}" name="diagnostico_{{ $i }}" class="form-control form-control-sm edit-diag-name-input" data-index="{{ $i }}" list="diagnosticosGlobalDatalist" placeholder="Escriba o busque diagnóstico..." autocomplete="off">
+                    </div>
+                    <div class="col-md-3 col-12">
+                      <select id="edit_reg_cond_{{ $i }}" name="cond_{{ $i }}" class="form-select form-select-sm">
+                        <option value="">(Ninguna)</option>
+                        <option value="N">N - Nuevo</option>
+                        <option value="S">S - Subsiguiente</option>
+                      </select>
+                    </div>
+                  </div>
+                @endfor
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid var(--border-color, #334155); padding: 0.65rem 1.25rem;">
+          <button type="button" class="btn btn-sm btn-subtle" data-dismiss="modal" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" id="btnGuardarEditFull" class="btn btn-sm btn-primary" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i class="bi bi-check-lg"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<datalist id="codigosGlobalDatalist"></datalist>
+<datalist id="diagnosticosGlobalDatalist"></datalist>
 
 <!-- Dataset serializado en JSON para carga instantánea en memoria sin saturar el DOM -->
 <script id="registrosDataJson" type="application/json">@json($registros)</script>
@@ -1087,6 +1454,30 @@
       '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
     };
 
+    // Catálogo precargado de diagnósticos para autocompletado instantáneo
+    let catalogoDiagsGlobal = [];
+    fetch("{{ route('informesat1.buscarDiagnosticos') }}")
+      .then(res => res.json())
+      .then(data => {
+        catalogoDiagsGlobal = data || [];
+        const codDl = document.getElementById('codigosGlobalDatalist');
+        const diagDl = document.getElementById('diagnosticosGlobalDatalist');
+
+        if (diagDl && catalogoDiagsGlobal.length > 0) {
+          diagDl.innerHTML = catalogoDiagsGlobal.map(d => 
+            `<option value="${d.patologia}">${d.codigo ? d.codigo + ' - ' : ''}${d.patologia}</option>`
+          ).join('');
+        }
+
+        if (codDl && catalogoDiagsGlobal.length > 0) {
+          codDl.innerHTML = catalogoDiagsGlobal
+            .filter(d => d.codigo && String(d.codigo).trim() !== '')
+            .map(d => `<option value="${d.codigo}">${d.codigo} - ${d.patologia}</option>`)
+            .join('');
+        }
+      })
+      .catch(err => console.warn('Error precargando diagnósticos globales:', err));
+
     // 2. EXCEL TABLE ENGINE (Progressive Infinite Scroll in Chunks of 200, In-Memory Lightning Filtering & Sorting)
     class SingExcelTable {
       constructor(tableId) {
@@ -1105,6 +1496,10 @@
         this.currentSortDir = null;
         this.globalSearchQuery = '';
         this.currentOpenCol = null;
+
+        // Selección Múltiple
+        this.selectedRecordIds = new Set();
+        this.isMultiSelectActive = false;
 
         // Cargar registros desde JSON
         this.loadRawData();
@@ -1126,69 +1521,73 @@
         }
 
         this.allRecords = rawArray.map((r, index) => {
-          const sexo = r.sexo ? (r.sexo.charAt(0).toUpperCase() || r.sexo) : '';
-          const cells = [
-            String(index + 1), // 0: Índice
-            String(r.numero ?? ''), // 1: Nº
-            String(r.cm ?? ''), // 2: CM
-            String(r.medico ?? ''), // 3: MEDICO
-            String(r.prof ?? ''), // 4: PROF
-            String(r.fecha ?? ''), // 5: FECHA
-            String(r.se ?? ''), // 6: SE
-            String(r.exp ?? ''), // 7: EXP
-            String(r.nombre_paciente ?? ''), // 8: PACIENTE
-            String(r.identidad ?? ''), // 9: IDENTIDAD
-            String(r.telefono ?? ''), // 10: TELÉFONO
-            String(r.fecha_nacimiento ?? ''), // 11: F. NACIMIENTO
-            String(r.etnia ?? ''), // 12: ETNIA
-            String(sexo ?? ''), // 13: SEXO
-            String(r.edad ?? ''), // 14: EDAD
-            String(r.tipo ?? ''), // 15: TIPO
-            String(r.rango ?? ''), // 16: RANGO
-            String(r.cond ?? ''), // 17: CONDICIÓN
-            String(r.cod_col ?? ''), // 18: COD. COL
-            String(r.colonia ?? ''), // 19: COLONIA
-            String(r.cod_1 ?? r.cod ?? ''), // 20: COD 1
-            String(r.diagnostico_1 ?? r.diagnostico ?? ''), // 21: DIAGNÓSTICO 1
-            String(r.cond_1 ?? ''), // 22: COND 1
-            String(r.sg ?? r.dg ?? ''), // 23: DG
-            String(r.cod_2 ?? ''), // 24: COD 2
-            String(r.diagnostico_2 ?? ''), // 25: DIAGNÓSTICO 2
-            String(r.cond_2 ?? ''), // 26: COND 2
-            String(r.cod_3 ?? ''), // 27: COD 3
-            String(r.diagnostico_3 ?? ''), // 28: DIAGNÓSTICO 3
-            String(r.cond_3 ?? ''), // 29: COND 3
-            String(r.cod_4 ?? ''), // 30: COD 4
-            String(r.diagnostico_4 ?? ''), // 31: DIAGNÓSTICO 4
-            String(r.cond_4 ?? ''), // 32: COND 4
-            String(r.cod_5 ?? ''), // 33: COD 5
-            String(r.diagnostico_5 ?? ''), // 34: DIAGNÓSTICO 5
-            String(r.cond_5 ?? ''), // 35: COND 5
-            String(r.cod_6 ?? ''), // 36: COD 6
-            String(r.diagnostico_6 ?? ''), // 37: DIAGNÓSTICO 6
-            String(r.cond_6 ?? ''), // 38: COND 6
-            String(r.cod_7 ?? ''), // 39: COD 7
-            String(r.diagnostico_7 ?? ''), // 40: DIAGNÓSTICO 7
-            String(r.cond_7 ?? ''), // 41: COND 7
-            String(r.referido_a ?? ''), // 42: REFERIDO A
-            String(r.referido_de ?? ''), // 43: REFERIDO DE
-            String(r.pg_emb ?? ''), // 44: PG / EMB
-            String(r.jornada ?? ''), // 45: JORNADA
-            String(r.sm ?? ''), // 46: SM
-            String(r.ano ?? ''), // 47: AÑO
-            String(r.mes ?? ''), // 48: MES
-            String(r.id ?? '') // 49: ID
-          ];
-
-          return {
-            raw: r,
-            cells: cells,
-            searchText: cells.slice(1).join(' ').toLowerCase(),
-            originalIndex: index + 1
-          };
+          return this.formatRecordItem(r, index + 1);
         });
 
         this.filteredRecords = [...this.allRecords];
+      }
+
+      formatRecordItem(r, displayIndex) {
+        const sexo = r.sexo ? (r.sexo.charAt(0).toUpperCase() || r.sexo) : '';
+        const cells = [
+          String(displayIndex), // 0: Índice
+          String(r.numero ?? ''), // 1: Nº
+          String(r.cm ?? ''), // 2: CM
+          String(r.medico ?? ''), // 3: MEDICO
+          String(r.prof ?? ''), // 4: PROF
+          String(r.fecha ?? ''), // 5: FECHA
+          String(r.se ?? ''), // 6: SE
+          String(r.exp ?? ''), // 7: EXP
+          String(r.nombre_paciente ?? ''), // 8: PACIENTE
+          String(r.identidad ?? ''), // 9: IDENTIDAD
+          String(r.telefono ?? ''), // 10: TELÉFONO
+          String(r.fecha_nacimiento ?? ''), // 11: F. NACIMIENTO
+          String(r.etnia ?? ''), // 12: ETNIA
+          String(sexo ?? ''), // 13: SEXO
+          String(r.edad ?? ''), // 14: EDAD
+          String(r.tipo ?? ''), // 15: TIPO
+          String(r.rango ?? ''), // 16: RANGO
+          String(r.cond ?? ''), // 17: CONDICIÓN
+          String(r.cod_col ?? ''), // 18: COD. COL
+          String(r.colonia ?? ''), // 19: COLONIA
+          String(r.cod_1 ?? r.cod ?? ''), // 20: COD 1
+          String(r.diagnostico_1 ?? r.diagnostico ?? ''), // 21: DIAGNÓSTICO 1
+          String(r.cond_1 ?? ''), // 22: COND 1
+          String(r.sg ?? r.dg ?? ''), // 23: DG
+          String(r.cod_2 ?? ''), // 24: COD 2
+          String(r.diagnostico_2 ?? ''), // 25: DIAGNÓSTICO 2
+          String(r.cond_2 ?? ''), // 26: COND 2
+          String(r.cod_3 ?? ''), // 27: COD 3
+          String(r.diagnostico_3 ?? ''), // 28: DIAGNÓSTICO 3
+          String(r.cond_3 ?? ''), // 29: COND 3
+          String(r.cod_4 ?? ''), // 30: COD 4
+          String(r.diagnostico_4 ?? ''), // 31: DIAGNÓSTICO 4
+          String(r.cond_4 ?? ''), // 32: COND 4
+          String(r.cod_5 ?? ''), // 33: COD 5
+          String(r.diagnostico_5 ?? ''), // 34: DIAGNÓSTICO 5
+          String(r.cond_5 ?? ''), // 35: COND 5
+          String(r.cod_6 ?? ''), // 36: COD 6
+          String(r.diagnostico_6 ?? ''), // 37: DIAGNÓSTICO 6
+          String(r.cond_6 ?? ''), // 38: COND 6
+          String(r.cod_7 ?? ''), // 39: COD 7
+          String(r.diagnostico_7 ?? ''), // 40: DIAGNÓSTICO 7
+          String(r.cond_7 ?? ''), // 41: COND 7
+          String(r.referido_a ?? ''), // 42: REFERIDO A
+          String(r.referido_de ?? ''), // 43: REFERIDO DE
+          String(r.pg_emb ?? ''), // 44: PG / EMB
+          String(r.jornada ?? ''), // 45: JORNADA
+          String(r.sm ?? ''), // 46: SM
+          String(r.ano ?? ''), // 47: AÑO
+          String(r.mes ?? ''), // 48: MES
+          String(r.id ?? '') // 49: ID
+        ];
+
+        return {
+          raw: r,
+          cells: cells,
+          searchText: cells.slice(1).join(' ').toLowerCase(),
+          originalIndex: displayIndex
+        };
       }
 
       restoreSavedFilters() {
@@ -1222,8 +1621,18 @@
 
       buildRowHtml(item, displayIndex) {
         const c = item.cells;
-        return `<tr>` +
-          `<td class="excel-row-num">${displayIndex}</td>` +
+        const regId = String(c[49]);
+        const isChecked = this.selectedRecordIds.has(regId) ? 'checked' : '';
+        const chkDisplay = this.isMultiSelectActive ? 'inline-block' : 'none';
+        const rowSelectedClass = this.selectedRecordIds.has(regId) ? ' row-selected' : '';
+
+        return `<tr class="${rowSelectedClass}" data-reg-id="${regId}">` +
+          `<td class="excel-row-num text-center">` +
+            `<div class="excel-row-num-wrapper">` +
+              `<input type="checkbox" class="row-select-checkbox form-check-input" data-id="${regId}" ${isChecked} style="display: ${chkDisplay};">` +
+              `<span class="row-num-val">${displayIndex}</span>` +
+            `</div>` +
+          `</td>` +
           `<td>${escHtml(c[1])}</td>` +
           `<td>${escHtml(c[2])}</td>` +
           `<td class="col-medico" title="${escHtml(c[3])}">${escHtml(c[3])}</td>` +
@@ -1273,7 +1682,80 @@
           `<td>${escHtml(c[47])}</td>` +
           `<td>${escHtml(c[48])}</td>` +
           `<td>${escHtml(c[49])}</td>` +
+          `<td class="excel-actions-cell text-center">` +
+            `<div class="d-inline-flex align-items-center justify-content-center gap-1">` +
+              `<button type="button" class="btn-action-icon text-info btn-view-reg" title="Ver Detalle Médico" data-id="${regId}"><i class="bi bi-eye"></i></button>` +
+              `<button type="button" class="btn-action-icon text-primary btn-edit-reg" title="Editar Registro Completo" data-id="${regId}"><i class="bi bi-pencil-square"></i></button>` +
+              `<button type="button" class="btn-action-icon text-danger btn-delete-reg" title="Eliminar Registro" data-id="${regId}"><i class="bi bi-trash3"></i></button>` +
+            `</div>` +
+          `</td>` +
         `</tr>`;
+      }
+
+      toggleMultiSelect(forceState) {
+        if (typeof forceState === 'boolean') {
+          this.isMultiSelectActive = forceState;
+        } else {
+          this.isMultiSelectActive = !this.isMultiSelectActive;
+        }
+
+        const isAct = this.isMultiSelectActive;
+        $('#selectAllRows').css('display', isAct ? 'inline-block' : 'none');
+        $('.row-select-checkbox').css('display', isAct ? 'inline-block' : 'none');
+        $('#excelAt1Table').toggleClass('multiselect-active', isAct);
+
+        if (isAct) {
+          $('#btnToggleMultiSelect').addClass('btn-danger text-white').removeClass('btn-subtle text-danger');
+          $('#btnToggleMultiSelectText').text('Cancelar Selección');
+          this.updateSelectedCount();
+        } else {
+          $('#btnToggleMultiSelect').removeClass('btn-danger text-white').addClass('btn-subtle text-danger');
+          $('#btnToggleMultiSelectText').text('Multiselección');
+          this.selectedRecordIds.clear();
+          $('#selectAllRows').prop('checked', false);
+          $('.row-select-checkbox').prop('checked', false);
+          $('.sing-table-excel tbody tr').removeClass('row-selected');
+          $('#btnDeleteSelected').hide();
+        }
+      }
+
+      updateSelectedCount() {
+        const count = this.selectedRecordIds.size;
+        $('#selectedCountBadge').text(count);
+        if (count > 0 && this.isMultiSelectActive) {
+          $('#btnDeleteSelected').css('display', 'inline-flex');
+        } else {
+          $('#btnDeleteSelected').hide();
+        }
+      }
+
+      updateRecordInStore(updatedRaw) {
+        if (!updatedRaw || !updatedRaw.id) return;
+        const idStr = String(updatedRaw.id);
+        const idx = this.allRecords.findIndex(r => String(r.cells[49]) === idStr);
+        if (idx !== -1) {
+          const formatted = this.formatRecordItem(updatedRaw, this.allRecords[idx].originalIndex);
+          this.allRecords[idx] = formatted;
+
+          // Re-apply filters to refresh view
+          this.applyFilters();
+        }
+      }
+
+      removeRecordFromStore(id) {
+        const idStr = String(id);
+        this.allRecords = this.allRecords.filter(r => String(r.cells[49]) !== idStr);
+        this.selectedRecordIds.delete(idStr);
+        this.applyFilters();
+        this.updateSelectedCount();
+      }
+
+      removeMultipleRecordsFromStore(idsArray) {
+        const idsSet = new Set(idsArray.map(id => String(id)));
+        this.allRecords = this.allRecords.filter(r => !idsSet.has(String(r.cells[49])));
+        idsArray.forEach(id => this.selectedRecordIds.delete(String(id)));
+        this.applyFilters();
+        this.updateSelectedCount();
       }
 
       renderNextChunk() {
@@ -1313,7 +1795,7 @@
         this.tbody.addEventListener('click', (e) => {
           const td = e.target.closest('td');
           if (!td) return;
-          if (e.target.tagName === 'BUTTON' || e.target.tagName === 'I') return;
+          if (e.target.tagName === 'BUTTON' || e.target.tagName === 'I' || e.target.tagName === 'INPUT') return;
 
           self.table.querySelectorAll('td.excel-cell-active').forEach(cell => {
             cell.classList.remove('excel-cell-active');
@@ -1379,6 +1861,406 @@
         if (exportXlsxBtn) {
           exportXlsxBtn.addEventListener('click', () => self.exportXLSX());
         }
+
+        // -------------------------------------------------------------
+        // MULTISELECCIÓN & ACCIONES CRUD (VER, EDITAR, ELIMINAR)
+        // -------------------------------------------------------------
+        $('#btnToggleMultiSelect').on('click', function(e) {
+          e.preventDefault();
+          self.toggleMultiSelect();
+        });
+
+        // Checkbox maestro: Seleccionar todos los visibles
+        $('#selectAllRows').on('change', function() {
+          const checked = $(this).is(':checked');
+          self.filteredRecords.forEach(r => {
+            const id = String(r.cells[49]);
+            if (id) {
+              if (checked) self.selectedRecordIds.add(id);
+              else self.selectedRecordIds.delete(id);
+            }
+          });
+          self.table.querySelectorAll('.row-select-checkbox').forEach(cb => {
+            cb.checked = checked;
+            const tr = cb.closest('tr');
+            if (tr) tr.classList.toggle('row-selected', checked);
+          });
+          self.updateSelectedCount();
+        });
+
+        // Checkbox individual de cada fila
+        $(document).on('change', '.row-select-checkbox', function() {
+          const id = String($(this).data('id'));
+          const checked = $(this).is(':checked');
+          if (checked) {
+            self.selectedRecordIds.add(id);
+          } else {
+            self.selectedRecordIds.delete(id);
+          }
+          $(this).closest('tr').toggleClass('row-selected', checked);
+          self.updateSelectedCount();
+        });
+
+        // Botón Eliminar Seleccionados (Lote)
+        $('#btnDeleteSelected').on('click', function(e) {
+          e.preventDefault();
+          const ids = Array.from(self.selectedRecordIds);
+          if (ids.length === 0) return;
+
+          Swal.fire({
+            title: `¿Eliminar ${ids.length} registros seleccionados?`,
+            text: "Esta acción eliminará de forma permanente los registros y actualizará automáticamente todos los informes del sistema.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: `<i class="bi bi-trash3-fill"></i> Sí, eliminar ${ids.length} registros`,
+            cancelButtonText: 'Cancelar',
+            background: 'var(--bg-surface, #1e293b)',
+            color: 'var(--text-primary, #f8fafc)'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: 'Eliminando registros...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+                background: 'var(--bg-surface, #1e293b)',
+                color: 'var(--text-primary, #f8fafc)'
+              });
+
+              fetch("{{ route('registrosat1.deleteMultiple') }}", {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                  'Accept': 'application/json'
+                },
+                body: JSON.stringify({ ids: ids })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  self.removeMultipleRecordsFromStore(ids);
+                  Swal.fire({
+                    title: '¡Eliminados!',
+                    text: data.message,
+                    icon: 'success',
+                    timer: 2200,
+                    showConfirmButton: false,
+                    background: 'var(--bg-surface, #1e293b)',
+                    color: 'var(--text-primary, #f8fafc)'
+                  });
+                } else {
+                  Swal.fire({ title: 'Error', text: data.message, icon: 'error', background: 'var(--bg-surface, #1e293b)', color: 'var(--text-primary, #f8fafc)' });
+                }
+              })
+              .catch(err => {
+                Swal.fire({ title: 'Error', text: 'Error en la petición: ' + err, icon: 'error' });
+              });
+            }
+          });
+        });
+
+        // Helper para abrir/cerrar modales
+        function abrirModalId(modalId) {
+          const $m = $(modalId);
+          if (typeof $m.modal === 'function') {
+            $m.modal('show');
+          } else if (window.bootstrap && typeof bootstrap.Modal === 'function') {
+            try {
+              const inst = bootstrap.Modal.getInstance ? bootstrap.Modal.getInstance($m[0]) : null;
+              (inst || new bootstrap.Modal($m[0])).show();
+            } catch(e) {
+              $m.addClass('show').css('display', 'block');
+              $('body').addClass('modal-open');
+            }
+          } else {
+            $m.addClass('show').css('display', 'block');
+            $('body').addClass('modal-open');
+          }
+        }
+
+        function cerrarModalId(modalId) {
+          const $m = $(modalId);
+          if (typeof $m.modal === 'function') {
+            $m.modal('hide');
+          } else if (window.bootstrap && typeof bootstrap.Modal === 'function') {
+            try {
+              const inst = bootstrap.Modal.getInstance ? bootstrap.Modal.getInstance($m[0]) : null;
+              if (inst) inst.hide();
+            } catch(e) {}
+          }
+          $m.removeClass('show').css('display', 'none');
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
+        }
+
+        // Eventos cerrar modales
+        $(document).on('click', '.modal [data-dismiss="modal"], .modal [data-bs-dismiss="modal"]', function(e) {
+          e.preventDefault();
+          const targetModal = $(this).closest('.modal');
+          if (targetModal.length) cerrarModalId('#' + targetModal.attr('id'));
+        });
+
+        // 1. BOTÓN VER DETALLE MÉDICO
+        let activeViewRecordId = null;
+        $(document).on('click', '.btn-view-reg', function(e) {
+          e.preventDefault();
+          const id = $(this).data('id');
+          activeViewRecordId = id;
+
+          fetch(`{{ url('/registrosat1/registro') }}/${id}`)
+            .then(res => res.json())
+            .then(resData => {
+              if (!resData.success || !resData.data) {
+                SingApp.toast({ title: 'Error', message: 'No se pudo cargar el registro.', type: 'danger' });
+                return;
+              }
+              const d = resData.data;
+              $('#ver_paciente_nombre').text(d.nombre_paciente || 'Sin nombre registrado');
+              $('#ver_exp').text(d.exp || 'Sin Exp.');
+              $('#ver_fecha').text(d.fecha || '-');
+              $('#ver_identidad').text(d.identidad || '-');
+              $('#ver_telefono').text(d.telefono || '-');
+              $('#ver_fecha_nacimiento').text(d.fecha_nacimiento || '-');
+              $('#ver_sexo_edad').text(`${d.sexo || '-'} • ${d.edad || '-'} ${d.tipo || ''}`);
+              $('#ver_etnia').text(d.etnia || '-');
+              $('#ver_colonia').text(`${d.colonia || '-'} ${d.cod_col ? '(Cód: ' + d.cod_col + ')' : ''}`);
+
+              $('#ver_medico').text(d.medico || 'No especificado');
+              $('#ver_prof').text(d.prof || '-');
+              $('#ver_jornada').text(d.jornada || '-');
+              $('#ver_se').text(d.se || '-');
+              $('#ver_cond').text(d.cond === 'N' ? 'N - Nuevo' : (d.cond === 'S' ? 'S - Subsiguiente' : (d.cond || '-')));
+              $('#ver_referencia').text(`${d.referido_a ? 'A: ' + d.referido_a : ''} ${d.referido_de ? 'De: ' + d.referido_de : '-'}`);
+
+              let diagsHtml = '';
+              let hasDiags = false;
+              for (let i = 1; i <= 7; i++) {
+                const diag = d['diagnostico_' + i] || (i === 1 ? d.diagnostico : '');
+                const cod = d['cod_' + i] || (i === 1 ? d.cod : '');
+                const cond = d['cond_' + i] || (i === 1 ? d.cond : '');
+
+                if (diag || cod) {
+                  hasDiags = true;
+                  const condBadge = cond === 'N' ? '<span class="badge badge-subtle-primary font-weight-bold">N</span>' : (cond === 'S' ? '<span class="badge badge-subtle-secondary font-weight-bold">S</span>' : '-');
+                  diagsHtml += `
+                    <tr>
+                      <td class="text-center font-weight-bold text-primary">D${i}</td>
+                      <td style="font-family: monospace; font-weight: 700; color: #38bdf8;">${cod || '-'}</td>
+                      <td class="font-weight-600">${diag || '-'}</td>
+                      <td class="text-center">${condBadge}</td>
+                    </tr>
+                  `;
+                }
+              }
+              if (!hasDiags) {
+                diagsHtml = '<tr><td colspan="4" class="text-center py-2 text-muted">Sin diagnósticos registrados.</td></tr>';
+              }
+              $('#verDiagnosticosTableBody').html(diagsHtml);
+
+              abrirModalId('#modalVerRegistro');
+            })
+            .catch(err => {
+              SingApp.toast({ title: 'Error', message: 'Error cargando datos: ' + err, type: 'danger' });
+            });
+        });
+
+        // Botón "Editar este Registro" desde modal Ver
+        $('#btnEditarDesdeVer').on('click', function(e) {
+          e.preventDefault();
+          cerrarModalId('#modalVerRegistro');
+          if (activeViewRecordId) {
+            $(`.btn-edit-reg[data-id="${activeViewRecordId}"]`).first().trigger('click');
+          }
+        });
+
+        // 2. BOTÓN EDITAR REGISTRO COMPLETO (POPUP)
+        $(document).on('click', '.btn-edit-reg', function(e) {
+          e.preventDefault();
+          const id = $(this).data('id');
+
+          fetch(`{{ url('/registrosat1/registro') }}/${id}`)
+            .then(res => res.json())
+            .then(resData => {
+              if (!resData.success || !resData.data) {
+                SingApp.toast({ title: 'Error', message: 'No se pudo cargar el registro.', type: 'danger' });
+                return;
+              }
+              const d = resData.data;
+              $('#edit_reg_id').val(d.id);
+              $('#edit_reg_exp').val(d.exp || '');
+              $('#edit_reg_identidad').val(d.identidad || '');
+              $('#edit_reg_nombre_paciente').val(d.nombre_paciente || '');
+              $('#edit_reg_sexo').val(d.sexo ? (d.sexo.charAt(0).toUpperCase() || d.sexo) : 'H');
+              $('#edit_reg_edad').val(d.edad ?? '');
+              $('#edit_reg_tipo').val(d.tipo ? d.tipo.toUpperCase() : 'A');
+              $('#edit_reg_fecha_nacimiento').val(d.fecha_nacimiento || '');
+              $('#edit_reg_telefono').val(d.telefono || '');
+              $('#edit_reg_etnia').val(d.etnia || '');
+              $('#edit_reg_cond').val(d.cond ? d.cond.toUpperCase() : 'N');
+              $('#edit_reg_cod_col').val(d.cod_col || '');
+              $('#edit_reg_colonia').val(d.colonia || '');
+
+              $('#edit_reg_fecha').val(d.fecha || '');
+              $('#edit_reg_se').val(d.se ?? '');
+              $('#edit_reg_medico').val(d.medico || '');
+              $('#edit_reg_prof').val(d.prof || '');
+              $('#edit_reg_jornada').val(d.jornada ? d.jornada.toUpperCase() : 'MATUTINA');
+              $('#edit_reg_referido_a').val(d.referido_a || '');
+              $('#edit_reg_referido_de').val(d.referido_de || '');
+              $('#edit_reg_pg_emb').val(d.pg_emb || '');
+
+              // Llenar diagnósticos 1 al 7
+              for (let i = 1; i <= 7; i++) {
+                const cod = d['cod_' + i] || (i === 1 ? d.cod : '') || '';
+                const diag = d['diagnostico_' + i] || (i === 1 ? d.diagnostico : '') || '';
+                const cond = d['cond_' + i] || (i === 1 ? d.cond : '') || '';
+
+                $(`#edit_reg_cod_${i}`).val(cod);
+                $(`#edit_reg_diagnostico_${i}`).val(diag);
+                $(`#edit_reg_cond_${i}`).val(cond ? cond.toUpperCase() : '');
+              }
+
+              abrirModalId('#modalEditarRegistroCompleto');
+            })
+            .catch(err => {
+              SingApp.toast({ title: 'Error', message: 'Error cargando datos para edición: ' + err, type: 'danger' });
+            });
+        });
+
+        // Búsqueda bidireccional Código <-> Diagnóstico en los 7 slots de edición
+        $(document).on('input change blur', '.edit-diag-code-input', function() {
+          const idx = $(this).data('index');
+          const rawCod = $(this).val();
+          if (!rawCod) return;
+          const codVal = String(rawCod).trim();
+          if (codVal === '') return;
+
+          const found = catalogoDiagsGlobal.find(d => 
+            String(d.codigo || '').trim().toUpperCase() === codVal.toUpperCase()
+          );
+
+          if (found && found.patologia) {
+            $(`#edit_reg_diagnostico_${idx}`).val(found.patologia);
+          }
+        });
+
+        $(document).on('input change blur', '.edit-diag-name-input', function() {
+          const idx = $(this).data('index');
+          const val = $(this).val().trim().toUpperCase();
+          if (!val) return;
+
+          const found = catalogoDiagsGlobal.find(d => (d.patologia || '').toUpperCase() === val);
+          if (found && found.codigo) {
+            $(`#edit_reg_cod_${idx}`).val(found.codigo);
+          }
+        });
+
+        // Enviar Formulario de Edición Completa
+        $('#formEditarRegistroCompleto').on('submit', function(e) {
+          e.preventDefault();
+          const btnSubmit = $('#btnGuardarEditFull');
+          const origHtml = btnSubmit.html();
+          btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...');
+
+          const formData = new FormData(this);
+          const dataObj = {};
+          formData.forEach((val, key) => { dataObj[key] = val; });
+
+          fetch("{{ route('registrosat1.updateFull') }}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(dataObj)
+          })
+          .then(res => res.json())
+          .then(data => {
+            btnSubmit.prop('disabled', false).html(origHtml);
+            if (data.success) {
+              cerrarModalId('#modalEditarRegistroCompleto');
+              self.updateRecordInStore(data.data);
+              Swal.fire({
+                title: '¡Actualizado con Éxito!',
+                text: data.message,
+                icon: 'success',
+                timer: 2400,
+                showConfirmButton: false,
+                background: 'var(--bg-surface, #1e293b)',
+                color: 'var(--text-primary, #f8fafc)'
+              });
+            } else {
+              Swal.fire({ title: 'Error', text: data.message, icon: 'error', background: 'var(--bg-surface, #1e293b)', color: 'var(--text-primary, #f8fafc)' });
+            }
+          })
+          .catch(err => {
+            btnSubmit.prop('disabled', false).html(origHtml);
+            Swal.fire({ title: 'Error', text: 'Error al actualizar el registro: ' + err, icon: 'error' });
+          });
+        });
+
+        // 3. BOTÓN ELIMINAR INDIVIDUAL
+        $(document).on('click', '.btn-delete-reg', function(e) {
+          e.preventDefault();
+          const id = $(this).data('id');
+          const rec = self.allRecords.find(r => String(r.cells[49]) === String(id));
+          const pacName = rec ? rec.cells[8] : 'este paciente';
+
+          Swal.fire({
+            title: '¿Eliminar registro?',
+            html: `¿Desea eliminar el registro de <strong>${escHtml(pacName)}</strong> (ID: #${id})?<br><small class="text-muted mt-1 d-block">También puede activar la selección múltiple para eliminar varios a la vez.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonColor: '#ef4444',
+            denyButtonColor: '#3b82f6',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: '<i class="bi bi-trash3"></i> Sí, eliminar este',
+            denyButtonText: '<i class="bi bi-check2-square"></i> Activar Multiselección',
+            cancelButtonText: 'Cancelar',
+            background: 'var(--bg-surface, #1e293b)',
+            color: 'var(--text-primary, #f8fafc)'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              fetch(`{{ url('/registrosat1') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                  'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                  'Accept': 'application/json'
+                }
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  self.removeRecordFromStore(id);
+                  Swal.fire({
+                    title: '¡Eliminado!',
+                    text: data.message,
+                    icon: 'success',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    background: 'var(--bg-surface, #1e293b)',
+                    color: 'var(--text-primary, #f8fafc)'
+                  });
+                } else {
+                  Swal.fire({ title: 'Error', text: data.message, icon: 'error', background: 'var(--bg-surface, #1e293b)', color: 'var(--text-primary, #f8fafc)' });
+                }
+              })
+              .catch(err => Swal.fire({ title: 'Error', text: 'Error en la petición: ' + err, icon: 'error' }));
+            } else if (result.isDenied) {
+              self.toggleMultiSelect(true);
+              self.selectedRecordIds.add(String(id));
+              self.table.querySelectorAll(`.row-select-checkbox[data-id="${id}"]`).forEach(cb => {
+                cb.checked = true;
+                cb.closest('tr')?.classList.add('row-selected');
+              });
+              self.updateSelectedCount();
+            }
+          });
+        });
       }
 
       getDistinctValuesForColumn(colIndex) {
@@ -1830,7 +2712,7 @@
         if (this.filteredRecords.length === 0) {
           this.tbody.innerHTML = `
             <tr class="excel-no-records-row">
-              <td colspan="50" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+              <td colspan="51" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
                 <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 0.45rem; opacity: 0.6;"></i>
                 <strong>No se encontraron registros que coincidan con los filtros</strong>
                 <div style="font-size: 0.78rem; margin-top: 0.25rem;">Prueba ajustando los filtros de columna o limpiando la búsqueda.</div>

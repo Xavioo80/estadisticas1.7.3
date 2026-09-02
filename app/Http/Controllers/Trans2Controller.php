@@ -258,7 +258,7 @@ class Trans2Controller extends Controller
                     ['id' => 'bronquitis', 'code' => 'J40.9-J21.9', 'label' => 'BRONQUITIS', 'diag' => ['BRONQUITIS', 'BRONQUITIS AGUDA', 'BRONQUITIS CRONICA']],
                     ['id' => 'asma', 'code' => '', 'label' => 'ASMA', 'diag' => ['ASMA', 'ASMA BRONQUIAL']],
                     ['id' => 'neumonia', 'code' => 'J18.9-J10.0', 'label' => 'NEUMONÍA / BRONCONEUMONÍA', 'diag' => ['NEUMONIA', 'BRONCONEUMONIA', 'NEUMONIAS', 'BRONCONEUMONIAS', 'NEUMONIAS/BRONCONEUMONIAS']],
-                    ['id' => 'faringo', 'code' => 'J02.0-J03.0', 'label' => 'FARINGO AMIGDALITIS', 'diag' => ['FARINGOAMIGDALITIS', 'FARINGITIS', 'FARINGOAMIGDALITIS ESTREPTOCOCICA', 'FARINGITIS ESTREPTOCOCICA', 'AMIGDALITIS AGUDA', 'AMIGDALITIS', 'FARINGO AMIGDALITIS', 'FARINGOAMIGDALITIS VIRAL', 'FARING.AMIG. ESTREPTOCOCICAS', 'FARINGOAMIGDALITIS ESTREPTOCOCICAS']],
+                    ['id' => 'faringo', 'code' => 'J02.0-J03.0', 'label' => 'FARINGO AMIGDALITIS', 'diag' => ['FARINGOAMIGDALITIS', 'FARINGO AMIGDALITIS', 'FARINGOAMIGDALITIS VIRAL', 'FARINGOAMIGDALITIS ESTREPTOCOCICA', 'FARINGOAMIGDALITIS ESTREPTOCOCICAS', 'FARING.AMIG. ESTREPTOCOCICAS', 'FARINGITIS ESTREPTOCOCICA']],
                     ['id' => 'tuberculosis', 'code' => 'A.16.4', 'label' => 'TUBERCULOSIS RESPIRATORIA', 'diag' => ['TUBERCULOSIS', 'TUBERCULOSIS PULMONAR', 'TUBERCULOSIS RESPIRATORIA']],
                     ['id' => 'covid', 'code' => 'U07.2', 'label' => 'INFECCIÓN POR COVID 19', 'diag' => ['COVID-19', 'CORONAVIRUS', 'ATENCION CLINICA POR COVID-19']],
                 ]
@@ -293,37 +293,40 @@ class Trans2Controller extends Controller
                 'title' => 'INFECCIONES DE TRANSMISIÓN SEXUAL',
                 'side' => 'reverso',
                 'rows' => [
-                    ['id' => 'sifilis', 'code' => 'A.53.9', 'label' => 'SIFILIS', 'diag' => ['SIFILIS', 'SIFILIS PRIMARIA', 'SIFILIS SECUNDARIA', 'SIFILIS CONGENITA']],
-                    ['id' => 'gonorrea', 'code' => 'A.54.9', 'label' => 'GONORREA', 'diag' => ['GONORREA', 'INFECCION GONOCOCICA']],
-                    ['id' => 'sida', 'code' => 'B.24.9', 'label' => 'SIDA', 'diag' => ['SIDA', 'VIH', 'VIH-SIDA', 'VIH POSITIVO']],
-                    ['id' => 'herpes', 'code' => 'A.60.0', 'label' => 'HERPES GENITAL', 'diag' => ['HERPES GENITAL', 'HERPES']],
+                    ['id' => 'sifilis', 'code' => 'A.53.9', 'label' => 'SIFILIS', 'diag' => ['SIFILIS', 'SIFILIS PRIMARIA', 'SIFILIS SECUNDARIA', 'SIFILIS CONGENITA', 'SIFILIS LATENTE', 'SIFILIS PRECOZ', 'SIFILIS TARDIA', 'SIFILIS GESTACIONAL']],
+                    ['id' => 'gonorrea', 'code' => 'A.54.9', 'label' => 'GONORREA', 'diag' => ['GONORREA', 'INFECCION GONOCOCICA', 'GONOCOCO', 'BLENORRAGIA']],
+                    ['id' => 'vih_asintomatico', 'code' => 'Z.21.X', 'label' => 'CASOS ASINTOMATICOS POR VIH', 'diag' => ['CASOS ASINTOMATICOS POR VIH', 'CASO ASINTOMATICO POR VIH', 'INFECCION ASINTOMATICA POR VIH', 'VIH ASINTOMATICO', 'ESTADO DE INFECCION ASINTOMATICA POR EL VIRUS DE LA INMUNODEFICIENCIA HUMANA (VIH)', 'VIH', 'VIH POSITIVO']],
+                    ['id' => 'vih_avanzado', 'code' => 'B.24.X', 'label' => 'INFECCION AVANZADA POR VIH', 'diag' => ['INFECCION AVANZADA POR VIH', 'VIH AVANZADO', 'ENFERMEDAD POR VIH', 'INFECCION POR VIH AVANZADA']],
+                    ['id' => 'sida', 'code' => 'B.24.9', 'label' => 'SIDA', 'diag' => ['SIDA', 'VIH-SIDA', 'SINDROME DE INMUNODEFICIENCIA ADQUIRIDA']],
+                    ['id' => 'condiloma', 'code' => 'A.63.0', 'label' => 'CONDILOMA ACUMINADO', 'diag' => ['CONDILOMA ACUMINADO', 'CONDILOMAS ACUMINADOS', 'CONDILOMA', 'CONDILOMAS', 'CONDILOMATOSIS', 'VERRUGA ANOGENITAL', 'VERRUGAS ANOGENITALES', 'VPH']],
+                    ['id' => 'herpes', 'code' => 'A.60.0', 'label' => 'HERPES GENITAL', 'diag' => ['HERPES GENITAL', 'INFECCION POR VIRUS DEL HERPES ANOGENITAL']],
                 ]
             ],
             [
                 'title' => 'ENFERMEDADES ZOONOTICAS',
                 'side' => 'reverso',
                 'rows' => [
-                    ['id' => 'rabia', 'code' => 'A.82.0', 'label' => 'RABIA HUMANA', 'diag' => 'RABIA HUMANA'],
-                    ['id' => 'leptospirosis', 'code' => 'A.27.0-A.27.9', 'label' => 'LEPTOSPIROSIS', 'diag' => 'LEPTOSPIROSIS'],
-                    ['id' => 'peste', 'code' => 'A.20.9', 'label' => 'PESTE', 'diag' => 'PESTE'],
-                    ['id' => 'fiebre_ama', 'code' => 'A.95.9', 'label' => 'FIEBRE AMARILLA', 'diag' => 'FIEBRE AMARILLA'],
+                    ['id' => 'rabia', 'code' => 'A.82.0', 'label' => 'RABIA HUMANA', 'diag' => ['RABIA HUMANA', 'RABIA', 'SOSPECHA DE RABIA']],
+                    ['id' => 'leptospirosis', 'code' => 'A.27.0-A.27.9', 'label' => 'LEPTOSPIROSIS', 'diag' => ['LEPTOSPIROSIS', 'SOSP. LEPTOSPIROSIS', 'SOSPECHA DE LEPTOSPIROSIS']],
+                    ['id' => 'peste', 'code' => 'A.20.9', 'label' => 'PESTE', 'diag' => ['PESTE', 'PESTE BUBONICA']],
+                    ['id' => 'fiebre_ama', 'code' => 'A.95.9', 'label' => 'FIEBRE AMARILLA', 'diag' => ['FIEBRE AMARILLA', 'SOSP. FIEBRE AMARILLA']],
                 ]
             ],
             [
                 'title' => 'ENF. CRÓNICO DEGENERATIVAS',
                 'side' => 'reverso',
                 'rows' => [
-                    ['id' => 'hipertension', 'code' => 'I.10.X', 'label' => 'HIPERTENSIÓN ARTERIAL', 'diag' => 'HIPERTENSION'],
-                    ['id' => 'diabetes', 'code' => 'E.14.9', 'label' => 'DIABETES MELLITUS', 'diag' => 'DIABETES'],
-                    ['id' => 'renal', 'code' => '', 'label' => 'ENFERMEDAD RENAL CRONICA', 'diag' => 'INSUFICIENCIA RENAL'],
+                    ['id' => 'hipertension', 'code' => 'I.10.X', 'label' => 'HIPERTENSIÓN ARTERIAL', 'diag' => ['HIPERTENSION', 'HIPERTENSION ARTERIAL', 'HTA', 'HIPERTENSION PRIMARIA', 'HIPERTENSION ESENCIAL', 'HIPERTENSION ARTERIAL PRIMARIA', 'HIPERTENSION ARTERIAL ESENCIAL', 'HIPERTENSION ARTERIAL SISTEMICA', 'HAS']],
+                    ['id' => 'diabetes', 'code' => 'E.14.9', 'label' => 'DIABETES MELLITUS', 'diag' => ['DIABETES', 'DIABETES MELLITUS', 'DIABETES MELLITUS TIPO 2', 'DIABETES MELLITUS TIPO 1', 'DM', 'DM2', 'DMT2', 'DIABETES MELLITUS NO INSULINODEPENDIENTE', 'DIABETES MELLITUS INSULINODEPENDIENTE']],
+                    ['id' => 'renal', 'code' => '', 'label' => 'ENFERMEDAD RENAL CRONICA', 'diag' => ['INSUFICIENCIA RENAL', 'INSUFICIENCIA RENAL CRONICA', 'ENFERMEDAD RENAL CRONICA', 'ERC', 'IRC', 'INSUFICIENCIA RENAL AGUDA', 'IRA']],
                 ]
             ],
             [
                 'title' => 'INTOXICACIONES',
                 'side' => 'reverso',
                 'rows' => [
-                    ['id' => 'plaguicidas', 'code' => 'I.65.9', 'label' => 'INTOXICACIONES AGUDAS PLAGUICIDAS', 'diag' => 'INTOXICACION POR PLAGUICIDAS'],
-                    ['id' => 'animales_tox', 'code' => '', 'label' => 'INTOX. POR MORDEDURAS DE ANIMALES TOXICOS', 'diag' => 'MORDEDURA DE ANIMAL'],
+                    ['id' => 'plaguicidas', 'code' => 'I.65.9', 'label' => 'INTOXICACIONES AGUDAS PLAGUICIDAS', 'diag' => ['INTOXICACION POR PLAGUICIDAS', 'INTOXICACION POR PLAGUICIDA', 'INTOXICACION AGUDA POR PLAGUICIDAS', 'INTOXICACION AGUDA POR PLAGUICIDA', 'INTOXICACION POR ORGANOFOSFORADOS', 'INTOXICACION POR QUIMICOS', 'PLAGUICIDAS']],
+                    ['id' => 'animales_tox', 'code' => '', 'label' => 'INTOX. POR MORDEDURAS DE ANIMALES TOXICOS', 'diag' => ['MORDEDURA DE ANIMAL', 'MORDEDURA DE SERPIENTE', 'PICADURA DE ALACRAN', 'MORDEDURA DE ANIMALES TOXICOS', 'INTOXICACION POR MORDEDURA DE ANIMAL', 'PICADURA DE ANIMAL TOXICO', 'MORDEDURA DE SERPIENTES']],
                 ]
             ]
         ];

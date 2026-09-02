@@ -425,10 +425,10 @@
 
             <div class="header-actions-row">
                 <!-- Botón Observaciones -->
-                <a href="{{ route('informes.hora-medico.consolidado', ['ano' => $ano, 'mes' => $mesNombre, 'jornada' => 'SERVICIO SOCIAL']) }}"
+                <button type="button" onclick="abrirObservacionesSociales()"
                     class="btn-header-purple" title="Ver Informe Oficial de Observaciones (Servicio Social)">
                     <i class="bi bi-journal-text"></i> Observaciones
-                </a>
+                </button>
 
                 <!-- Botón Incluir Médico Social -->
                 <button type="button" class="btn btn-primary btn-sm flex items-center gap-1 shadow-sm"
@@ -464,10 +464,14 @@
             <div class="flex flex-1 items-center gap-2 mb-0 flex-wrap">
                 <div class="flex items-center gap-1.5">
                     <span class="text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">Jornada:</span>
-                    <span class="badge badge-info font-bold px-2.5 py-1 text-xs"
-                        style="background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); border-radius: 6px;">
-                        <i class="bi bi-mortarboard-fill mr-1"></i> TODAS LAS JORNADAS (SERVICIO SOCIAL)
-                    </span>
+                    <div style="width: 190px;">
+                        <select name="jornada" class="filter-select w-full" onchange="updateFilters()">
+                            <option value="TOTAL JORNADAS" {{ ($jornada == 'TOTAL JORNADAS' || $jornada == 'TODAS LAS JORNADAS' || $jornada == 'SERVICIO SOCIAL') ? 'selected' : '' }}>TOTAL JORNADAS</option>
+                            <option value="MATUTINA" {{ $jornada == 'MATUTINA' ? 'selected' : '' }}>MATUTINA</option>
+                            <option value="VESPERTINA" {{ $jornada == 'VESPERTINA' ? 'selected' : '' }}>VESPERTINA</option>
+                            <option value="FIN DE SEMANA" {{ $jornada == 'FIN DE SEMANA' ? 'selected' : '' }}>FIN DE SEMANA</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-1.5">
@@ -518,25 +522,23 @@
                                 COMPLETO DEL MEDICO</th>
                             <th colspan="2" rowspan="2" class="align-middle">MODALIDAD</th>
                             <th colspan="2" rowspan="2" class="align-middle">CATEGORIA</th>
-                            <th rowspan="3" class="vertical-text align-middle" style="width: 32px; min-width: 32px;">HORAS
-                                CONTRATADAS X DIA</th>
+                            <th rowspan="3" class="vertical-text align-middle" style="width: 32px;">HORAS / DÍA</th>
                             <th colspan="2" rowspan="2" class="align-middle">DIAS MES</th>
                             <th colspan="2" rowspan="2" class="align-middle">HORAS MES</th>
                             <th colspan="3" rowspan="2" class="align-middle">ATENCIONES</th>
-                            <th rowspan="3" class="vertical-text align-middle font-bold"
-                                style="width: 36px; min-width: 36px;"><span class="text-danger">%</span> DE RENDIMIENTO</th>
-                            <th colspan="10" class="align-middle bg-primary-soft font-bold" style="letter-spacing: 0.5px;">
-                                HORAS SIN CONSULTA</th>
-                            <th rowspan="3" class="align-middle no-print" style="width: 40px; min-width: 40px;">ACCION</th>
+                            <th rowspan="3" class="vertical-text align-middle font-bold" style="width: 32px;">% RENDIMIENTO
+                            </th>
+                            <th colspan="10" class="align-middle bg-oficial-main">HORAS SIN CONSULTA</th>
+                            <th rowspan="3" class="align-middle" style="width: 36px; min-width: 36px;">ACCION</th>
                         </tr>
-                        {{-- Fila 2: Sub-grupos bajo HORAS SIN CONSULTA --}}
+                        {{-- Fila 2: Sub-grupos bajo Horas Sin Consulta --}}
                         <tr class="header-row-mid">
-                            <th colspan="7" class="align-middle font-bold">TOTAL DE HORAS OFICIALES</th>
-                            <th colspan="2" class="align-middle font-bold th-hatched">VACACIONES</th>
-                            <th rowspan="2" class="vertical-text align-middle" style="width: 32px; min-width: 32px;">
-                                PERMISOS PERSONALES.</th>
+                            <th colspan="7" class="align-middle bg-oficial-sub">TOTAL DE HORAS OFICIALES</th>
+                            <th colspan="2" class="align-middle th-hatched" id="th_vacaciones_group">VACACIONES</th>
+                            <th rowspan="2" class="vertical-text align-middle" style="width: 30px;">PERMISOS PERSONALES.
+                            </th>
                         </tr>
-                        {{-- Fila 3: Subcolumnas Detalladas (Verticales y compactas) --}}
+                        {{-- Fila 3: Subcolumnas Verticales Detalladas --}}
                         <tr class="header-row-sub">
                             {{-- Modalidad: Acuerdo rayado, Contrato activo --}}
                             <th class="vertical-text align-middle th-hatched" style="width: 30px;">ACUERDO.</th>
@@ -554,10 +556,10 @@
                             <th class="vertical-text align-middle" style="width: 32px;">PROGRAMADAS.</th>
                             <th class="vertical-text align-middle" style="width: 32px;">REPROGRAMADAS.</th>
                             <th class="vertical-text align-middle font-bold" style="width: 34px;">ATENDIDAS.</th>
-                            {{-- Horas Sin Consulta: Oficiales (7) con ACTIVIDADES UNIVERSIDAD --}}
+                            {{-- Horas Sin Consulta: Oficiales (7) con **** OTRAS ACTIVIDADES --}}
                             <th class="vertical-text align-middle" style="width: 30px;">FERIADOS / COMPENSATORIOS</th>
                             <th class="vertical-text align-middle" style="width: 30px;">ESFAM.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES DE PROMOCION.</th>
+                            <th class="vertical-text align-middle" style="width: 30px;">**** OTRAS ACTIVIDADES</th>
                             <th class="vertical-text align-middle" style="width: 30px;">CONGRESOS / TALLERES.</th>
                             <th class="vertical-text align-middle" style="width: 30px;">INVESTIGACION DE CAMPO.</th>
                             <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES UNIVERSIDAD.</th>
@@ -579,23 +581,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         function syncStickyHeaderOffsets() {
             const row1 = document.querySelector('#mainTable thead tr.header-row-main');
             const row2 = document.querySelector('#mainTable thead tr.header-row-mid');
             const row3 = document.querySelector('#mainTable thead tr.header-row-sub');
-            if (!row1) return;
-            const h1 = row1.offsetHeight;
-            if (row2) {
-                const h2 = row2.offsetHeight;
-                row2.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1}px`, 'important'));
-                if (row3) {
-                    row3.querySelectorAll('th').forEach(th => th.style.setProperty('top', `${h1 + h2}px`, 'important'));
-                }
-            }
+
+            if (!row1 || !row2 || !row3) return;
+
+            const h1 = row1.getBoundingClientRect().height;
+            const h2 = row2.getBoundingClientRect().height;
+
+            row2.querySelectorAll('th').forEach(th => {
+                th.style.top = `${h1}px`;
+            });
+
+            row3.querySelectorAll('th').forEach(th => {
+                th.style.top = `${h1 + h2}px`;
+            });
         }
 
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', () => {
             syncStickyHeaderOffsets();
             window.addEventListener('resize', syncStickyHeaderOffsets);
         });
@@ -603,7 +610,7 @@
         function updateFilters() {
             let ano = $('[name="ano"]').val();
             let mes = $('[name="mes"]').val();
-            let jornada = 'TOTAL JORNADAS';
+            let jornada = $('[name="jornada"]').val();
 
             $('#table-loader').css('display', 'flex').fadeIn(150);
 
@@ -620,6 +627,7 @@
                 const url = new URL(window.location);
                 url.searchParams.set('ano', ano);
                 url.searchParams.set('mes', mes);
+                url.searchParams.set('jornada', jornada);
                 window.history.pushState({}, '', url);
             }).fail(function () {
                 $('#table-loader').fadeOut(150);
@@ -658,14 +666,29 @@
         function imprimirReporte() {
             let ano = $('[name="ano"]').val();
             let mes = $('[name="mes"]').val();
-            let jornada = 'TOTAL JORNADAS';
+            let jornada = $('[name="jornada"]').val();
 
             const url = new URL("{{ route('informes.hora-medico.imprimir') }}");
             url.searchParams.set('ano', ano);
             url.searchParams.set('mes', mes);
             url.searchParams.set('jornada', jornada);
+            url.searchParams.set('only_ss', '1');
 
             window.open(url.toString(), '_blank');
+        }
+
+        function abrirObservacionesSociales() {
+            let ano = $('[name="ano"]').val();
+            let mes = $('[name="mes"]').val();
+            let jornada = $('[name="jornada"]').val();
+
+            const url = new URL("{{ route('informes.hora-medico.consolidado') }}");
+            url.searchParams.set('ano', ano);
+            url.searchParams.set('mes', mes);
+            url.searchParams.set('jornada', jornada);
+            url.searchParams.set('only_ss', '1');
+
+            window.location.href = url.toString();
         }
 
         // Modal HSC / Observaciones Calculations

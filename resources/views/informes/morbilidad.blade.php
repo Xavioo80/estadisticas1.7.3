@@ -35,7 +35,73 @@
 
 @include('informes.partials.modal_comparacion_cruzada')
 
-<script>
+    <script>
+        // ── Función global para abrir el Modal de Detalles de Pacientes ──
+        window.fetchMorbilidadDetails = function(rowId, col) {
+            const ano = $('select[name="ano"]').val() || '{{ $ano }}';
+            const mes = $('select[name="mes"]').val() || '{{ $mes }}';
+            const jornada = $('select[name="jornada"]').val() || '{{ $jornada }}';
+
+            $('#modalMorbilidadTitle').text('Cargando datos...');
+            $('#modalMorbilidadFiltroBadge').text('Consultando...');
+            $('#modalMorbilidadCountBadge').text('');
+            $('#modalMorbilidadSearch').val('');
+            $('#modalMorbilidadTableBody').html('<tr><td colspan="10" class="text-center py-4 text-muted font-weight-bold"><div class="spinner-border spinner-border-sm text-primary mr-2"></div> Cargando registros de pacientes...</td></tr>');
+            $('#modalMorbilidadDetalles').modal('show');
+
+            const url = `{{ route('informes.morbilidad.details') }}?ano=${ano}&mes=${mes}&jornada=${jornada}&row_id=${rowId}&col=${col}&_t=${new Date().getTime()}`;
+
+            $.getJSON(url, function(data) {
+                $('#modalMorbilidadTitle').text(data.label || 'Detalles');
+                $('#modalMorbilidadFiltroBadge').text(data.filtro || '');
+                $('#modalMorbilidadCountBadge').text(`${data.total || 0} pacientes`);
+
+                let rowsHtml = '';
+                if (data.details && data.details.length > 0) {
+                    $.each(data.details, function(i, item) {
+                        const condBadge = item.cond === 'N' 
+                            ? '<span class="badge badge-subtle-primary font-weight-bold">N</span>' 
+                            : '<span class="badge badge-subtle-secondary font-weight-bold">S</span>';
+                        
+                        rowsHtml += `
+                            <tr class="morbilidad-patient-row" style="border-bottom: 1px solid var(--border-color);">
+                                <td class="text-center font-weight-bold text-nowrap" style="font-family: monospace; font-size: 0.8rem; color: var(--color-primary, #38bdf8);">#${item.numero || item.id || '-'}</td>
+                                <td class="font-weight-600 text-nowrap" style="color: var(--text-primary); font-size: 0.8rem;">${item.fecha}</td>
+                                <td style="font-family: monospace; font-size: 0.8rem; color: var(--color-primary); font-weight: 700;">${item.exp || '-'}</td>
+                                <td style="font-family: monospace; font-size: 0.78rem; color: var(--text-muted);">${item.identidad || '-'}</td>
+                                <td class="font-weight-bold" style="color: var(--text-primary); font-size: 0.82rem;">${item.paciente || '-'}</td>
+                                <td class="text-center font-weight-bold" style="font-size: 0.8rem;">${item.sexo || '-'}</td>
+                                <td class="text-center text-nowrap" style="font-size: 0.8rem;"><span class="badge badge-subtle-info">${item.edad || '-'}</span></td>
+                                <td class="text-center">${condBadge}</td>
+                                <td style="color: var(--text-primary); font-size: 0.82rem;">${item.diagnostico || '-'}</td>
+                                <td class="small" style="color: var(--text-secondary); font-size: 0.78rem;">${item.medico || '-'}</td>
+                                <td class="text-center small" style="color: var(--text-muted); font-size: 0.75rem;">${item.jornada || '-'}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rowsHtml = '<tr><td colspan="11" class="text-center py-4 text-muted font-weight-bold">No se encontraron pacientes para este criterio en este periodo.</td></tr>';
+                }
+                $('#modalMorbilidadTableBody').html(rowsHtml);
+            }).fail(function(xhr) {
+                console.error('Error fetching Morbilidad details:', xhr);
+                $('#modalMorbilidadTableBody').html('<tr><td colspan="11" class="text-center text-danger py-4 font-weight-bold"><i class="bi bi-exclamation-octagon-fill mr-1"></i> Error al cargar los datos. Intente de nuevo.</td></tr>');
+            });
+        };
+
+        // Filtro de búsqueda en tiempo real dentro del modal
+        $(document).on('keyup', '#modalMorbilidadSearch', function() {
+            const term = $(this).val().toLowerCase().trim();
+            $('#modalMorbilidadTableBody tr.morbilidad-patient-row').each(function() {
+                const text = $(this).text().toLowerCase();
+                if (text.indexOf(term) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             
             function refreshReport() {

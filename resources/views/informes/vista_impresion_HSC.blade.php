@@ -393,7 +393,7 @@
 
     @foreach($jornadasSheets as $currentJornada => $doctorList)
         @php
-            $MAX_ROWS = 24;
+            $MAX_ROWS = 25;
             $docCount = count($doctorList);
         @endphp
 
@@ -440,18 +440,18 @@
                 <div class="header-info-bar">
                     <div>ESTABLECIMIENTO DE SALUD: <span class="val"
                             id="lbl-establecimiento">{{ $nombreEstablecimiento }}</span></div>
-                    <div>JORNADA: <span class="val">{{ $currentJornada }}</span></div>
+                    <div>JORNADA: <span class="val">{{ $currentJornada }}{{ !empty($onlySS) ? ' (SERVICIO SOCIAL)' : '' }}</span></div>
                     <div>MES: <span class="val">{{ $mesNombre }}</span></div>
                     <div>AÑO: <span class="val">{{ $ano }}</span></div>
                 </div>
             </div>
 
-            <!-- ── 2. Tabla Oficial de Observaciones (24 Filas Exactas a Matriz) ── -->
+            <!-- ── 2. Tabla Oficial de Observaciones (25 Filas Exactas a Matriz) ── -->
             <div class="table-wrap">
                 <table class="table-oficial">
                     <thead>
                         <tr>
-                            <th class="b-thick-r" style="width: 3.5%;">N°</th>
+                            <th class="b-thick-r" style="width: 3.5%;">#</th>
                             <th class="b-thick-r" style="width: 30.5%; text-align: left; padding-left: 8px !important;">
                                 NOMBRE COMPLETO DEL MEDICO</th>
                             <th style="width: 66.0%; text-align: left; padding-left: 8px !important;">OBSERVACIONES</th>
@@ -495,19 +495,18 @@
                 </table>
             </div>
 
-            <!-- ── 3. Notas Oficiales al Pie ── -->
+            <!-- ── 3. Notas Oficiales al Pie (Exactas a la Plantilla Oficial) ── -->
             <div class="print-footer-notes">
                 <div class="notes-col text-left">
                     <div>*** ESTE INFORME DEBE COINCIDIR CON EL TOTAL DE ATENCIONES DEL AT2R.</div>
                     <div>*** EL ORDEN DE LOS MEDICOS DEBE SER IGUAL AL DE LOS MESES ANTERIORES.</div>
-                    <div>*** EN LA PRIMERA CASILLA COLOCAR SIEMPRE EL NOMBRE COMPLETO DEL DIRECTOR DEL ESTABLECIMIENTO DE
-                        SALUD.</div>
+                    <div>*** EN LA PRIMERA CASILLA COLOCAR SIEMPRE EL NOMBRE COMPLETO DEL DIRECTOR / COORDINADOR DEL E.S.</div>
                 </div>
                 <div class="notes-col text-left">
-                    <div>*** COLOCAR EL PERSONAL QUE ESTE DE VACACIONES O INCAPACITADO (DE LO CONTRARIO SE REPORTARA COMO
-                        FALTANTE).</div>
+                    <div>*** COLOCAR EL PERSONAL QUE ESTE DE VACACIONES / INCAPACITADO / TRASLADO (DE LO CONTRARIO SE REPORTARA COMO FALTANTE)</div>
                     <div>*** COLOCAR FECHA DE INICIO Y DE FINAL DE CADA MEDICO EN SERVICIO SOCIAL.</div>
                     <div>*** LLENAR UNA HOJA POR JORNADA (MATUTINA, VESPERTINA, FIN DE SEMANA Y SERVICIO SOCIAL).</div>
+                    <div>*** <span style="color: #dc2626; font-weight: bold;">OTRAS ACTIVIDADES</span> = SOLICITUD Y RECEPCIÓN DE INSUMOS, REALIZACIÓN Y ENTREGA DE INFORMES, ACT EXTRAMUROS, CLUB DE ENFERMOS CRONICOS, EMBARAZADAS, CHARLAS, TAMIZAJES, REUNION INTERSECTORIALES, OTROS.</div>
                 </div>
             </div>
         </div>

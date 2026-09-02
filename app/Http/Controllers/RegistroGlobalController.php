@@ -523,19 +523,30 @@ class RegistroGlobalController extends Controller
     }
     
     /**
-     * Eliminar un registro
+     * Eliminar un registro individual
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            RegistroGlobal::findOrFail($id)->delete();
+            $registro = RegistroGlobal::findOrFail($id);
+            $registro->delete(); // Dispara Observer: elimina informes hijos y limpia caché
             
-            // Limpiar caché
-            Cache::flush();
+            if ($request->wantsJson() || $request->ajax() || $request->isJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Registro eliminado exitosamente.'
+                ]);
+            }
             
             return redirect()->route('registros.index')
                 ->with('success', 'Registro eliminado exitosamente.');
         } catch (\Exception $e) {
+            if ($request->wantsJson() || $request->ajax() || $request->isJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al eliminar el registro: ' . $e->getMessage()
+                ], 500);
+            }
             return redirect()->route('registros.index')
                 ->with('error', 'Error al eliminar el registro: ' . $e->getMessage());
         }
@@ -634,12 +645,17 @@ class RegistroGlobalController extends Controller
     {
         $q = trim($request->input('q', ''));
         if (strlen($q) < 1) {
-            $diags = \App\Models\Diagnostico::select('codigo', 'patologia')->limit(30)->get();
+            $diags = \App\Models\Diagnostico::select('codigo', 'patologia')
+                ->whereNotNull('patologia')
+                ->where('patologia', '!=', '')
+                ->orderBy('codigo')
+                ->get();
         } else {
             $diags = \App\Models\Diagnostico::select('codigo', 'patologia')
                 ->where('patologia', 'LIKE', "%{$q}%")
                 ->orWhere('codigo', 'LIKE', "%{$q}%")
-                ->limit(30)
+                ->orderBy('codigo')
+                ->limit(50)
                 ->get();
         }
         return response()->json($diags);
@@ -763,4 +779,130 @@ class RegistroGlobalController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener un registro global específico por ID para visualización y edición
+     */
+    public function getRegistro($id)
+    {
+        try {
+            $registro = RegistroGlobal::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'data' => $registro
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registro no encontrado: ' . $e->getMessage()
+            ], 404);
+        }
+    }
+
+    /**
+     * Actualización Integral de RegistroGlobal y Paciente desde Registros AT1
+     */
+    public function updateFull(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required|integer|exists:registros_globales,id',
+            ]);
+
+            $registro = RegistroGlobal::findOrFail($request->id);
+
+            $data = $request->except(['_token', 'id']);
+
+            // Parsear y normalizar fecha
+            if (!empty($data['fecha'])) {
+                try {
+                    $dt = Carbon::parse($data['fecha']);
+                    $data['fecha'] = $dt->format('Y-m-d');
+                    $data['ano'] = (int)$dt->format('Y');
+                    
+                    $mesesEs = [
+                        1 => 'ENERO', 2 => 'FEBRERO', 3 => 'MARZO', 4 => 'ABRIL',
+                        5 => 'MAYO', 6 => 'JUNIO', 7 => 'JULIO', 8 => 'AGOSTO',
+                        9 => 'SEPTIEMBRE', 10 => 'OCTUBRE', 11 => 'NOVIEMBRE', 12 => 'DICIEMBRE'
+                    ];
+                    $data['mes'] = $mesesEs[(int)$dt->format('n')] ?? strtoupper($dt->format('F'));
+                } catch (\Exception $e) {
+                    // Mantener fecha original si falla el parseo
+                }
+            }
+
+            // Normalizar y calcular rangos epidemiológicos de edad
+            $edad = isset($data['edad']) ? (int)$data['edad'] : $registro->edad;
+            $tipo = isset($data['tipo']) ? strtoupper(trim($data['tipo'])) : $registro->tipo;
+
+            if ($edad !== null && !empty($tipo)) {
+                $rangos = \App\Services\ExcelImportService::calcularRangosEpidemiologicos($edad, $tipo);
+                $data['rango'] = $rangos['rango'] ?? $registro->rango;
+                $data['rango_2'] = $rangos['rango_2'] ?? $registro->rango_2;
+                $data['rango_3'] = $rangos['rango_3'] ?? $registro->rango_3;
+                $data['rango_4'] = $rangos['rango_4'] ?? $registro->rango_4;
+                $data['rango_5'] = $rangos['rango_5'] ?? $registro->rango_5;
+            }
+
+            // Normalizar condición principal con cond_1
+            if (!empty($data['cond_1'])) {
+                $data['cond'] = strtoupper(trim($data['cond_1']));
+            } elseif (!empty($data['cond'])) {
+                $data['cond_1'] = strtoupper(trim($data['cond']));
+            }
+
+            // Asignar atributos al modelo
+            $registro->fill($data);
+            $registro->save(); // El observer sincroniza la tabla 'informes' y limpia caché automáticamente
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registro y paciente actualizados exitosamente. Los cambios se han propagado a todos los informes.',
+                'data' => $registro->fresh()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el registro: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    /**
+     * Eliminar múltiples registros seleccionados en lote
+     */
+    public function deleteMultiple(Request $request)
+    {
+        try {
+            $ids = $request->input('ids', []);
+            if (!is_array($ids) || empty($ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se proporcionaron registros para eliminar.'
+                ], 400);
+            }
+
+            /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\RegistroGlobal> $registros */
+            $registros = RegistroGlobal::whereIn('id', $ids)->get();
+            $count = $registros->count();
+
+            foreach ($registros as $rg) {
+                /** @var \App\Models\RegistroGlobal $rg */
+                $rg->delete(); // Dispara Observer individual para cada registro
+            }
+
+            return response()->json([
+                'success' => true,
+                'count' => $count,
+                'message' => "Se eliminaron {$count} registros exitosamente."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar los registros: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+
