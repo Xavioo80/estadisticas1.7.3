@@ -2257,11 +2257,46 @@ html.dark #consolidadoTable td.sticky-col-2,
   box-sizing: border-box !important;
 }
 
-#mainTable thead tr.header-row-main th,
-#mainTable thead tr.header-row-mid th,
-#mainTable thead tr.header-row-sub th {
+#mainTable thead tr.header-row-main {
+  height: 28px !important;
+}
+
+#mainTable thead tr.header-row-mid {
+  height: 24px !important;
+}
+
+#mainTable thead tr.header-row-sub {
+  height: 110px !important;
+}
+
+#mainTable thead tr.header-row-main th {
   vertical-align: middle !important;
   text-align: center !important;
+  padding: 2px 2px !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.2px;
+}
+
+#mainTable thead tr.header-row-mid th {
+  vertical-align: middle !important;
+  text-align: center !important;
+  padding: 2px 2px !important;
+  font-size: 0.60rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1px;
+}
+
+#mainTable thead tr.header-row-sub th {
+  vertical-align: bottom !important;
+  text-align: center !important;
+  padding: 4px 1px !important;
+  height: 110px !important;
+}
+
+#mainTable thead tr.header-row-mid th[rowspan="2"] {
+  vertical-align: bottom !important;
+  padding-bottom: 4px !important;
 }
 
 .v-header {
@@ -2269,14 +2304,15 @@ html.dark #consolidadoTable td.sticky-col-2,
   transform: rotate(180deg) !important;
   white-space: normal !important;
   word-break: normal !important;
-  font-size: 0.54rem !important;
+  font-size: 0.52rem !important;
   font-weight: 800 !important;
   text-align: center !important;
   margin: 0 auto !important;
   display: inline-block !important;
   letter-spacing: 0px !important;
-  line-height: 1.08 !important;
-  padding: 1px 0 !important;
+  line-height: 1.06 !important;
+  padding: 0 !important;
+  max-height: 104px !important;
 }
 
 /* Celdas de esquina en thead (N° y Nombre del Médico): máxima prioridad z-index: 120 */
