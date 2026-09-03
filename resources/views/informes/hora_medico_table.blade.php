@@ -57,13 +57,17 @@
                     $nomina = strtoupper($medicoRecord->NOMINA ?? '');
                     $modalidad = strtoupper($medicoRecord->MODALIDAD ?? '');
                     $especialidad = trim(strtoupper($medicoRecord->ESPECIALIDAD ?? ''));
+                    $nombre = strtoupper($medicoRecord->NOM_MED ?? '');
+                    $obs = strtoupper($medicoRecord->observaciones ?? '');
+
+                    $isONG = (!empty($row['is_ong']) || !empty($medicoRecord->es_ong) || str_contains($modalidad, 'ONG') || str_contains($nomina, 'ONG') || str_contains($modalidad, 'TEMPORAL') || str_contains($nomina, 'TEMPORAL') || str_contains($nombre, 'MEDICOS SIN FRONTERAS') || str_contains($nombre, 'UNITEC') || str_contains($nombre, 'TEMPORAL') || str_contains($nombre, 'ONG') || str_contains($obs, 'MEDICOS SIN FRONTERAS') || str_contains($obs, 'UNITEC') || str_contains($obs, 'TEMPORAL'));
 
                     $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL'));
-                    $isAcuerdo = (!$isSS && (str_contains($nomina, 'ACUERDO') || str_contains($nomina, 'PERMANENTE') || str_contains($modalidad, 'ACUERDO') || str_contains($modalidad, 'PERMANENTE')));
-                    $isContrato = ($isSS || str_contains($nomina, 'CONTRATO') || str_contains($nomina, 'INTERINATO') || str_contains($modalidad, 'CONTRATO') || str_contains($modalidad, 'INTERINATO') || (!$isAcuerdo && ($nomina != '' || $modalidad != '')));
+                    $isAcuerdo = (!$isONG && !$isSS && (str_contains($nomina, 'ACUERDO') || str_contains($nomina, 'PERMANENTE') || str_contains($modalidad, 'ACUERDO') || str_contains($modalidad, 'PERMANENTE')));
+                    $isContrato = (!$isONG && ($isSS || str_contains($nomina, 'CONTRATO') || str_contains($nomina, 'INTERINATO') || str_contains($modalidad, 'CONTRATO') || str_contains($modalidad, 'INTERINATO') || (!$isAcuerdo && ($nomina != '' || $modalidad != ''))));
 
-                    $isEspecialista = ($especialidad !== '' && $especialidad !== 'MEDICO GENERAL' && $especialidad !== 'MÉDICO GENERAL' && !$isSS);
-                    $isGeneral = !$isEspecialista;
+                    $isEspecialista = (!$isONG && $especialidad !== '' && $especialidad !== 'MEDICO GENERAL' && $especialidad !== 'MÉDICO GENERAL' && !$isSS);
+                    $isGeneral = (!$isONG && !$isEspecialista);
 
                     if ($isAcuerdo)
                         $jTotals['acuerdo']++;
@@ -82,17 +86,20 @@
                     $jTotals['prog'] += $row['prog'];
                     $jTotals['repr'] += $row['repr'];
                     $jTotals['atend'] += $row['atenciones'];
-                    $h = $row['hsc'] ?? null;
-                    $jTotals['hsc_comp'] += $h ? round((float) ($h->compensatorio ?? 0)) : 0;
-                    $jTotals['hsc_esfam'] += $h ? round((float) ($h->esfam ?? 0)) : 0;
-                    $jTotals['hsc_prom'] += $h ? round((float) ($h->promocion ?? 0)) : 0;
-                    $jTotals['hsc_cong'] += $h ? round((float) ($h->congresos_medicos ?? 0)) : 0;
-                    $jTotals['hsc_campo'] += $h ? round((float) ($h->trabajo_campo ?? 0)) : 0;
-                    $jTotals['hsc_asam'] += $h ? round((float) ($h->convocatoria_general ?? 0)) : 0;
-                    $jTotals['hsc_citas'] += $h ? round((float) ($h->incapacidad ?? 0) + (float) ($h->cita_ihss ?? 0)) : 0;
-                    $jTotals['hsc_ord'] += $h ? round((float) ($h->vacaciones_ordinarias ?? 0)) : 0;
-                    $jTotals['hsc_profil'] += $h ? round((float) ($h->descanso_profilactico ?? 0)) : 0;
-                    $jTotals['hsc_pers'] += $h ? round((float) ($h->permiso_personal ?? 0)) : 0;
+
+                    if (!$isONG) {
+                        $h = $row['hsc'] ?? null;
+                        $jTotals['hsc_comp'] += $h ? round((float) ($h->compensatorio ?? 0)) : 0;
+                        $jTotals['hsc_esfam'] += $h ? round((float) ($h->esfam ?? 0)) : 0;
+                        $jTotals['hsc_prom'] += $h ? round((float) ($h->promocion ?? 0)) : 0;
+                        $jTotals['hsc_cong'] += $h ? round((float) ($h->congresos_medicos ?? 0)) : 0;
+                        $jTotals['hsc_campo'] += $h ? round((float) ($h->trabajo_campo ?? 0)) : 0;
+                        $jTotals['hsc_asam'] += $h ? round((float) ($h->convocatoria_general ?? 0)) : 0;
+                        $jTotals['hsc_citas'] += $h ? round((float) ($h->incapacidad ?? 0) + (float) ($h->cita_ihss ?? 0)) : 0;
+                        $jTotals['hsc_ord'] += $h ? round((float) ($h->vacaciones_ordinarias ?? 0)) : 0;
+                        $jTotals['hsc_profil'] += $h ? round((float) ($h->descanso_profilactico ?? 0)) : 0;
+                        $jTotals['hsc_pers'] += $h ? round((float) ($h->permiso_personal ?? 0)) : 0;
+                    }
                 }
 
                 foreach ($jTotals as $k => $v)
@@ -221,7 +228,7 @@
                 $nombre = strtoupper($medicoRecord->NOM_MED ?? '');
                 $obs = strtoupper($medicoRecord->observaciones ?? '');
 
-                $isONG = (!empty($row['is_ong']) || !empty($medicoRecord->es_ong) || str_contains($modalidad, 'ONG') || str_contains($nomina, 'ONG') || str_contains($nombre, 'MEDICOS SIN FRONTERAS') || str_contains($nombre, 'ONG') || str_contains($obs, 'MEDICOS SIN FRONTERAS'));
+                $isONG = (!empty($row['is_ong']) || !empty($medicoRecord->es_ong) || str_contains($modalidad, 'ONG') || str_contains($nomina, 'ONG') || str_contains($modalidad, 'TEMPORAL') || str_contains($nomina, 'TEMPORAL') || str_contains($nombre, 'MEDICOS SIN FRONTERAS') || str_contains($nombre, 'UNITEC') || str_contains($nombre, 'TEMPORAL') || str_contains($nombre, 'ONG') || str_contains($obs, 'MEDICOS SIN FRONTERAS') || str_contains($obs, 'UNITEC') || str_contains($obs, 'TEMPORAL'));
 
                 $isSS = (str_contains($nomina, 'SOCIAL') || str_contains($modalidad, 'SOCIAL') || str_contains($especialidad, 'SOCIAL'));
                 $isAcuerdo = (!$isONG && !$isSS && (str_contains($nomina, 'ACUERDO') || str_contains($nomina, 'PERMANENTE') || str_contains($modalidad, 'ACUERDO') || str_contains($modalidad, 'PERMANENTE')));
@@ -260,16 +267,18 @@
                 $hsc_profil = $h ? round((float) ($h->descanso_profilactico ?? 0)) : 0;
                 $hsc_pers = $h ? round((float) ($h->permiso_personal ?? 0)) : 0;
 
-                $totals['hsc_comp'] += $hsc_comp;
-                $totals['hsc_esfam'] += $hsc_esfam;
-                $totals['hsc_prom'] += $hsc_prom;
-                $totals['hsc_cong'] += $hsc_cong;
-                $totals['hsc_campo'] += $hsc_campo;
-                $totals['hsc_asam'] += $hsc_asam;
-                $totals['hsc_citas'] += $hsc_citas;
-                $totals['hsc_ord'] += $hsc_ord;
-                $totals['hsc_profil'] += $hsc_profil;
-                $totals['hsc_pers'] += $hsc_pers;
+                if (!$isONG) {
+                    $totals['hsc_comp'] += $hsc_comp;
+                    $totals['hsc_esfam'] += $hsc_esfam;
+                    $totals['hsc_prom'] += $hsc_prom;
+                    $totals['hsc_cong'] += $hsc_cong;
+                    $totals['hsc_campo'] += $hsc_campo;
+                    $totals['hsc_asam'] += $hsc_asam;
+                    $totals['hsc_citas'] += $hsc_citas;
+                    $totals['hsc_ord'] += $hsc_ord;
+                    $totals['hsc_profil'] += $hsc_profil;
+                    $totals['hsc_pers'] += $hsc_pers;
+                }
             @endphp
             <tr style="height: auto;" class="medico-row {{ $isONG ? 'ong-row' : '' }}" data-medico-id="{{ $medicoRecord->id }}">
                 <td class="border-black sticky-col-1">{{ $index + 1 }}</td>
@@ -292,41 +301,41 @@
                     @endphp
                     {{ trim($nombreLimpio) }}
                 </td>
-                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}
+                <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">{{ $isONG || $isSS ? '-' : ($isAcuerdo ? 'X' : '-') }}
                 </td>
-                <td class="border-black middle">{{ $isContrato ? 'X' : '-' }}</td>
-                <td class="border-black middle">{{ $isGeneral ? 'X' : '-' }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($isContrato ? 'X' : '-') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($isGeneral ? 'X' : '-') }}</td>
                 <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
-                    {{ $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
+                    {{ $isONG || $isSS ? '-' : ($isEspecialista ? 'X' : '-') }}</td>
                 <td class="border-black middle">
-                    {{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? (round($row['horasPorDia']) == $row['horasPorDia'] ? round($row['horasPorDia']) : number_format($row['horasPorDia'], 1)) : '0') }}
+                    {{ $isONG ? '-' : ($row['horasPorDia'] > 0 ? round((float)$row['horasPorDia']) : '0') }}
                 </td>
                 <td class="border-black middle">
-                    {{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round($row['diasContratados']) : '0') }}</td>
+                    {{ $isONG ? '-' : ($row['diasContratados'] > 0 ? round((float)$row['diasContratados']) : '0') }}</td>
                 <td class="border-black middle">
-                    {{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round($row['diasCumplidos']) : '0') }}</td>
+                    {{ $isONG ? '-' : ($row['diasCumplidos'] > 0 ? round((float)$row['diasCumplidos']) : '0') }}</td>
                 <td class="border-black middle">
-                    {{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round($row['horasContratadasMes']) : '0') }}</td>
+                    {{ $isONG ? '-' : ($row['horasContratadasMes'] > 0 ? round((float)$row['horasContratadasMes']) : '0') }}</td>
                 <td class="border-black middle">
-                    {{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round($row['horasCumplidas']) : '0') }}</td>
-                <td class="border-black middle">{{ $isONG ? '-' : ($row['prog'] > 0 ? round($row['prog']) : '0') }}</td>
+                    {{ $isONG ? '-' : ($row['horasCumplidas'] > 0 ? round((float)$row['horasCumplidas']) : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($row['prog'] > 0 ? round((float)$row['prog']) : '0') }}</td>
                 <td class="border-black middle font-weight-bold">
-                    {{ $isONG ? '-' : ($row['repr'] > 0 ? round($row['repr']) : '0') }}</td>
-                <td class="border-black middle font-weight-bold text-primary">{{ round($row['atenciones']) }}</td>
+                    {{ $isONG ? '-' : ($row['repr'] > 0 ? round((float)$row['repr']) : '0') }}</td>
+                <td class="border-black middle font-weight-bold text-primary">{{ round((float)$row['atenciones']) }}</td>
                 <td class="border-black middle">
                     {{ $isONG ? '-' : ($row['rendimiento'] > 0 ? round($row['rendimiento']) . '%' : '0%') }}</td>
-                <td class="border-black middle">{{ $hsc_comp > 0 ? $hsc_comp : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_esfam > 0 ? $hsc_esfam : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_prom > 0 ? $hsc_prom : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_cong > 0 ? $hsc_cong : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_campo > 0 ? $hsc_campo : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_asam > 0 ? $hsc_asam : '0' }}</td>
-                <td class="border-black middle">{{ $hsc_citas > 0 ? $hsc_citas : '0' }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_comp > 0 ? $hsc_comp : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_esfam > 0 ? $hsc_esfam : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_prom > 0 ? $hsc_prom : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_cong > 0 ? $hsc_cong : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_campo > 0 ? $hsc_campo : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_asam > 0 ? $hsc_asam : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_citas > 0 ? $hsc_citas : '0') }}</td>
                 <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
-                    {{ $isSS ? '-' : ($hsc_ord > 0 ? $hsc_ord : '0') }}</td>
+                    {{ $isONG || $isSS ? '-' : ($hsc_ord > 0 ? $hsc_ord : '0') }}</td>
                 <td class="border-black middle {{ $isSS ? 'td-hatched' : '' }}">
-                    {{ $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
-                <td class="border-black middle">{{ $hsc_pers > 0 ? $hsc_pers : '0' }}</td>
+                    {{ $isONG || $isSS ? '-' : ($hsc_profil > 0 ? $hsc_profil : '0') }}</td>
+                <td class="border-black middle">{{ $isONG ? '-' : ($hsc_pers > 0 ? $hsc_pers : '0') }}</td>
                 <td class="border-black no-print middle">
                     @php
                         $atenciones = $row['atenciones'] ?? 0;

@@ -13,50 +13,51 @@
             white-space: nowrap !important;
         }
 
-        #mainTable th.vertical-text,
-        #mainTable .vertical-text,
-        .vertical-text {
+        .v-header {
             writing-mode: vertical-rl !important;
             transform: rotate(180deg) !important;
             white-space: normal !important;
             word-break: normal !important;
             font-size: 0.54rem !important;
-            font-weight: 700 !important;
+            font-weight: 800 !important;
             text-align: center !important;
-            vertical-align: middle !important;
-            padding: 2px 1px !important;
+            margin: 0 auto !important;
+            display: inline-block !important;
             letter-spacing: 0px !important;
             line-height: 1.08 !important;
+            padding: 1px 0 !important;
         }
 
         #mainTable thead tr.header-row-main th {
             height: 22px !important;
             font-size: 0.70rem !important;
             font-weight: 800 !important;
-            padding: 2px 4px !important;
+            padding: 2px 2px !important;
             vertical-align: middle !important;
+            text-align: center !important;
         }
 
         #mainTable thead tr.header-row-mid th {
             height: 20px !important;
             font-size: 0.66rem !important;
             font-weight: 800 !important;
-            padding: 2px 4px !important;
+            padding: 2px 2px !important;
             vertical-align: middle !important;
+            text-align: center !important;
         }
 
         #mainTable thead tr.header-row-sub th {
-            height: 100px !important;
+            height: 96px !important;
             font-size: 0.66rem !important;
-            max-height: 100px !important;
+            max-height: 96px !important;
             vertical-align: middle !important;
+            text-align: center !important;
             padding: 2px 1px !important;
         }
 
         #mainTable {
             border: 1px solid #94a3b8 !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
+            border-collapse: collapse !important;
         }
 
         html.dark #mainTable,
@@ -204,22 +205,11 @@
             box-sizing: border-box !important;
         }
 
-        #mainTable thead tr.header-row-main th {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 60 !important;
-        }
-
-        #mainTable thead tr.header-row-mid th {
-            position: sticky !important;
-            top: 28px !important;
-            z-index: 55 !important;
-        }
-
+        #mainTable thead tr.header-row-main th,
+        #mainTable thead tr.header-row-mid th,
         #mainTable thead tr.header-row-sub th {
-            position: sticky !important;
-            top: 54px !important;
-            z-index: 50 !important;
+            vertical-align: middle !important;
+            text-align: center !important;
         }
 
         html.dark #mainTable thead th,
@@ -467,6 +457,7 @@
                     <div style="width: 190px;">
                         <select name="jornada" class="filter-select w-full" onchange="updateFilters()">
                             <option value="TOTAL JORNADAS" {{ ($jornada == 'TOTAL JORNADAS' || $jornada == 'TODAS LAS JORNADAS' || $jornada == 'SERVICIO SOCIAL') ? 'selected' : '' }}>TOTAL JORNADAS</option>
+                            <option value="CONGLOMERADO SOCIALES" {{ $jornada == 'CONGLOMERADO SOCIALES' ? 'selected' : '' }}>CONGLOMERADO SOCIALES</option>
                             <option value="MATUTINA" {{ $jornada == 'MATUTINA' ? 'selected' : '' }}>MATUTINA</option>
                             <option value="VESPERTINA" {{ $jornada == 'VESPERTINA' ? 'selected' : '' }}>VESPERTINA</option>
                             <option value="FIN DE SEMANA" {{ $jornada == 'FIN DE SEMANA' ? 'selected' : '' }}>FIN DE SEMANA</option>
@@ -522,12 +513,11 @@
                                 COMPLETO DEL MEDICO</th>
                             <th colspan="2" rowspan="2" class="align-middle">MODALIDAD</th>
                             <th colspan="2" rowspan="2" class="align-middle">CATEGORIA</th>
-                            <th rowspan="3" class="vertical-text align-middle" style="width: 32px;">HORAS / DÍA</th>
+                            <th rowspan="3" class="align-middle" style="width: 32px;"><div class="v-header">HORAS / DÍA</div></th>
                             <th colspan="2" rowspan="2" class="align-middle">DIAS MES</th>
                             <th colspan="2" rowspan="2" class="align-middle">HORAS MES</th>
                             <th colspan="3" rowspan="2" class="align-middle">ATENCIONES</th>
-                            <th rowspan="3" class="vertical-text align-middle font-bold" style="width: 32px;">% RENDIMIENTO
-                            </th>
+                            <th rowspan="3" class="align-middle font-bold" style="width: 32px;"><div class="v-header">% RENDIMIENTO</div></th>
                             <th colspan="10" class="align-middle bg-oficial-main">HORAS SIN CONSULTA</th>
                             <th rowspan="3" class="align-middle" style="width: 36px; min-width: 36px;">ACCION</th>
                         </tr>
@@ -535,39 +525,37 @@
                         <tr class="header-row-mid">
                             <th colspan="7" class="align-middle bg-oficial-sub">TOTAL DE HORAS OFICIALES</th>
                             <th colspan="2" class="align-middle th-hatched" id="th_vacaciones_group">VACACIONES</th>
-                            <th rowspan="2" class="vertical-text align-middle" style="width: 30px;">PERMISOS PERSONALES.
-                            </th>
+                            <th rowspan="2" class="align-middle" style="width: 30px;"><div class="v-header">PERMISOS PERSONALES.</div></th>
                         </tr>
                         {{-- Fila 3: Subcolumnas Verticales Detalladas --}}
                         <tr class="header-row-sub">
                             {{-- Modalidad: Acuerdo rayado, Contrato activo --}}
-                            <th class="vertical-text align-middle th-hatched" style="width: 30px;">ACUERDO.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">CONTRATO.</th>
+                            <th class="align-middle th-hatched" style="width: 30px;"><div class="v-header">ACUERDO.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">CONTRATO.</div></th>
                             {{-- Categoria: Medico General activo, Especialista rayado --}}
-                            <th class="vertical-text align-middle" style="width: 30px;">MÉDICO GENERAL.</th>
-                            <th class="vertical-text align-middle th-hatched" style="width: 30px;">MÉDICO ESPECIALISTA.</th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">MÉDICO GENERAL.</div></th>
+                            <th class="align-middle th-hatched" style="width: 30px;"><div class="v-header">MÉDICO ESPECIALISTA.</div></th>
                             {{-- Días Mes --}}
-                            <th class="vertical-text align-middle" style="width: 30px;">CONTRATADOS.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">CUMPLIDOS.</th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">CONTRATADOS.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">CUMPLIDOS.</div></th>
                             {{-- Horas Mes --}}
-                            <th class="vertical-text align-middle" style="width: 32px;">CONTRATADAS.</th>
-                            <th class="vertical-text align-middle" style="width: 32px;">CUMPLIDAS.</th>
+                            <th class="align-middle" style="width: 32px;"><div class="v-header">CONTRATADAS.</div></th>
+                            <th class="align-middle" style="width: 32px;"><div class="v-header">CUMPLIDAS.</div></th>
                             {{-- Atenciones --}}
-                            <th class="vertical-text align-middle" style="width: 32px;">PROGRAMADAS.</th>
-                            <th class="vertical-text align-middle" style="width: 32px;">REPROGRAMADAS.</th>
-                            <th class="vertical-text align-middle font-bold" style="width: 34px;">ATENDIDAS.</th>
+                            <th class="align-middle" style="width: 32px;"><div class="v-header">PROGRAMADAS.</div></th>
+                            <th class="align-middle" style="width: 32px;"><div class="v-header">REPROGRAMADAS.</div></th>
+                            <th class="align-middle font-bold" style="width: 34px;"><div class="v-header">ATENDIDAS.</div></th>
                             {{-- Horas Sin Consulta: Oficiales (7) con **** OTRAS ACTIVIDADES --}}
-                            <th class="vertical-text align-middle" style="width: 30px;">FERIADOS / COMPENSATORIOS</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">ESFAM.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">**** OTRAS ACTIVIDADES</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">CONGRESOS / TALLERES.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">INVESTIGACION DE CAMPO.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">ACTIVIDADES UNIVERSIDAD.</th>
-                            <th class="vertical-text align-middle" style="width: 30px;">CITAS, INCAPACIDADES IHSS / PRIVADA.
-                            </th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">FERIADOS / COMPENSATORIOS</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">ESFAM.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">**** OTRAS ACTIVIDADES</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">CONGRESOS / TALLERES.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">INVESTIGACION DE CAMPO.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">ACTIVIDADES UNIVERSIDAD.</div></th>
+                            <th class="align-middle" style="width: 30px;"><div class="v-header">CITAS, INCAPACIDADES IHSS / PRIVADA.</div></th>
                             {{-- Horas Sin Consulta: Vacaciones rayadas --}}
-                            <th class="vertical-text align-middle th-hatched" style="width: 30px;">ORDINARIAS.</th>
-                            <th class="vertical-text align-middle th-hatched" style="width: 30px;">PROFILACTICAS.</th>
+                            <th class="align-middle th-hatched" style="width: 30px;"><div class="v-header">ORDINARIAS.</div></th>
+                            <th class="align-middle th-hatched" style="width: 30px;"><div class="v-header">PROFILACTICAS.</div></th>
                         </tr>
                     </thead>
                     @include('informes.hora_medico_table')
@@ -584,28 +572,8 @@
 
     <script>
         function syncStickyHeaderOffsets() {
-            const row1 = document.querySelector('#mainTable thead tr.header-row-main');
-            const row2 = document.querySelector('#mainTable thead tr.header-row-mid');
-            const row3 = document.querySelector('#mainTable thead tr.header-row-sub');
-
-            if (!row1 || !row2 || !row3) return;
-
-            const h1 = row1.getBoundingClientRect().height;
-            const h2 = row2.getBoundingClientRect().height;
-
-            row2.querySelectorAll('th').forEach(th => {
-                th.style.top = `${h1}px`;
-            });
-
-            row3.querySelectorAll('th').forEach(th => {
-                th.style.top = `${h1 + h2}px`;
-            });
+            // El thead completo tiene position: sticky sin desfasar las filas
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            syncStickyHeaderOffsets();
-            window.addEventListener('resize', syncStickyHeaderOffsets);
-        });
 
         function updateFilters() {
             let ano = $('[name="ano"]').val();

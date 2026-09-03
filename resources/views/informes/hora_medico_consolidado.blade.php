@@ -418,6 +418,9 @@
                     <div style="width: 175px;">
                         <select name="jornada" class="filter-select w-full" onchange="updateFilters()">
                             <option value="TOTAL JORNADAS" {{ ($jornada == 'TOTAL JORNADAS' || $jornada == 'TODAS LAS JORNADAS' || $jornada == 'SERVICIO SOCIAL') ? 'selected' : '' }}>TOTAL JORNADAS</option>
+                            @if(!empty($onlySS))
+                                <option value="CONGLOMERADO SOCIALES" {{ $jornada == 'CONGLOMERADO SOCIALES' ? 'selected' : '' }}>CONGLOMERADO SOCIALES</option>
+                            @endif
                             <option value="MATUTINA" {{ $jornada == 'MATUTINA' ? 'selected' : '' }}>MATUTINA</option>
                             <option value="VESPERTINA" {{ $jornada == 'VESPERTINA' ? 'selected' : '' }}>VESPERTINA</option>
                             <option value="FIN DE SEMANA" {{ $jornada == 'FIN DE SEMANA' ? 'selected' : '' }}>FIN DE SEMANA</option>

@@ -517,7 +517,7 @@
 
         $('#addMedicoModal').on('show.bs.modal', function() {
             let activeJor = $('[name="jornada"]').val() || 'TODAS';
-            if (activeJor === 'SERVICIO SOCIAL' || activeJor === 'TOTAL JORNADAS') {
+            if (activeJor === 'SERVICIO SOCIAL' || activeJor === 'TOTAL JORNADAS' || activeJor === 'CONGLOMERADO SOCIALES') {
                 activeJor = 'TODAS';
             }
             if ($('#filter_add_jornada option[value="' + activeJor + '"]').length > 0) {

@@ -12,7 +12,7 @@
         /* ─── Configuración de Página: Ajustado al Área de Impresión (Landscape / Oficio) ─── */
         @page {
             size: landscape;
-            margin: 2mm 2mm 2mm 2mm;
+            margin: 4mm 8mm 4mm 8mm;
         }
 
         * {
@@ -38,7 +38,7 @@
         .print-sheet {
             width: 100%;
             max-width: 1350px;
-            padding: 3mm 5mm 2mm 5mm;
+            padding: 3mm 8mm 2mm 8mm;
             margin: 10px auto;
             background: #ffffff;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
@@ -72,17 +72,20 @@
                 margin: 0 !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                height: 100% !important;
-                max-height: 100vh !important;
+                height: auto !important;
+                min-height: 98% !important;
                 padding: 0 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
                 gap: 2px !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
+                page-break-after: always !important;
                 page-break-inside: avoid !important;
                 overflow: hidden !important;
+            }
+
+            .print-sheet:last-of-type {
+                page-break-after: avoid !important;
             }
 
             .no-print {
@@ -104,17 +107,21 @@
                 max-width: 1350px;
                 min-height: 215mm;
                 margin: 15px auto;
-                padding: 4mm 6mm;
+                padding: 4mm 8mm;
             }
         }
 
         /* ─── Encabezado Oficial Full HD (Negrita y Todo Subrayado) ─── */
         .header-grid {
             display: grid;
-            grid-template-columns: 22% 56% 22%;
+            grid-template-columns: 18% 64% 18%;
             align-items: center;
             width: 100%;
             margin-bottom: 5px;
+        }
+
+        .resizable-logo-container {
+            max-width: 100%;
         }
 
         .header-title-box {
@@ -264,26 +271,28 @@
         /* ─── Pie de Página: Notas Oficiales Full HD ─── */
         .print-footer-notes {
             display: grid;
-            grid-template-columns: 45% 55%;
-            gap: 8px;
-            font-size: 0.49rem;
-            font-weight: 900;
-            line-height: 1.45;
+            grid-template-columns: 47% 53%;
+            gap: 10px;
+            width: 100%;
+            max-width: 100%;
+            font-size: 0.47rem;
+            font-weight: 800;
+            line-height: 1.35;
             border-top: none !important;
-            padding-top: 3px !important;
+            padding-top: 2px !important;
             margin-top: 2px !important;
             text-align: left !important;
-            white-space: nowrap !important;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .print-footer-notes .notes-col {
             text-align: left !important;
-            white-space: nowrap !important;
         }
 
         .print-footer-notes .notes-col div {
             white-space: nowrap !important;
-            padding: 1.5px 0 !important;
+            padding: 0.5px 0 !important;
         }
 
         /* ─── Toolbar Flotante de Controles (Solo en Pantalla) ─── */
@@ -393,7 +402,7 @@
 
     @foreach($jornadasSheets as $currentJornada => $doctorList)
         @php
-            $MAX_ROWS = 25;
+            $MAX_ROWS = max(25, count($doctorList));
             $docCount = count($doctorList);
         @endphp
 
@@ -440,7 +449,7 @@
                 <div class="header-info-bar">
                     <div>ESTABLECIMIENTO DE SALUD: <span class="val"
                             id="lbl-establecimiento">{{ $nombreEstablecimiento }}</span></div>
-                    <div>JORNADA: <span class="val">{{ $currentJornada }}{{ !empty($onlySS) ? ' (SERVICIO SOCIAL)' : '' }}</span></div>
+                    <div>JORNADA: <span class="val">{{ $currentJornada === 'CONGLOMERADO SOCIALES' ? 'CONGLOMERADO SOCIALES' : ($currentJornada . (!empty($onlySS) ? ' (SERVICIO SOCIAL)' : '')) }}</span></div>
                     <div>MES: <span class="val">{{ $mesNombre }}</span></div>
                     <div>AÑO: <span class="val">{{ $ano }}</span></div>
                 </div>
@@ -506,7 +515,7 @@
                     <div>*** COLOCAR EL PERSONAL QUE ESTE DE VACACIONES / INCAPACITADO / TRASLADO (DE LO CONTRARIO SE REPORTARA COMO FALTANTE)</div>
                     <div>*** COLOCAR FECHA DE INICIO Y DE FINAL DE CADA MEDICO EN SERVICIO SOCIAL.</div>
                     <div>*** LLENAR UNA HOJA POR JORNADA (MATUTINA, VESPERTINA, FIN DE SEMANA Y SERVICIO SOCIAL).</div>
-                    <div>*** <span style="color: #dc2626; font-weight: bold;">OTRAS ACTIVIDADES</span> = SOLICITUD Y RECEPCIÓN DE INSUMOS, REALIZACIÓN Y ENTREGA DE INFORMES, ACT EXTRAMUROS, CLUB DE ENFERMOS CRONICOS, EMBARAZADAS, CHARLAS, TAMIZAJES, REUNION INTERSECTORIALES, OTROS.</div>
+                    <div>*** <span style="color: #dc2626; font-weight: bold;">OTRAS ACTIVIDADES</span> = SOLICITUD Y RECEPCIÓN DE INSUMOS, REALIZACIÓN Y ENTREGA DE INFORMES, ACT EXTRAMUROS,<br>CLUB DE ENFERMOS CRONICOS, EMBARAZADAS, CHARLAS, TAMIZAJES, REUNION INTERSECTORIALES, OTROS.</div>
                 </div>
             </div>
         </div>

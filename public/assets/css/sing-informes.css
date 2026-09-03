@@ -2252,25 +2252,31 @@ html.dark #consolidadoTable td.sticky-col-2,
   background-color: var(--bg-surface-alt, #e2e8f0) !important;
   color: var(--text-primary, #0f172a) !important;
   border: 1px solid #94a3b8 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
   box-sizing: border-box !important;
 }
 
-#mainTable thead tr.header-row-main th {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 60 !important;
-}
-
-#mainTable thead tr.header-row-mid th {
-  position: sticky !important;
-  top: 28px !important;
-  z-index: 55 !important;
-}
-
+#mainTable thead tr.header-row-main th,
+#mainTable thead tr.header-row-mid th,
 #mainTable thead tr.header-row-sub th {
-  position: sticky !important;
-  top: 54px !important;
-  z-index: 50 !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+.v-header {
+  writing-mode: vertical-rl !important;
+  transform: rotate(180deg) !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  font-size: 0.54rem !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  display: inline-block !important;
+  letter-spacing: 0px !important;
+  line-height: 1.08 !important;
+  padding: 1px 0 !important;
 }
 
 /* Celdas de esquina en thead (N° y Nombre del Médico): máxima prioridad z-index: 120 */

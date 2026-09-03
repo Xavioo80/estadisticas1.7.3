@@ -303,7 +303,7 @@ class HoraMedicoController extends Controller
             ->whereNotNull('medico')
             ->where('medico', '!=', '');
 
-        $isAllJornadas = in_array($jornada, ['TOTAL JORNADAS', 'TODAS LAS JORNADAS', 'TODAS', 'SERVICIO SOCIAL']);
+        $isAllJornadas = in_array($jornada, ['TOTAL JORNADAS', 'TODAS LAS JORNADAS', 'TODAS', 'SERVICIO SOCIAL', 'CONGLOMERADO SOCIALES', 'CONGLOMERADO']);
         $isSpecificJornada = !$isAllJornadas;
 
         // For specific jornada (not totals), also filter RG by jornada
@@ -411,7 +411,12 @@ class HoraMedicoController extends Controller
             $rawHrs = $medico->HORAS_CONTRATADAS ?: 0;
             $horasPorDia = ($rawHrs > 12) ? ($rawHrs / 5) : $rawHrs;
 
-            $diasContratados = ($jornada === 'FIN DE SEMANA') ? $diasFinSemana : $diasLaborables;
+            $medicoJornada = strtoupper($medico->JORNADA ?? '');
+            if ($jornada === 'CONGLOMERADO SOCIALES' || $jornada === 'CONGLOMERADO' || $jornada === 'TOTAL JORNADAS' || $jornada === 'TODAS LAS JORNADAS') {
+                $diasContratados = ($medicoJornada === 'FIN DE SEMANA') ? $diasFinSemana : $diasLaborables;
+            } else {
+                $diasContratados = ($jornada === 'FIN DE SEMANA') ? $diasFinSemana : $diasLaborables;
+            }
             if ($hsc && $hsc->dias_contratados > 0) {
                 $diasContratados = $hsc->dias_contratados;
             }
@@ -573,7 +578,7 @@ class HoraMedicoController extends Controller
             if ($anos->isEmpty())
                 $anos = [date('Y')];
             $meses = array_keys($this->mesMap);
-            $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+            $jornadas = ['TOTAL JORNADAS', 'CONGLOMERADO SOCIALES', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
 
             return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico_sociales', compact(
                 'dataByJornada', 'data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'jornadas', 'diasLaborables', 'diasFinSemana',
@@ -586,7 +591,7 @@ class HoraMedicoController extends Controller
         if ($anos->isEmpty())
             $anos = [date('Y')];
         $meses = array_keys($this->mesMap);
-        $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+        $jornadas = ['TOTAL JORNADAS', 'CONGLOMERADO SOCIALES', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
 
         return view($request->ajax() ? 'informes.hora_medico_table' : 'informes.hora_medico_sociales', compact(
             'data', 'ano', 'mesNombre', 'jornada', 'meses', 'anos', 'jornadas', 'diasLaborables', 'diasFinSemana',
@@ -835,7 +840,9 @@ class HoraMedicoController extends Controller
             $anos = [date('Y'), date('Y') - 1];
         }
         $meses = array_keys($this->mesMap);
-        $jornadas = ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
+        $jornadas = $onlySS
+            ? ['TOTAL JORNADAS', 'CONGLOMERADO SOCIALES', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA']
+            : ['TOTAL JORNADAS', 'MATUTINA', 'VESPERTINA', 'FIN DE SEMANA'];
         $settings = Setting::pluck('value', 'key');
         $currentDirectorId = Setting::where('key', "director_medico_id_{$ano}_{$mes}")->value('value') ?: Setting::where('key', 'director_medico_id')->value('value');
         if ($onlySS) {
